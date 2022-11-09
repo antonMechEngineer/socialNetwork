@@ -22,7 +22,7 @@ public class Notification {
     private Timestamp sentTime;
 
     @Column(name = "person_id")
-    private long personID;
+    private Person person;
 
     @Column(name = "entity_id")
     private long entityID;
