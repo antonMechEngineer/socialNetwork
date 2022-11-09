@@ -11,3 +11,12 @@ spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation: true
 
 
 
+#team30BackendParams
+team30Backend:
+  default:
+    page: 0
+    size: 20
+
+
+
+
