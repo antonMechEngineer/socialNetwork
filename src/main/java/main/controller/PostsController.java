@@ -29,6 +29,8 @@ public class PostsController {
     public ResponseEntity<ListResponseRsPostRs> getFeeds(
             @RequestParam(name = "page", required = false, defaultValue = "${team30Backend.default.page}") int page,
             @RequestParam(name = "size", required = false, defaultValue = "${team30Backend.default.size}") int size) {
+        System.out.println(page);
+        System.out.println(size);
         Page<Post> postList = postsService.getAllPosts(page, size);
         return ResponseEntity.status(HttpStatus.OK).body(new ListResponseRsPostRs(
                 "success",
