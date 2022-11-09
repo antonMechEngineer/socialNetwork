@@ -17,14 +17,13 @@ public class Message {
 
     private Timestamp time;
 
+    @ManyToOne
     @Column(name = "author_id")
-    private long authorID;
+    private Person author;
 
+    @ManyToOne
     @Column(name = "recipient_id")
-    private long recipientID;
-
-    @Column(name = "second_person_id")
-    private long secondPersonID;
+    private Person recipient;
 
     @Column(name = "message_text", length = 10000)
     private String messageText;
@@ -32,8 +31,9 @@ public class Message {
     @Column(name = "read_status")
     private String readStatus;
 
+    @ManyToOne
     @Column(name = "dialog_id")
-    private long dialogID;
+    private Dialog dialog;
 
     @Column(name = "is_deleted")
     private boolean isDeleted;

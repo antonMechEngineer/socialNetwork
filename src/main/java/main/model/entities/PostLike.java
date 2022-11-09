@@ -17,8 +17,9 @@ public class PostLike {
 
     private Timestamp time;
 
+    @ManyToOne
     @Column(name = "person_id")
-    private long personID;
+    private Person person;
 
     @Column(name = "post_id")
     private long postID;

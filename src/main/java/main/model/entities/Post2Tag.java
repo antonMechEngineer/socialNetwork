@@ -14,8 +14,9 @@ public class Post2Tag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @ManyToOne
     @Column(name = "tag_id")
-    private long tagID;
+    private Tag tag;
 
     @Column(name = "post_id")
     private long postID;

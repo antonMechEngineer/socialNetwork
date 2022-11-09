@@ -13,13 +13,20 @@ public class Friendship {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @OneToOne
     @Column(name = "status_id")
-    private long statusID;
+    private FriendshipStatus friendshipStatus;
+
     @Column(name = "sent_time")
     private Timestamp sentTime;
+
+    @ManyToOne
     @Column(name = "src_person_id")
-    private long srcPersonID;
+    private Person srcPerson;
+
+    @ManyToOne
     @Column(name = "dst_person_id")
-    private long dstPersonID;
+    private Person dstPerson;
 
 }

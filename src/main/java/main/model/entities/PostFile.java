@@ -14,8 +14,9 @@ public class PostFile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @ManyToOne
     @Column(name = "post_id")
-    private long postID;
+    private Post post;
 
     private long name;
     private long path;

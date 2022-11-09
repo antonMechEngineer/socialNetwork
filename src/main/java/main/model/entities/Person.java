@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Getter
@@ -64,4 +65,35 @@ public class Person {
 
     @Column(name = "deleted_time")
     private Timestamp deletedTime;
+
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    private List<Friendship> friendships;
+
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    private List<BlockHistory> blockHistories;
+
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    private List<Post> posts;
+
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    private List<PostComment> postComments;
+
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    private List<PersonSettings> personSettings;
+
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    private List<Notification> notifications;
+
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    private List<Dialog> dialogs;
+
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    private List<Message> messages;
+
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    private List<PostLike> postLikes;
+
+    // TODO: 09.11.2022 можно через join проложить связи до friendship_status и post_file но не уверен что, нужно
+
+
 }
