@@ -1,4 +1,4 @@
-package main.repositories;
+package main.repository;
 
 import main.model.entities.Captcha;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,4 +1,4 @@
-package main.repositories;
+package main.repository;
 
 import main.model.entities.Post;
 import org.springframework.data.domain.Page;
