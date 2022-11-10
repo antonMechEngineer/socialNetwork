@@ -15,7 +15,7 @@ public class Post {
     private Timestamp time;
 
     @ManyToOne
-    @Column(name = "author_id")
+    @JoinColumn(name = "author_id")
     private Person author;
 
     @Column(name = "title")

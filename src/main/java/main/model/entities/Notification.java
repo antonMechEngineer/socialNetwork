@@ -19,7 +19,7 @@ public class Notification {
     private Timestamp sentTime;
 
     @ManyToOne
-    @Column(name = "person_id")
+    @JoinColumn(name = "person_id")
     private Person person;
 
     @Column(name = "entity_id")

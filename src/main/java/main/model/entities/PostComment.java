@@ -14,15 +14,15 @@ public class PostComment {
     private Timestamp time;
 
     @ManyToOne
-    @Column(name = "post_id")
+    @JoinColumn(name = "post_id")
     private Post post;
 
     @OneToOne
-    @Column(name = "parent_id")
+    @JoinColumn(name = "parent_id")
     private PostComment postComment; // TODO: 10.11.2022 самозамыкание!
 
     @ManyToOne
-    @Column(name = "author_id")
+    @JoinColumn(name = "author_id")
     private Person person;
 
     private String password;

@@ -12,7 +12,7 @@ public class PostFile {
     private Long id;
 
     @ManyToOne
-    @Column(name = "post_id")
+    @JoinColumn(name = "post_id")
     private Post post;
 
     private long name;
