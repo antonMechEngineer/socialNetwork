@@ -1,4 +1,4 @@
-package main.model.entities;
+package main.config.entities;
 import lombok.Data;
 import javax.persistence.*;
 @Entity

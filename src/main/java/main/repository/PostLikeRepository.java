@@ -1,5 +1,5 @@
 package main.repository;
-import main.model.entities.PostLike;
+import main.config.entities.PostLike;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

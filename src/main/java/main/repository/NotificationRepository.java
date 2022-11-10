@@ -1,6 +1,6 @@
 package main.repository;
 
-import main.model.entities.Notification;
+import main.config.entities.Notification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

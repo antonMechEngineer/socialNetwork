@@ -1,6 +1,6 @@
 package main.repository;
 
-import main.model.entities.PersonSettings;
+import main.config.entities.PersonSettings;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

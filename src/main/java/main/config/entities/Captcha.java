@@ -1,20 +1,19 @@
-package main.model.entities;
+package main.config.entities;
 
 import lombok.Data;
 import javax.persistence.*;
 import java.sql.Timestamp;
 
-
 @Entity
 @Data
-@Table(name = "friendship_status")
-public class FriendshipStatus {
+@Table(name = "captcha")
+public class Captcha {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Timestamp time;
-    private String name;
     private String code;
-
+    @Column(name = "secret_code")
+    private String secretCode;
 
 }

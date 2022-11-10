@@ -1,5 +1,5 @@
 package main.repository;
-import main.model.entities.PostComment;
+import main.config.entities.PostComment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
