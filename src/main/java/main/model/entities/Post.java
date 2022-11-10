@@ -1,20 +1,16 @@
 package main.model.entities;
-
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.Data;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(name = "post")
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     private Timestamp time;
 
@@ -29,10 +25,10 @@ public class Post {
     private String postText;
 
     @Column (name = "is_blocked")
-    private boolean isBlocked;
+    private Boolean isBlocked;
 
     @Column (name = "is_deleted")
-    private boolean isDeleted;
+    private Boolean isDeleted;
 
     @Column (name = "time_delete")
     private Timestamp timeDelete;
@@ -42,9 +38,6 @@ public class Post {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<PostComment> postComments;
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    private List<BlockHistory> blockHistories; // TODO: 09.11.2022 не уверен в связи, не очень понимаю что такое block_history
 
 
 }

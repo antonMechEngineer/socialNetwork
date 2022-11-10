@@ -1,19 +1,16 @@
 package main.model.entities;
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.Data;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(name = "dialog")
 public class Dialog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @ManyToOne
     @Column(name = "first_person_id")
