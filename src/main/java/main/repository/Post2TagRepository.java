@@ -1,5 +1,5 @@
 package main.repository;
-import main.model.entities.Post2Tag;
+import main.config.entities.Post2Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

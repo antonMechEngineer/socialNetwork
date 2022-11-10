@@ -2,7 +2,7 @@ package main.api.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import main.model.entities.Post;
+import main.config.entities.Post;
 
 import java.util.List;
 

@@ -1,5 +1,5 @@
 package main.repository;
-import main.model.entities.Dialog;
+import main.config.entities.Dialog;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

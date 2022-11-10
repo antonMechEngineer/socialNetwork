@@ -1,4 +1,4 @@
-package main.model.entities;
+package main.config.entities;
 import lombok.Data;
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -62,13 +62,13 @@ public class Person {
     @Column(name = "deleted_time")
     private Timestamp deletedTime;
 
-    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "srcPerson", cascade = CascadeType.ALL)
     private List<Friendship> friendships;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
     private List<BlockHistory> blockHistories;
 
-    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List<Post> posts;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
@@ -80,10 +80,13 @@ public class Person {
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
     private List<Notification> notifications;
 
-    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
-    private List<Dialog> dialogs;
+    @OneToMany(mappedBy = "firstPerson", cascade = CascadeType.ALL)
+    private List<Dialog> firstPersonDialogs;
 
-    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "secondPerson", cascade = CascadeType.ALL)
+    private List<Dialog> secondPersonDialogs;
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List<Message> messages;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
