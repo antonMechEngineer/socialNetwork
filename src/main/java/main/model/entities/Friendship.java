@@ -12,18 +12,18 @@ public class Friendship {
     private Long id;
 
     @OneToOne
-    @Column(name = "status_id")
+    @JoinColumn(name = "status_id")
     private FriendshipStatus friendshipStatus;
 
-    @Column(name = "sent_time")
+    @JoinColumn(name = "sent_time")
     private Timestamp sentTime;
 
     @ManyToOne
-    @Column(name = "src_person_id")
+    @JoinColumn(name = "src_person_id")
     private Person srcPerson;
 
     @ManyToOne
-    @Column(name = "dst_person_id")
+    @JoinColumn(name = "dst_person_id")
     private Person dstPerson;
 
 }

@@ -10,7 +10,7 @@ public class Post2Tag {
     private Long id;
 
     @ManyToOne
-    @Column(name = "tag_id")
+    @JoinColumn(name = "tag_id")
     private Tag tag;
 
     @Column(name = "post_id")

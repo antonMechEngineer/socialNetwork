@@ -13,15 +13,15 @@ public class Dialog {
     private Long id;
 
     @ManyToOne
-    @Column(name = "first_person_id")
+    @JoinColumn(name = "first_person_id")
     private Person firstPerson;
 
     @ManyToOne
-    @Column(name = "second_person_id")
+    @JoinColumn(name = "second_person_id")
     private Person secondPerson;
 
     @OneToOne
-    @Column(name = "last_message_id")
+    @JoinColumn(name = "last_message_id")
     private Message message;
 
     @Column(name = "last_time_active")

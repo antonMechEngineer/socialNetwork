@@ -15,11 +15,11 @@ public class Message {
     private Timestamp time;
 
     @ManyToOne
-    @Column(name = "author_id")
+    @JoinColumn(name = "author_id")
     private Person author;
 
     @ManyToOne
-    @Column(name = "recipient_id")
+    @JoinColumn(name = "recipient_id")
     private Person recipient;
 
     @Column(name = "message_text", length = 10000)
@@ -29,7 +29,7 @@ public class Message {
     private String readStatus;
 
     @ManyToOne
-    @Column(name = "dialog_id")
+    @JoinColumn(name = "dialog_id")
     private Dialog dialog;
 
     @Column(name = "is_deleted")

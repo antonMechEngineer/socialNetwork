@@ -10,7 +10,7 @@ public class PersonSettings {
     private Long id;
 
     @ManyToOne
-    @Column(name = "person_id")
+    @JoinColumn(name = "person_id")
     private Person person;
 
     @Column(name = "post_comment_notification")
