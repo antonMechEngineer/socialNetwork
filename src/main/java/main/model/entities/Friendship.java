@@ -1,18 +1,15 @@
 package main.model.entities;
 
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.Data;
 import javax.persistence.*;
 import java.sql.Timestamp;
 @Entity
-@Getter
-@Setter
+@Data
 @Table(name = "friendship")
 public class Friendship {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @OneToOne
     @Column(name = "status_id")

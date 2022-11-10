@@ -1,19 +1,16 @@
 package main.model.entities;
 
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.Data;
 import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(name = "post_like")
 public class PostLike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     private Timestamp time;
 
@@ -22,7 +19,7 @@ public class PostLike {
     private Person person;
 
     @Column(name = "post_id")
-    private long postID;
+    private Long postID;
 
     private String type;
 

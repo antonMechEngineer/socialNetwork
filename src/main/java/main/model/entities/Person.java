@@ -1,20 +1,16 @@
 package main.model.entities;
-
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.Data;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(name = "person")
 public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(name = "first_name")
     private String firstName;
@@ -37,10 +33,10 @@ public class Person {
     private String country;
 
     @Column(name = "confirmation_code")
-    private long confirmationCode;
+    private Long confirmationCode;
 
     @Column(name = "is_approved")
-    private boolean isApproved;
+    private Boolean isApproved;
 
     @Column (name = "message_permission")
     private String messagePermission;
@@ -49,7 +45,7 @@ public class Person {
     private Timestamp lastOnlineTime;
 
     @Column(name = "is_blocked")
-    private boolean isBlocked;
+    private Boolean isBlocked;
 
     @Column (name = "change_password_token")
     private String changePasswordToken;
@@ -61,7 +57,7 @@ public class Person {
     private String onlineStatus;
 
     @Column(name = "is_deleted")
-    private boolean isDeleted;
+    private Boolean isDeleted;
 
     @Column(name = "deleted_time")
     private Timestamp deletedTime;
@@ -93,7 +89,6 @@ public class Person {
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
     private List<PostLike> postLikes;
 
-    // TODO: 09.11.2022 можно через join проложить связи до friendship_status и post_file но не уверен что, нужно
 
 
 }

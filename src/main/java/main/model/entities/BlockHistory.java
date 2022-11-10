@@ -1,20 +1,15 @@
 package main.model.entities;
-
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.Data;
 import javax.persistence.*;
-import javax.xml.stream.events.Comment;
 import java.sql.Timestamp;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(name = "block_history")
 public class BlockHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     private Timestamp time;
 
@@ -22,13 +17,12 @@ public class BlockHistory {
     @Column(name = "person_id")
     private Person person;
 
-    @ManyToOne   // TODO: 09.11.2022 не уверен в связи, не очень понимаю что такое block_history
     @Column(name = "post_id")
-    private Post post;
+    private Long postId;
 
-    @ManyToOne // TODO: 09.11.2022 не уверен в связи, не очень понимаю что такое block_history
+
     @Column(name = "comment_id")
-    private Comment comment;
+    private Long commentId;
 
 
     private String action;

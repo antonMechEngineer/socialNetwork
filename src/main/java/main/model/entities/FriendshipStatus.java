@@ -1,20 +1,17 @@
 package main.model.entities;
 
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.Data;
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.List;
+
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(name = "friendship_status")
 public class FriendshipStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     private Timestamp time;
     private String name;
     private String code;
