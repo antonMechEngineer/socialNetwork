@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/chat
+    url: jdbc:postgresql://localhost:5432/network
     username: postgres
     password: 123
     driver-class-name: org.postgresql.Driver
@@ -12,8 +12,8 @@ spring:
 
 
 
-#team30BackendParams
-team30Backend:
+#applicationParams
+socialNetwork:
   default:
     page: 0
     size: 20

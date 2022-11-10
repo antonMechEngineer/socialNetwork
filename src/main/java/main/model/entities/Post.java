@@ -1,7 +1,9 @@
 package main.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
+import main.model.enums.PostTypes;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -26,4 +28,9 @@ public class Post {
     private boolean isDeleted;
     @Column (name = "time_delete")
     private Timestamp timeDelete;
+
+    @JsonProperty("type")
+    public PostTypes getPostType() {
+        return PostTypes.getType(isDeleted, time.getTime());
+    }
 }

@@ -13,8 +13,8 @@ spring:jpa:
 
 
 
-#team30BackendParams
-team30Backend:
+#applicationParams
+socialNetwork:
   default:
     page: 0
     size: 20

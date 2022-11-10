@@ -8,13 +8,12 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class ListResponseRsPostRs {
+public class PostResponse {
 
     private String error;
     private long timestamp;
-    private long total;
     private int offset;
+    private int perPage;
     private List<Post> data;
-    private int itemPerPage;
     private String errorDescription;
 }
