@@ -9,7 +9,8 @@ spring:
     hibernate:
       ddl-auto: create
 
-
+  liquibase:
+    change-log: classpath:liquibase/changelog.sql
 #team30BackendParams
 team30Backend:
   default:
