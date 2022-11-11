@@ -4,7 +4,7 @@ import com.github.cage.Cage;
 import com.github.cage.GCage;
 import lombok.AllArgsConstructor;
 import main.api.response.CaptchaRs;
-import main.model.entities.Captcha;
+import main.config.entities.Captcha;
 import main.repository.CaptchaRepository;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;

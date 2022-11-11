@@ -4,7 +4,11 @@ import lombok.AllArgsConstructor;
 import main.api.request.RegisterRq;
 import main.api.response.ComplexRs;
 import main.api.response.RegisterRs;
+<<<<<<< HEAD
 import main.model.entities.Person;
+=======
+import main.config.entities.Person;
+>>>>>>> riabchinski
 import main.repository.PersonRepository;
 import org.springframework.stereotype.Service;
 
