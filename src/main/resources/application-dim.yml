@@ -1,3 +1,8 @@
+server:
+  port: 8086
+  servlet:
+    session:
+      tracking-modes: cookie
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/social
@@ -7,7 +12,14 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
+  security:
+    user:
+      name: admin
+      password: admin
+
+jwt:
+  secret: someSecretCode
 
 #team30BackendParams
 team30Backend:
