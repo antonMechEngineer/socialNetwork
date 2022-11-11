@@ -1,7 +1,6 @@
 package main.config.entities;
 
 import lombok.Data;
-
 import javax.persistence.*;
 import java.sql.Timestamp;
 
