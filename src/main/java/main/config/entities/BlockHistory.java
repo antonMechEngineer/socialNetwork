@@ -1,25 +1,29 @@
-package main.model.entities;
-
-import lombok.Getter;
-import lombok.Setter;
-
+package main.config.entities;
+import lombok.Data;
 import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(name = "block_history")
 public class BlockHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
+
     private Timestamp time;
-    @Column(name = "person_id")
-    private long personID;
+
+    @ManyToOne
+    @JoinColumn(name = "person_id")
+    private Person person;
+
     @Column(name = "post_id")
-    private long postID;
+    private Long postId;
+
+
     @Column(name = "comment_id")
-    private long commentID;
+    private Long commentId;
+
+
     private String action;
 }

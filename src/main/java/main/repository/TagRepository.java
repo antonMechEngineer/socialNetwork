@@ -1,10 +1,8 @@
 package main.repository;
-
-import main.model.entities.Post;
+import main.config.entities.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PostsRepository extends JpaRepository<Post, Long> {
-
+public interface TagRepository extends JpaRepository<Tag, Integer> {
 }

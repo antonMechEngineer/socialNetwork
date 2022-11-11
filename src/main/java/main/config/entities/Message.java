@@ -1,30 +1,27 @@
-package main.model.entities;
+package main.config.entities;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(name = "message")
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     private Timestamp time;
 
-    @Column(name = "author_id")
-    private long authorID;
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    private Person author;
 
-    @Column(name = "recipient_id")
-    private long recipientID;
-
-    @Column(name = "second_person_id")
-    private long secondPersonID;
+    @ManyToOne
+    @JoinColumn(name = "recipient_id")
+    private Person recipient;
 
     @Column(name = "message_text", length = 10000)
     private String messageText;
@@ -32,8 +29,9 @@ public class Message {
     @Column(name = "read_status")
     private String readStatus;
 
-    @Column(name = "dialog_id")
-    private long dialogID;
+    @ManyToOne
+    @JoinColumn(name = "dialog_id")
+    private Dialog dialog;
 
     @Column(name = "is_deleted")
     private boolean isDeleted;
