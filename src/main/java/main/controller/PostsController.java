@@ -30,13 +30,13 @@ public class PostsController {
     public ResponseEntity<PostsListResponse> getFeeds(
             @RequestParam(name = "page", required = false, defaultValue = "${socialNetwork.default.page}") int page,
             @RequestParam(name = "size", required = false, defaultValue = "${socialNetwork.default.size}") int size) {
-        Page<Post> postList = postsService.getAllPosts(page, size);
+        Page<Post> postPage = postsService.getAllPosts(page, size);
         return ResponseEntity.status(HttpStatus.OK).body(new PostsListResponse(
                 "success",
                 System.currentTimeMillis(),
-                postList.getTotalElements(),
-                postList.getNumberOfElements(),
-                postList.getContent(),
+                postPage.getTotalElements(),
+                postPage.getNumberOfElements(),
+                postPage.getContent(),
                 page,
                 ""
         ));
@@ -79,8 +79,8 @@ public class PostsController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<PostResponse> deletePost(@PathVariable int id) {
-        postsService.deletePost(id);
+    public ResponseEntity<PostResponse> deletePost(@PathVariable int id) throws NoPostEntityException {
+        Post post = postsService.deletePost(id);
         return ResponseEntity.status(HttpStatus.OK).body(new PostResponse(
                 "success",
                 System.currentTimeMillis(),

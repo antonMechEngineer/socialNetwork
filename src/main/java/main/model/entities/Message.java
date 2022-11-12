@@ -38,5 +38,5 @@ public class Message {
     private Dialog dialog;
 
     @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private boolean isDeleted;
+    private Boolean isDeleted;
 }
