@@ -18,7 +18,7 @@ spring:
       name: admin
       password: admin
 
-jwt:
+auth:
   secret: someSecretCode
 
 #team30BackendParams
