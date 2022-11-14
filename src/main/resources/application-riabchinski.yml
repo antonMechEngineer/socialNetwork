@@ -27,7 +27,10 @@ spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation: true
   liquibase:
     change-log: classpath:liquibase/changelog.sql
 
-
+server:
+  port: 8086
+  servlet:
+    context-path: "/"
 #applicationParams
 socialNetwork:
   default:
