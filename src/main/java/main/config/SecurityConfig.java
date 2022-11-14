@@ -51,10 +51,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/**").authenticated()
-                .antMatchers("/login").permitAll()
+                .antMatchers("/api/v1/auth/*").permitAll()
+                .anyRequest()
+                .authenticated()
                 .and().formLogin()
-                .and().logout().deleteCookies("token");
+                .loginPage("/api/v1/auth/login").failureUrl("/api/v1/auth/login")
+                .and().logout()
+                .logoutUrl("/api/v1/auth/logout")
+                .deleteCookies("token");
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
     }

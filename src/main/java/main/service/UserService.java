@@ -1,6 +1,7 @@
 package main.service;
 
 import main.api.request.LoginRq;
+import main.api.response.LoginRs;
 import main.repository.UserRepository;
 import main.security.UserDetailsImpl;
 import main.security.UserDetailsServiceImpl;
@@ -31,19 +32,23 @@ public class UserService {
         this.jwtUtil = jwtUtil;
     }
 
-    public String login(LoginRq login) {
+    public LoginRs login(LoginRq login) {
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         login.getEmail(), login.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(auth);
-        return "login ok";
+        LoginRs loginRs = new LoginRs();
+        loginRs.setResult("true");
+        return loginRs;
     }
 
-    public String jwtLogin(LoginRq login) {
+    public LoginRs jwtLogin(LoginRq login) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 login.getEmail(), login.getPassword()));
         UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(login.getEmail());
         String jwtToken = jwtUtil.generateToken(userDetails);
-        return jwtToken;
+        LoginRs loginRs = new LoginRs();
+        loginRs.setResult(jwtToken);
+        return loginRs;
     }
 }
