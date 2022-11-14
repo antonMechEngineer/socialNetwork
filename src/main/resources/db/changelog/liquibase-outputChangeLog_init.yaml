@@ -501,7 +501,7 @@ databaseChangeLog:
             constraints:
               nullable: false
             name: comment_text
-            type: VARCHAR(255)
+            type: TEXT
         - column:
             constraints:
               nullable: false
@@ -1101,4 +1101,11 @@ databaseChangeLog:
         referencedColumnNames: id
         referencedTableName: persons
         validate: true
-
+- changeSet:
+      id: 1668264569196-49
+      author: YurK
+      changes:
+          - addUniqueConstraint:
+                columnNames: tag_id, post_id
+                constraintName: post2tag_index
+                tableName: post2tag
