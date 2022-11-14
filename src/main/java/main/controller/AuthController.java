@@ -1,5 +1,6 @@
 package main.controller;
 
+import lombok.RequiredArgsConstructor;
 import main.api.request.LoginRq;
 import main.api.response.LoginRs;
 import main.service.UserService;
@@ -16,20 +17,14 @@ import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/api/v1/auth/")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final UserService userService;
 
-    @Autowired
-    public AuthController(UserService userService) {
-        this.userService = userService;
-    }
-
     @PostMapping("/login")
-    public ResponseEntity<LoginRs> login(@RequestBody LoginRq loginRq, HttpServletResponse response) {
-        Cookie cookie = new Cookie("token", "true");
-        response.addCookie(cookie);
-        return ResponseEntity.ok(userService.jwtLogin(loginRq));
+    public ResponseEntity<LoginRs> login(@RequestBody LoginRq loginRq) {
+        return ResponseEntity.ok(userService.login(loginRq));
     }
 
     @PostMapping("/logout")

@@ -1,5 +1,7 @@
 package main.security;
 
+import lombok.Builder;
+import lombok.Data;
 import main.model.entities.Person;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -8,13 +10,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Arrays;
 import java.util.Collection;
 
+@Data
+@Builder
 public class UserDetailsImpl implements UserDetails {
 
-    private final Person user;
-
-    public UserDetailsImpl(Person user) {
-        this.user = user;
-    }
+    private final String email;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -23,12 +23,12 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return "";
     }
 
     @Override
     public String getUsername() {
-        return user.getEmail();
+        return email;
     }
 
     @Override

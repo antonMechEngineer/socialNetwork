@@ -1,8 +1,5 @@
 server:
   port: 8086
-  servlet:
-    session:
-      tracking-modes: cookie
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/social
