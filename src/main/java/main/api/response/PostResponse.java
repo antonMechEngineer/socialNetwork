@@ -9,7 +9,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class PostResponse {
-
     private String error;
     private long timestamp;
     private int offset;
