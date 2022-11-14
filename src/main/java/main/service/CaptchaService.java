@@ -4,15 +4,14 @@ import com.github.cage.Cage;
 import com.github.cage.GCage;
 import lombok.AllArgsConstructor;
 import main.api.response.CaptchaRs;
-import main.config.entities.Captcha;
+import main.model.entities.Captcha;
 import main.repository.CaptchaRepository;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Base64;
-import java.util.Date;
 import java.util.UUID;
 
 @Service
@@ -31,7 +30,7 @@ public class CaptchaService {
         Captcha captcha = new Captcha();
         captcha.setCode(code);
         captcha.setSecretCode(secret);
-        captcha.setTime((Timestamp) new Date());
+        captcha.setTime(LocalDateTime.now());
         captchaRepository.save(captcha);
         captchaResponse.setCode(secret);
         captchaResponse.setImage(image);

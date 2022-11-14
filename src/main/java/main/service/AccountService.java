@@ -4,20 +4,19 @@ import lombok.AllArgsConstructor;
 import main.api.request.RegisterRq;
 import main.api.response.ComplexRs;
 import main.api.response.RegisterRs;
-import main.config.entities.Captcha;
-import main.config.entities.Person;
+import main.model.entities.Captcha;
+import main.model.entities.Person;
 import main.repository.CaptchaRepository;
-import main.repository.PersonRepository;
+import main.repository.PersonsRepository;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class AccountService {
-    private final PersonRepository personRepository;
+    private final PersonsRepository personsRepository;
     private final CaptchaRepository captchaRepository;
 
     public RegisterRs getRegResponse(RegisterRq regRequest){
@@ -51,8 +50,8 @@ public class AccountService {
             person.setFirstName(regRequest.getFirstName());
             person.setLastName(regRequest.getLastName());
             person.setPassword(regRequest.getPasswd1());
-            person.setRegDate((Timestamp) new Date());
-            personRepository.save(person);
+            person.setRegDate(LocalDateTime.now());
+            personsRepository.save(person);
         }
 
         return registerRs;

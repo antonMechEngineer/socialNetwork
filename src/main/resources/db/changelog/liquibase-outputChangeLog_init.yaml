@@ -1,0 +1,1104 @@
+databaseChangeLog:
+- changeSet:
+    id: 1668264569196-1
+    author: YurK
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: block_history_pkey
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: BLOCK
+            name: action
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: time
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            name: comment_id
+            type: BIGINT
+        - column:
+            name: person_id
+            type: BIGINT
+        - column:
+            name: post_id
+            type: BIGINT
+        tableName: block_history
+- changeSet:
+    id: 1668264569196-2
+    author: YurK
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: captcha_pkey
+            name: id
+            type: BIGINT
+        - column:
+            name: code
+            type: VARCHAR(255)
+        - column:
+            name: secret_code
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: time
+            type: TIMESTAMP WITHOUT TIME ZONE
+        tableName: captcha
+- changeSet:
+    id: 1668264569196-3
+    author: YurK
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: cities_pkey
+            name: id
+            type: BIGINT
+        - column:
+            name: clouds
+            type: VARCHAR(255)
+        - column:
+            name: temp
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: title
+            type: VARCHAR(255)
+        - column:
+            name: country_id
+            type: BIGINT
+        tableName: cities
+- changeSet:
+    id: 1668264569196-4
+    author: YurK
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: countries_pkey
+            name: id
+            type: BIGINT
+        - column:
+            name: title
+            type: VARCHAR(255)
+        tableName: countries
+- changeSet:
+    id: 1668264569196-5
+    author: YurK
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: currencies_pkey
+            name: id
+            type: BIGINT
+        - column:
+            name: name
+            type: VARCHAR(255)
+        - column:
+            name: price
+            type: VARCHAR(255)
+        tableName: currencies
+- changeSet:
+    id: 1668264569196-6
+    author: YurK
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: dialogs_pkey
+            name: id
+            type: BIGINT
+        - column:
+            name: last_time_active
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            name: first_person_id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: second_person_id
+            type: BIGINT
+        tableName: dialogs
+- changeSet:
+    id: 1668264569196-7
+    author: YurK
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: friendship_statuses_pkey
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: code
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: name
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: time
+            type: TIMESTAMP WITHOUT TIME ZONE
+        tableName: friendship_statuses
+- changeSet:
+    id: 1668264569196-8
+    author: YurK
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: friendships_pkey
+            name: id
+            type: BIGINT
+        - column:
+            name: sent_time
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            name: dst_person_id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: status_id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: src_person_id
+            type: BIGINT
+        tableName: friendships
+- changeSet:
+    id: 1668264569196-9
+    author: YurK
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: messages_pkey
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: false
+            name: is_deleted
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: message_text
+            type: TEXT
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: SENT
+            name: read_status
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: time
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            name: author_id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: dialog_id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: recipient_id
+            type: BIGINT
+        tableName: messages
+- changeSet:
+    id: 1668264569196-10
+    author: YurK
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: notifications_pkey
+            name: id
+            type: BIGINT
+        - column:
+            name: contact
+            type: VARCHAR(255)
+        - column:
+            name: notification_type
+            type: VARCHAR(255)
+        - column:
+            name: entity_id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: false
+            name: is_read
+            type: BOOLEAN
+        - column:
+            name: sent_time
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            name: person_id
+            type: BIGINT
+        tableName: notifications
+- changeSet:
+    id: 1668264569196-11
+    author: YurK
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: person_settings_pkey
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: true
+            name: comment_comment_notification
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: true
+            name: friend_birthday_notification
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: true
+            name: friend_request_notification
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: true
+            name: like_notification
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: true
+            name: message_notification
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: true
+            name: post_comment_notification
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: true
+            name: post_notification
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: person_id
+            type: BIGINT
+        tableName: person_settings
+- changeSet:
+    id: 1668264569196-12
+    author: YurK
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: persons_pkey
+            name: id
+            type: BIGINT
+        - column:
+            name: about
+            type: VARCHAR(255)
+        - column:
+            name: birth_date
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            name: change_password_token
+            type: VARCHAR(255)
+        - column:
+            name: confirmation_code
+            type: INTEGER
+        - column:
+            name: deleted_time
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            name: email
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: first_name
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: false
+            name: is_approved
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: false
+            name: is_blocked
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: false
+            name: is_deleted
+            type: BOOLEAN
+        - column:
+            name: last_name
+            type: VARCHAR(255)
+        - column:
+            name: last_online_time
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: ALL
+            name: message_permission
+            type: VARCHAR(255)
+        - column:
+            name: notifications_session_id
+            type: VARCHAR(255)
+        - column:
+            name: online_status
+            type: VARCHAR(255)
+        - column:
+            name: password
+            type: VARCHAR(255)
+        - column:
+            name: phone
+            type: VARCHAR(255)
+        - column:
+            name: photo
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: reg_date
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            name: city_id
+            type: BIGINT
+        tableName: persons
+- changeSet:
+    id: 1668264569196-13
+    author: YurK
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: post2tag_pkey
+            name: id
+            type: BIGINT
+        - column:
+            name: post_id
+            type: BIGINT
+        - column:
+            name: tag_id
+            type: BIGINT
+        tableName: post2tag
+- changeSet:
+    id: 1668264569196-14
+    author: YurK
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: post_comments_pkey
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: comment_text
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: false
+            name: is_blocked
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: false
+            name: is_deleted
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: time
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            name: parent_id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: author_id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: post_id
+            type: BIGINT
+        tableName: post_comments
+- changeSet:
+    id: 1668264569196-15
+    author: YurK
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: post_files_pkey
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: name
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: path
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: post_id
+            type: BIGINT
+        tableName: post_files
+- changeSet:
+    id: 1668264569196-16
+    author: YurK
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: post_likes_pkey
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: time
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            name: type
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: person_id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: post_id
+            type: BIGINT
+        tableName: post_likes
+- changeSet:
+    id: 1668264569196-17
+    author: YurK
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: posts_pkey
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: false
+            name: is_blocked
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: false
+            name: is_deleted
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: post_text
+            type: TEXT
+        - column:
+            constraints:
+              nullable: false
+            name: time
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            name: time_delete
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            name: title
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: author_id
+            type: BIGINT
+        tableName: posts
+- changeSet:
+    id: 1668264569196-18
+    author: YurK
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: tags_pkey
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: tag
+            type: VARCHAR(255)
+        tableName: tags
+- changeSet:
+    id: 1668264569196-19
+    author: YurK
+    changes:
+    - addUniqueConstraint:
+        columnNames: first_name, last_name
+        constraintName: full_name_index
+        tableName: persons
+- changeSet:
+    id: 1668264569196-20
+    author: YurK
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: title
+        indexName: post_name_index
+        tableName: posts
+- changeSet:
+    id: 1668264569196-21
+    author: YurK
+    changes:
+    - addUniqueConstraint:
+        columnNames: tag
+        constraintName: tag_index
+        tableName: tags
+- changeSet:
+    id: 1668264569196-22
+    author: YurK
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: src_person_id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: dst_person_id
+            type: BIGINT
+        tableName: friendship
+- changeSet:
+    id: 1668264569196-23
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: src_person_id
+        baseTableName: friendship
+        constraintName: fk18m8yy9pp291xaqdjusvj9kxj
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: persons
+        validate: true
+- changeSet:
+    id: 1668264569196-24
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: comment_id
+        baseTableName: block_history
+        constraintName: fk27sy52mr06s7f1hptr9h62gac
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: post_comments
+        validate: true
+- changeSet:
+    id: 1668264569196-25
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: dst_person_id
+        baseTableName: friendships
+        constraintName: fk2opbtq1x5yyjjjyuuop1g0lrv
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: persons
+        validate: true
+- changeSet:
+    id: 1668264569196-26
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: author_id
+        baseTableName: posts
+        constraintName: fk31biid9u6ekl7h6n2i7fgnqdq
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: persons
+        validate: true
+- changeSet:
+    id: 1668264569196-27
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: person_id
+        baseTableName: person_settings
+        constraintName: fk334yklep5aibjfqygnfj2son6
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: persons
+        validate: true
+- changeSet:
+    id: 1668264569196-28
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: post_id
+        baseTableName: post2tag
+        constraintName: fk3hxxi71po39189j9lc4wv93vm
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: posts
+        validate: true
+- changeSet:
+    id: 1668264569196-29
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: country_id
+        baseTableName: cities
+        constraintName: fk6gatmv9dwedve82icy8wrkdmk
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: countries
+        validate: true
+- changeSet:
+    id: 1668264569196-30
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: post_id
+        baseTableName: post_files
+        constraintName: fk8xc9ew2bxk7axrmc9epq40v2h
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: posts
+        validate: true
+- changeSet:
+    id: 1668264569196-31
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: post_id
+        baseTableName: post_likes
+        constraintName: fka5wxsgl4doibhbed9gm7ikie2
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: posts
+        validate: true
+- changeSet:
+    id: 1668264569196-32
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: src_person_id
+        baseTableName: friendships
+        constraintName: fka6kt88iykw6x25pcd8hcdd0vi
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: persons
+        validate: true
+- changeSet:
+    id: 1668264569196-33
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: person_id
+        baseTableName: post_likes
+        constraintName: fka9oua9nyomg75dxgcpxaa8dtr
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: persons
+        validate: true
+- changeSet:
+    id: 1668264569196-34
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: post_id
+        baseTableName: post_comments
+        constraintName: fkaawaqxjs3br8dw5v90w7uu514
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: posts
+        validate: true
+- changeSet:
+    id: 1668264569196-35
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: status_id
+        baseTableName: friendships
+        constraintName: fkbauc5679o4rckvvtyalk059fl
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: friendship_statuses
+        validate: true
+- changeSet:
+    id: 1668264569196-36
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: parent_id
+        baseTableName: post_comments
+        constraintName: fkc3b7s6wypcsvua2ycn4o1lv2c
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: post_comments
+        validate: true
+- changeSet:
+    id: 1668264569196-37
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: tag_id
+        baseTableName: post2tag
+        constraintName: fkc9yntlsu2li5iiyn3p7xlwfd3
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: tags
+        validate: true
+- changeSet:
+    id: 1668264569196-38
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: second_person_id
+        baseTableName: dialogs
+        constraintName: fkcp5c690srs8jma7t8p3d0sq5c
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: persons
+        validate: true
+- changeSet:
+    id: 1668264569196-39
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: dst_person_id
+        baseTableName: friendship
+        constraintName: fkd7peios1ldfebilr8ia5h978x
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: persons
+        validate: true
+- changeSet:
+    id: 1668264569196-40
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: author_id
+        baseTableName: post_comments
+        constraintName: fkf7t4v8dcs6fypin8iwartpv60
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: persons
+        validate: true
+- changeSet:
+    id: 1668264569196-41
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: person_id
+        baseTableName: notifications
+        constraintName: fkfe9v78lkrmbqkt4cdsb05cit9
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: persons
+        validate: true
+- changeSet:
+    id: 1668264569196-42
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: city_id
+        baseTableName: persons
+        constraintName: fkhcy9b4brono9em0c6mk1lbh16
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: cities
+        validate: true
+- changeSet:
+    id: 1668264569196-43
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: author_id
+        baseTableName: messages
+        constraintName: fkimdd1pd5sipwsh4e5mepl7fcj
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: persons
+        validate: true
+- changeSet:
+    id: 1668264569196-44
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: dialog_id
+        baseTableName: messages
+        constraintName: fkjbkac2909pydsesgme6wc0mn5
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: dialogs
+        validate: true
+- changeSet:
+    id: 1668264569196-45
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: recipient_id
+        baseTableName: messages
+        constraintName: fkmbdxcyfputddn3xwmw1phto7t
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: persons
+        validate: true
+- changeSet:
+    id: 1668264569196-46
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: person_id
+        baseTableName: block_history
+        constraintName: fks2nkvcw9gud7t27mgumo14hkp
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: persons
+        validate: true
+- changeSet:
+    id: 1668264569196-47
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: post_id
+        baseTableName: block_history
+        constraintName: fkt4h1oocc1eeibw6m38lap04ro
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: posts
+        validate: true
+- changeSet:
+    id: 1668264569196-48
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: first_person_id
+        baseTableName: dialogs
+        constraintName: fkt78yi0mpgmkq6g9r37tn4wxsg
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: persons
+        validate: true
+

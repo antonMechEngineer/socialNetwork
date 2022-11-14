@@ -1,6 +1,6 @@
 package main.repository;
 
-import main.config.entities.Captcha;
+import main.model.entities.Captcha;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
