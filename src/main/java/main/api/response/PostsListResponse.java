@@ -9,7 +9,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class PostsListResponse {
-
     private String error;
     private long timestamp;
     private long total;

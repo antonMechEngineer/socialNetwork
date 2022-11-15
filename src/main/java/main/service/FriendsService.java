@@ -1,6 +1,8 @@
 package main.service;
 
 import lombok.AllArgsConstructor;
+import main.api.response.FriendRs;
+import main.api.response.FriendsRs;
 import main.repository.FriendshipStatusesRepository;
 import main.repository.FriendshipsRepository;
 import main.repository.PersonsRepository;
@@ -13,16 +15,34 @@ public class FriendsService {
     private final FriendshipStatusesRepository friendshipStatusesRepository;
     private final PersonsRepository personsRepository;
 
-    public void addFriend(Long id){
+    public FriendRs addFriend(Long id){
 
+        return new FriendRs();
     }
 
-    public void deleteFriend(Long id){
+    public FriendRs deleteFriend(Long id){
 
+        return new FriendRs();
     }
 
-    public void getFriends(){
+    public FriendsRs getFriends(){
 
+        return new FriendRs();
+    }
+
+    public FriendsRs getFriendRecommendations(){
+
+        return new FriendsRs();
+    }
+
+    public FriendRs sendFriendshipRequest(Long id){
+
+        return new FriendsRs();
+    }
+
+    public FriendsRs getPotentialFriends(){
+
+        return new FriendsRs();
     }
 
 }
