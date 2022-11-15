@@ -1,6 +1,8 @@
 package main.controller;
 
+import main.api.request.UserRq;
 import main.api.response.PostsListResponse;
+import main.api.response.UserRs;
 import main.model.entities.Post;
 import main.service.PostsService;
 import main.service.PersonsService;
@@ -39,4 +41,12 @@ public class UsersController {
                 ""
         ));
     }
+
+    //@PreAuthorize("hasAuthority('user:write')")
+    @PutMapping("/me")
+    ResponseEntity<UserRs> updateMyData(@RequestBody UserRq userRq){return null;}
+
+    //@PreAuthorize("hasAuthority('user:write')")
+    @DeleteMapping("/me")
+    ResponseEntity<UserRs>deleteMyData(){return null;}
 }
