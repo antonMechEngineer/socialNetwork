@@ -1,7 +1,6 @@
 package main.api.request;
 
 import lombok.Data;
-import main.model.enums.PostLikeTypes;
 
 @Data
 public class UserRq {
