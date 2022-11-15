@@ -2,7 +2,6 @@ package main.security;
 
 import lombok.Builder;
 import lombok.Data;
-import main.model.entities.Person;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

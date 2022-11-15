@@ -1,5 +1,6 @@
 package main.security.jwt;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
@@ -26,17 +27,21 @@ public class JWTUtil {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
                 .signWith(SignatureAlgorithm.HS256, secret).compact();
     }
 
-    public String extractUserName(String token) {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
+    private Claims getTokenBody(String token) {
+        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+    }
+
+    private String extractUserName(String token) {
+        return getTokenBody(token).getSubject();
     }
 
     public Boolean validateToken(String token) {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getExpiration().before(new Date()) &&
-                !Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().isEmpty();
+        return getTokenBody(token).getExpiration().before(new Date()) &&
+                !getTokenBody(token).isEmpty();
     }
 
     public String resolveToken(HttpServletRequest request) {
