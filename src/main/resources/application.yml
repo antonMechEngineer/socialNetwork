@@ -16,7 +16,10 @@ spring:
     change-log: classpath:db/changelog/changelog-master.yaml
     enabled: true
 
-
+server:
+  port: 8086
+  servlet:
+    context-path: "/"
 #applicationParams
 socialNetwork:
   default:
