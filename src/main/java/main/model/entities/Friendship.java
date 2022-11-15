@@ -1,25 +1,31 @@
 package main.model.entities;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
 @Entity
-@Getter
-@Setter
-@Table(name = "friendship")
+@Data
+@Table(name = "friendships")
 public class Friendship {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    @Column(name = "status_id")
-    private long statusID;
-    @Column(name = "sent_time")
-    private Timestamp sentTime;
-    @Column(name = "src_person_id")
-    private long srcPersonID;
-    @Column(name = "dst_person_id")
-    private long dstPersonID;
+    private Long id;
 
+    @OneToOne
+    @JoinColumn(name = "status_id", nullable = false)
+    private FriendshipStatus friendshipStatus;
+
+    @JoinColumn(name = "sent_time", nullable = false)
+    private LocalDateTime sentTime;
+
+    @ManyToOne
+    @JoinColumn(name = "src_person_id", nullable = false)
+    private Person srcPerson;
+
+    @ManyToOne
+    @JoinColumn(name = "dst_person_id", nullable = false)
+    private Person dstPerson;
 }

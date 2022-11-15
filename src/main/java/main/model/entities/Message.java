@@ -1,40 +1,42 @@
 package main.model.entities;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import main.model.enums.ReadStatusTypes;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@Setter
-@Table(name = "message")
+@Data
+@Table(name = "messages")
 public class Message {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
-    private Timestamp time;
+    @Column(nullable = false)
+    private LocalDateTime time;
 
-    @Column(name = "author_id")
-    private long authorID;
+    @ManyToOne
+    @JoinColumn(name = "author_id", nullable = false)
+    private Person author;
 
-    @Column(name = "recipient_id")
-    private long recipientID;
+    @ManyToOne
+    @JoinColumn(name = "recipient_id", nullable = false)
+    private Person recipient;
 
-    @Column(name = "second_person_id")
-    private long secondPersonID;
-
-    @Column(name = "message_text", length = 10000)
+    @Column(name = "message_text", nullable = false, columnDefinition = "TEXT")
     private String messageText;
 
-    @Column(name = "read_status")
-    private String readStatus;
+    @Column(name = "read_status", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'SENT'")
+    @Enumerated(EnumType.STRING)
+    private ReadStatusTypes readStatus;
 
-    @Column(name = "dialog_id")
-    private long dialogID;
+    @ManyToOne
+    @JoinColumn(name = "dialog_id", nullable = false)
+    private Dialog dialog;
 
-    @Column(name = "is_deleted")
-    private boolean isDeleted;
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean isDeleted;
 }

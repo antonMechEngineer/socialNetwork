@@ -1,21 +1,28 @@
 package main.model.entities;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import main.model.enums.FriendshipStatusTypes;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
 
 @Entity
-@Getter
-@Setter
-@Table(name = "friendship_status")
+@Data
+@Table(name = "friendship_statuses")
 public class FriendshipStatus {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
-    private Timestamp time;
-    private String name;
+    @Column(nullable = false)
+    private LocalDateTime time;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private FriendshipStatusTypes name;
+
+    @Column(nullable = false)
     private String code;
 }

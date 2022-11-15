@@ -1,25 +1,36 @@
 package main.model.entities;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import main.model.enums.BlockActionTypes;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(name = "block_history")
 public class BlockHistory {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    private Timestamp time;
-    @Column(name = "person_id")
-    private long personID;
-    @Column(name = "post_id")
-    private long postID;
-    @Column(name = "comment_id")
-    private long commentID;
-    private String action;
+    private Long id;
+
+    @Column(nullable = false)
+    private LocalDateTime time;
+
+    @ManyToOne
+    @JoinColumn(name = "person_id")
+    private Person person;
+
+    @OneToOne
+    @JoinColumn(name = "post_id", referencedColumnName = "id")
+    private Post post;
+
+    @OneToOne
+    @JoinColumn(name = "comment_id", referencedColumnName = "id")
+    private Comment comment;
+
+    @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'BLOCK'")
+    @Enumerated(EnumType.STRING)
+    private BlockActionTypes action;
 }

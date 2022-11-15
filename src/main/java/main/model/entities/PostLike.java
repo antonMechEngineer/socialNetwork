@@ -1,28 +1,32 @@
 package main.model.entities;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import main.model.enums.PostLikeTypes;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@Setter
-@Table(name = "post_like")
+@Data
+@Table(name = "post_likes")
 public class PostLike {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
-    private Timestamp time;
+    @Column(nullable = false)
+    private LocalDateTime time;
 
-    @Column(name = "person_id")
-    private long personID;
+    @ManyToOne
+    @JoinColumn(name = "person_id", nullable = false)
+    private Person person;
 
-    @Column(name = "post_id")
-    private long postID;
+    @ManyToOne
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
 
-    private String type;
-
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PostLikeTypes type;
 }

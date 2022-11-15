@@ -1,22 +1,24 @@
 package main.model.entities;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(name = "captcha")
 public class Captcha {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    private Timestamp time;
+    private Long id;
+
+    @Column(nullable = false)
+    private LocalDateTime time;
+
     private String code;
+
     @Column(name = "secret_code")
     private String secretCode;
-
 }

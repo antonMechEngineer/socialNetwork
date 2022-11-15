@@ -1,35 +1,46 @@
 package main.model.entities;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import main.model.enums.NotificationTypes;
+import org.hibernate.annotations.Any;
+import org.hibernate.annotations.AnyMetaDef;
+import org.hibernate.annotations.MetaValue;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@Setter
-@Table(name = "notification")
+@Data
+@Table(name = "notifications")
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
-    @Column(name = "notification_type")
-    private String notificationType;
+    @Column(name = "notification_type", insertable = false, updatable = false)
+    @Enumerated(value = EnumType.STRING)
+    private NotificationTypes notificationType;
 
     @Column(name = "sent_time")
-    private Timestamp sentTime;
+    private LocalDateTime sentTime;
 
-    @Column(name = "person_id")
-    private long personID;
+    @ManyToOne
+    @JoinColumn(name = "person_id", nullable = false)
+    private Person person;
 
-    @Column(name = "entity_id")
-    private long entityID;
+    @Any(metaColumn = @Column(name = "notification_type"), fetch = FetchType.EAGER)
+    @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
+            @MetaValue(targetEntity = Post.class, value = "POST"),
+            @MetaValue(targetEntity = Comment.class, value = "POST_COMMENT"),
+            @MetaValue(targetEntity = Comment.class, value = "COMMENT_COMMENT"),
+            @MetaValue(targetEntity = Friendship.class, value = "FRIEND_REQUEST"),
+            @MetaValue(targetEntity = Message.class, value = "MESSAGE"),
+    })
+    @JoinColumn(name = "entity_id")
+    private Object entity;
 
     private String contact;
 
-    @Column(name = "is_read")
-    private boolean isRead;
-
+    @Column(name = "is_read", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean isRead;
 }

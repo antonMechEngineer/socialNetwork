@@ -1,22 +1,25 @@
 package main.model.entities;
 
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.Data;
 import javax.persistence.*;
 
 @Entity
-@Getter
-@Setter
-@Table(name = "city")
+@Data
+@Table(name = "cities")
 public class City {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    private String title;
-    @Column(name = "country_id")
-    private long countryID;
-    private String temp;
-    private String clouds;
+    private Long id;
 
+    @Column(nullable = false)
+    private String title;
+
+    @ManyToOne
+    @JoinColumn(name = "country_id")
+    private Country country;
+
+    private String temp;
+
+    private String clouds;
 }

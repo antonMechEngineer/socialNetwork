@@ -1,22 +1,24 @@
 package main.model.entities;
 
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.Data;
 import javax.persistence.*;
 
 @Entity
-@Getter
-@Setter
-@Table(name = "post_file")
+@Data
+@Table(name = "post_files")
 public class PostFile {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
-    @Column(name = "post_id")
-    private long postID;
+    @ManyToOne
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
 
-    private long name;
-    private long path;
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
+    private String path;
 }
