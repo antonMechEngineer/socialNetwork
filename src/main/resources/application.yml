@@ -11,13 +11,15 @@ spring.jpa.database: postgresql
 spring.jpa.open-in-view: true
 spring:jpa:database-platform=org:hibernate:dialect: PostgreSQLDialect
 spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation: true
+spring:
+  liquibase:
+    change-log: classpath:db/changelog/changelog-master.yaml
+    enabled: true
 
-server.port: 8086
-auth.secret: someSecretCode
-
-
-
-
+server:
+  port: 8086
+  servlet:
+    context-path: "/"
 #applicationParams
 socialNetwork:
   default:
