@@ -11,11 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FriendRs {
-
     String error;
-    LocalDateTime timestamp;
+    String timestamp;
     ComplexRs data;
 }
-
-//request
-//recommendation

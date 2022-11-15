@@ -13,7 +13,6 @@ import java.util.List;
 @Table(name = "persons", indexes = @Index(name = "full_name_index", columnList = "first_name, last_name", unique = true))
 public class Person {
 
-    // TODO: 15.11.2022 добавить описание колонок согласно swagger, что-то может быть заигнорить то чего не в swagger, как ввести объекты заглушки в Person
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -110,9 +109,4 @@ public class Person {
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
     private List<PostLike> postLikes;
-
-    private Currency currency = new Currency();
-
-    private Weather weather = new Weather();
-
 }

@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-// TODO: 15.11.2022 в swagger 7 энпоинтов а здесь описаны только 6
 @RestController
 @RequestMapping("/api/v1/friends")
 public class FriendsController {
@@ -34,6 +33,11 @@ public class FriendsController {
         return ResponseEntity.ok(friendsService.getFriends());
     }
 
+    // TODO: 15.11.2022 здесь вставлена заглушка до реализации сервиса рекоммендаций
+    @GetMapping("/recommendations")
+    public ResponseEntity<FriendsRs> getFriendRecommendations() {
+        return ResponseEntity.ok(new FriendsRs());
+    }
 
     @PostMapping("/request/{id}")
     public ResponseEntity<FriendRs> sendFriendshipRequest(@PathVariable Long id) {
@@ -45,11 +49,9 @@ public class FriendsController {
         return ResponseEntity.ok(friendsService.getPotentialFriends());
     }
 
-
-    @GetMapping("/recommendations")
-    public ResponseEntity<FriendsRs> getFriendRecommendations() {
-        return ResponseEntity.ok(friendsService.getFriendRecommendations());
+    @DeleteMapping("/{id}")
+    public ResponseEntity<FriendRs> deleteSentFriendshipRequest (@PathVariable Long id) {
+        return ResponseEntity.ok(friendsService.deleteSentFriendshipRequest(id));
     }
-
 
 }
