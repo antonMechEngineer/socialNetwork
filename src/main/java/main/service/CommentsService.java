@@ -36,7 +36,7 @@ public class CommentsService {
         return commentRepository.findAll(pageable);
     }
 
-    public Comment changeComment(long commentId, String newText) {
+    public Comment editComment(long commentId, String newText) {
         Comment comment = commentRepository.findById(commentId).get();
         comment.setCommentText(newText);
         comment.setTime(LocalDateTime.now());
