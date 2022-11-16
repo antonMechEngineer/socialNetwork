@@ -34,7 +34,7 @@ public class PersonsService {
     public UserRs editImage(Principal principal, MultipartFile photo, String phone, String about,
                             String city, String country, String first_name, String last_name,
                             String birth_date, String message_permission) throws IOException {
-        Person person = personRepository.findByEmail(principal.getName()).get();
+        Person person = personRepository.findPersonByEmail(principal.getName()).get();
         UserRs response =new UserRs();
 
         return response;

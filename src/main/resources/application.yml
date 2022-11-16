@@ -1,10 +1,4 @@
 spring:
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5434/postgres?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&serverTimezone=UTC&useUnicode=true&characterEncoding=utf8
-    username: postgres
-    password: test
-    initialization-mode: always
   jpa:
     hibernate:ddl-auto: validate
     database: postgresql
@@ -12,6 +6,13 @@ spring:
     database-platform=org:hibernate:dialect: PostgreSQLDialect
     properties:hibernate:jdbc:lob:non_contextual_creation: true
     show-sql: true
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5434/postgres?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&serverTimezone=UTC&useUnicode=true&characterEncoding=utf8
+    username: postgres
+    password: test
+    initialization-mode: always
   liquibase:
     change-log: classpath:db/changelog/changelog-master.yaml
     enabled: true
