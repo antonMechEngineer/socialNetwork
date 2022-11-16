@@ -1,6 +1,8 @@
+server:
+  port: 8086
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/network
+    url: jdbc:postgresql://localhost:5432/social
     username: postgres
     password: 123
     driver-class-name: org.postgresql.Driver
@@ -13,15 +15,11 @@ spring:
     change-log: classpath:db/changelog/changelog-master.yaml
     enabled: true
 
-
-
+auth:
+  secret: someSecretCode
 
 #applicationParams
 socialNetwork:
   default:
     page: 0
     size: 20
-
-
-
-
