@@ -36,7 +36,7 @@ public class JWTUtil {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
     }
 
-    private String extractUserName(String token) {
+    public String extractUserName(String token) {
         return getTokenBody(token).getSubject();
     }
 

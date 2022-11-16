@@ -1,14 +1,23 @@
 package main.model.entities;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@NoArgsConstructor
 @Entity
 @Data
 @Table(name = "friendships")
 public class Friendship {
+
+    public Friendship(FriendshipStatus friendshipStatus, LocalDateTime sentTime, Person srcPerson, Person dstPerson) {
+        this.friendshipStatus = friendshipStatus;
+        this.sentTime = sentTime;
+        this.srcPerson = srcPerson;
+        this.dstPerson = dstPerson;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
