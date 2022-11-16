@@ -1,7 +1,9 @@
 package main.controller;
 
 import main.api.response.CommonResponse;
+import main.api.response.PersonResponse;
 import main.errors.NoPostEntityException;
+import main.errors.PersonNotFoundByEmailException;
 import main.model.entities.Post;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,4 +22,14 @@ public class ExceptionHandlerController {
                 .errorDescription(e.getMessage())
                 .build());
     }
+
+    @ExceptionHandler(PersonNotFoundByEmailException.class)
+    public ResponseEntity<CommonResponse<PersonResponse>> handlePersonNotFoundByEmailException(Exception e) {
+        return ResponseEntity.ok().body(CommonResponse.<PersonResponse>builder()
+                .error(e.getLocalizedMessage())
+                .timestamp(System.currentTimeMillis())
+                .errorDescription(e.getLocalizedMessage())
+                .build());
+    }
+
 }
