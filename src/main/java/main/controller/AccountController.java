@@ -1,5 +1,6 @@
 package main.controller;
 
+import lombok.RequiredArgsConstructor;
 import main.api.request.EmailRq;
 import main.api.request.PasswordRq;
 import main.api.request.RegisterRq;
@@ -11,13 +12,9 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/account")
+@RequiredArgsConstructor
 public class AccountController {
     private final AccountService accountService;
-
-    @Autowired
-    public AccountController(AccountService accountService){
-        this.accountService = accountService;
-    }
 
     @PostMapping("/register")
     public ResponseEntity<RegisterRs> register(@RequestBody RegisterRq regRequest) {

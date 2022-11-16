@@ -19,6 +19,11 @@ public class PersonsService {
 
     public Person getPersonById(long personId) {
         Logger.getLogger(this.getClass().getName()).info("getPersonById with id " + personId);
-        return personRepository.findById(personId).get();
+        return personRepository.findById(personId).orElse(null);
+    }
+
+    public Person getPersonByEmail(String email) {
+        Logger.getLogger(this.getClass().getName()).info("getPersonByEmail with email " + email);
+        return personRepository.findPersonByEmail(email).orElse(null);
     }
 }
