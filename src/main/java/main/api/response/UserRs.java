@@ -8,6 +8,6 @@ import lombok.Setter;
 public class UserRs {
     private String error;
     private long timestamp;
-    private UserDto data;
+    private PersonResponse data;
     private String error_description;
 }
