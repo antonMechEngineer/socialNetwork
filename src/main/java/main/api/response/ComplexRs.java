@@ -10,7 +10,6 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @Setter
 @JsonInclude(NON_NULL)
 public class ComplexRs {
-
     private int id;
     private int count;
     private String message;

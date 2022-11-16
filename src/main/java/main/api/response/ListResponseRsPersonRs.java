@@ -8,7 +8,7 @@ import java.util.List;
 
 @NoArgsConstructor
 @Data
-public class FriendsRs {
+public class ListResponseRsPersonRs {
     private String error;
     private Long time;
     private Integer total;

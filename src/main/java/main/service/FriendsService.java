@@ -1,6 +1,6 @@
 package main.service;
-import main.api.response.FriendRs;
-import main.api.response.FriendsRs;
+import main.api.response.FriendshipRs;
+import main.api.response.ListResponseRsPersonRs;
 import main.model.entities.Friendship;
 import main.model.entities.FriendshipStatus;
 import main.model.entities.Person;
@@ -34,29 +34,29 @@ public class FriendsService {
         this.jwtUtil = jwtUtil;
     }
 
-    public FriendRs addFriend(String token, Long futureFriendId){
+    public FriendshipRs addFriend(String token, Long futureFriendId){
         Person srcPerson = getPersonByToken(token);
         Person dstPerson = personsRepository.findPersonById(futureFriendId);
         modifyFriendShipStatus(srcPerson, dstPerson, FriendshipStatusTypes.FRIEND, FriendshipStatusTypes.FRIEND);
 
-        return new FriendRs();
+        return new FriendshipRs();
     }
 
-    public FriendRs deleteFriend(String token, Long idDeletableFriend){
+    public FriendshipRs deleteFriend(String token, Long idDeletableFriend){
         Person srcPerson = getPersonByToken(token);
         Person dstPerson = personsRepository.findPersonById(idDeletableFriend);
         modifyFriendShipStatus(srcPerson, dstPerson, FriendshipStatusTypes.REQUEST, FriendshipStatusTypes.SUBSCRIBED);
 
-        return new FriendRs();
+        return new FriendshipRs();
     }
 
-    public FriendsRs getFriends(String token){
+    public ListResponseRsPersonRs getFriends(String token){
         List<Person> requestedPersons = getPersons(token, FriendshipStatusTypes.FRIEND);
 
-        return new FriendsRs();
+        return new ListResponseRsPersonRs();
     }
 
-    public FriendRs sendFriendshipRequest(String token, Long potentialFriendId){
+    public FriendshipRs sendFriendshipRequest(String token, Long potentialFriendId){
         Person srcPerson = getPersonByToken(token);
         Person dstPerson = personsRepository.findPersonById(potentialFriendId);
         FriendshipStatus srcFriendshipStatus = new FriendshipStatus(LocalDateTime.now(), FriendshipStatusTypes.SUBSCRIBED);
@@ -68,10 +68,10 @@ public class FriendsService {
         friendshipsRepository.save(srcFriendship);
         friendshipsRepository.save(dstFriendship);
 
-        return new FriendRs();
+        return new FriendshipRs();
     }
 
-    public FriendRs deleteSentFriendshipRequest(String token, Long requestedPersonId){
+    public FriendshipRs deleteSentFriendshipRequest(String token, Long requestedPersonId){
         Person srcPerson = getPersonByToken(token);
         Person dstPerson = personsRepository.findPersonById(requestedPersonId);
         Friendship srcFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(srcPerson, dstPerson);
@@ -85,13 +85,13 @@ public class FriendsService {
         friendshipStatusesRepository.delete(srcFriendshipStatus);
         friendshipStatusesRepository.delete(dstFriendshipStatus);
 
-        return new FriendRs();
+        return new FriendshipRs();
     }
 
-    public FriendsRs getRequestedPersons(String token){
+    public ListResponseRsPersonRs getRequestedPersons(String token){
         List<Person> requestedPersons = getPersons(token, FriendshipStatusTypes.REQUEST);
 
-        return new FriendsRs();
+        return new ListResponseRsPersonRs();
     }
 
     private List<Person> getPersons(String token, FriendshipStatusTypes friendshipStatusTypes){
@@ -121,10 +121,10 @@ public class FriendsService {
         friendshipStatusesRepository.save(dstFriendshipStatus);
     }
 
-
     private Person getPersonByToken(String token){
         String personEmail = jwtUtil.extractUserName(token);
         Person currentPerson = personsRepository.findPersonByEmail(personEmail);
         return currentPerson;
     }
 }
+
