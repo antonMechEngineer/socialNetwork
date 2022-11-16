@@ -1,7 +1,4 @@
 package main.service;
-
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import main.api.response.FriendRs;
 import main.api.response.FriendsRs;
 import main.model.entities.Friendship;
@@ -14,8 +11,9 @@ import main.repository.PersonsRepository;
 import main.security.jwt.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FriendsService {
@@ -30,7 +28,6 @@ public class FriendsService {
                           FriendshipStatusesRepository friendshipStatusesRepository,
                           PersonsRepository personsRepository,
                           JWTUtil jwtUtil) {
-
         this.friendshipsRepository = friendshipsRepository;
         this.friendshipStatusesRepository = friendshipStatusesRepository;
         this.personsRepository = personsRepository;
@@ -38,49 +35,92 @@ public class FriendsService {
     }
 
     public FriendRs addFriend(String token, Long futureFriendId){
-        Person currentPerson = getPersonByToken(token);
-        Person futureFriend = personsRepository.findPersonById(futureFriendId);
-        FriendshipStatus friendshipStatus = new FriendshipStatus(LocalDateTime.now(),
-                                            FriendshipStatusTypes.FRIEND,
-                                            "mock");
-        friendshipStatusesRepository.save(friendshipStatus);
-        // TODO: 16.11.2022 может быть придется повторно достать status, что бы он был c id
-        Friendship friendship = new Friendship(friendshipStatus, LocalDateTime.now(),
-                                                currentPerson, futureFriend);
-        friendshipsRepository.save(friendship);
+        Person srcPerson = getPersonByToken(token);
+        Person dstPerson = personsRepository.findPersonById(futureFriendId);
+        modifyFriendShipStatus(srcPerson, dstPerson, FriendshipStatusTypes.FRIEND, FriendshipStatusTypes.FRIEND);
 
         return new FriendRs();
     }
 
-    public FriendRs deleteFriend(String token, Long idDeletablePerson){
-        Person currentPerson = getPersonByToken(token);
-        Person deletablePerson = personsRepository.findPersonById(idDeletablePerson);
-        Friendship currentFriendShip =
-                friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(currentPerson, deletablePerson);
-        FriendshipStatus friendshipStatus = friendshipStatusesRepository.;
+    public FriendRs deleteFriend(String token, Long idDeletableFriend){
+        Person srcPerson = getPersonByToken(token);
+        Person dstPerson = personsRepository.findPersonById(idDeletableFriend);
+        modifyFriendShipStatus(srcPerson, dstPerson, FriendshipStatusTypes.REQUEST, FriendshipStatusTypes.SUBSCRIBED);
 
         return new FriendRs();
     }
 
     public FriendsRs getFriends(String token){
+        List<Person> requestedPersons = getPersons(token, FriendshipStatusTypes.FRIEND);
 
         return new FriendsRs();
     }
 
-    public FriendRs sendFriendshipRequest(String token, Long id){
+    public FriendRs sendFriendshipRequest(String token, Long potentialFriendId){
+        Person srcPerson = getPersonByToken(token);
+        Person dstPerson = personsRepository.findPersonById(potentialFriendId);
+        FriendshipStatus srcFriendshipStatus = new FriendshipStatus(LocalDateTime.now(), FriendshipStatusTypes.SUBSCRIBED);
+        FriendshipStatus dstFriendshipStatus = new FriendshipStatus(LocalDateTime.now(), FriendshipStatusTypes.REQUEST);
+        friendshipStatusesRepository.save(srcFriendshipStatus);
+        friendshipStatusesRepository.save(dstFriendshipStatus);
+        Friendship srcFriendship = new Friendship(srcFriendshipStatus, LocalDateTime.now(), srcPerson, dstPerson);
+        Friendship dstFriendship = new Friendship(dstFriendshipStatus, LocalDateTime.now(), dstPerson, srcPerson);
+        friendshipsRepository.save(srcFriendship);
+        friendshipsRepository.save(dstFriendship);
 
         return new FriendRs();
     }
 
-    public FriendRs deleteSentFriendshipRequest(String token, Long id){
+    public FriendRs deleteSentFriendshipRequest(String token, Long requestedPersonId){
+        Person srcPerson = getPersonByToken(token);
+        Person dstPerson = personsRepository.findPersonById(requestedPersonId);
+        Friendship srcFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(srcPerson, dstPerson);
+        Friendship dstFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(dstPerson, srcPerson);
+        FriendshipStatus srcFriendshipStatus = friendshipStatusesRepository.
+                findFriendshipStatusesById(srcFriendship.getFriendshipStatus().getId());
+        FriendshipStatus dstFriendshipStatus = friendshipStatusesRepository.
+                findFriendshipStatusesById(dstFriendship.getFriendshipStatus().getId());
+        friendshipsRepository.delete(srcFriendship);
+        friendshipsRepository.delete(dstFriendship);
+        friendshipStatusesRepository.delete(srcFriendshipStatus);
+        friendshipStatusesRepository.delete(dstFriendshipStatus);
 
         return new FriendRs();
     }
 
-    public FriendsRs getPotentialFriends(String token){
+    public FriendsRs getRequestedPersons(String token){
+        List<Person> requestedPersons = getPersons(token, FriendshipStatusTypes.REQUEST);
 
         return new FriendsRs();
     }
+
+    private List<Person> getPersons(String token, FriendshipStatusTypes friendshipStatusTypes){
+        Person srcPerson = getPersonByToken(token);
+        List<Friendship> srcPersonFriendships = friendshipsRepository.findFriendshipBySrcPerson(srcPerson).stream().
+                filter(friendship -> friendship.getFriendshipStatus().getCode() == friendshipStatusTypes).
+                collect(Collectors.toList());
+        List<Person> persons = personsRepository.findPersonByDstFriendships(srcPersonFriendships);
+        return persons;
+    }
+
+    private void modifyFriendShipStatus(Person srcPerson, Person dstPerson,
+                                        FriendshipStatusTypes srcFriendshipStatusTypes,
+                                        FriendshipStatusTypes dstFriendshipStatusTypes){
+
+        Friendship srcFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(srcPerson, dstPerson);
+        Friendship dstFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(dstPerson, srcPerson);
+        FriendshipStatus srcFriendshipStatus = friendshipStatusesRepository.
+                findFriendshipStatusesById(srcFriendship.getFriendshipStatus().getId());
+        FriendshipStatus dstFriendshipStatus = friendshipStatusesRepository.
+                findFriendshipStatusesById(dstFriendship.getFriendshipStatus().getId());
+        srcFriendshipStatus.setCode(srcFriendshipStatusTypes);
+        srcFriendshipStatus.setTime(LocalDateTime.now());
+        dstFriendshipStatus.setCode(dstFriendshipStatusTypes);
+        dstFriendshipStatus.setTime(LocalDateTime.now());
+        friendshipStatusesRepository.save(srcFriendshipStatus);
+        friendshipStatusesRepository.save(dstFriendshipStatus);
+    }
+
 
     private Person getPersonByToken(String token){
         String personEmail = jwtUtil.extractUserName(token);

@@ -14,9 +14,8 @@ import java.time.LocalDateTime;
 @Table(name = "friendship_statuses")
 public class FriendshipStatus {
 
-    public FriendshipStatus(LocalDateTime time, FriendshipStatusTypes name, String code) {
+    public FriendshipStatus(LocalDateTime time, FriendshipStatusTypes code) {
         this.time = time;
-        this.name = name;
         this.code = code;
     }
 
@@ -29,9 +28,5 @@ public class FriendshipStatus {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private FriendshipStatusTypes name;
-
-    @Column(nullable = false)
-    private String code;
-
+    private FriendshipStatusTypes code;
 }

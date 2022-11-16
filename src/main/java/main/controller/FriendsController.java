@@ -47,7 +47,7 @@ public class FriendsController {
 
     @GetMapping("/request")
     public ResponseEntity<FriendsRs> getPotentialFriends(@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(friendsService.getPotentialFriends(token));
+        return ResponseEntity.ok(friendsService.getRequestedPersons(token));
     }
 
     @DeleteMapping("/{id}")
