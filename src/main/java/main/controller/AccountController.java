@@ -21,19 +21,15 @@ public class AccountController {
         return ResponseEntity.ok(accountService.getRegResponse(regRequest));
     }
 
-    //@PreAuthorize("hasAuthority('user:write')")
     @PutMapping("/password/set")
     public ResponseEntity<RegisterRs> passwordSet(@RequestBody PasswordRq passwordRq){return null;}
 
-    //@PreAuthorize("hasAuthority('user:write')")
     @PutMapping("/password/recovery")
     public ResponseEntity<RegisterRs> passwordRecovery(){return null;}
 
-    //@PreAuthorize("hasAuthority('user:write')")
     @PutMapping("/email")
     public ResponseEntity<RegisterRs> emailSet(@RequestBody EmailRq emailRq) {return null;}
 
-    //@PreAuthorize("hasAuthority('user:write')")
     @PutMapping("/email/recovery")
     public ResponseEntity<RegisterRs> emailRecovery() {return null;}
 }

@@ -1,7 +1,6 @@
 package main.controller;
 
 import lombok.RequiredArgsConstructor;
-import main.api.request.UserRq;
 import main.api.response.CommonResponse;
 import main.api.response.UserRs;
 import main.model.entities.Person;
@@ -11,8 +10,13 @@ import main.service.PersonsService;
 import main.service.PostsService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.security.Principal;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -56,11 +60,21 @@ public class UsersController {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
     }
 
-    //@PreAuthorize("hasAuthority('user:write')")
-    @PutMapping("/me")
-    ResponseEntity<UserRs> updateMyData(@RequestBody UserRq userRq){return null;}
+    @PutMapping(value = "/me", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    ResponseEntity<UserRs> updateMyData(
+            @RequestParam(value = "photo_id", required = false) MultipartFile photo,
+            @RequestParam(value = "phone", required = false) String phone,
+            @RequestParam(value = "about", required = false) String about,
+            @RequestParam(value = "city", required = false) String city,
+            @RequestParam(value = "country", required = false) String country,
+            @RequestParam(value = "first_name", required = false) String first_name,
+            @RequestParam(value = "last_name", required = false) String last_name,
+            @RequestParam(value = "birth_date", required = false) String birth_date,
+            @RequestParam(value = "message_permission", required = false) String message_permission,
+            Principal principal)throws IOException { return ResponseEntity
+            .ok(usersService.editImage(principal, photo,phone,about,city,country,first_name,
+                    last_name,birth_date,message_permission));}
 
-    //@PreAuthorize("hasAuthority('user:write')")
     @DeleteMapping("/me")
     ResponseEntity<UserRs>deleteMyData(){return null;}
 }
