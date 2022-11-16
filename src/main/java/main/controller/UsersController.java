@@ -1,7 +1,6 @@
 package main.controller;
 
 import lombok.RequiredArgsConstructor;
-import main.api.request.UserRq;
 import main.api.response.CommonResponse;
 import main.api.response.UserRs;
 import main.model.entities.Person;
