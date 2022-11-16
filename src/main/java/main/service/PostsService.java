@@ -1,6 +1,7 @@
 package main.service;
 
 import main.api.request.PostRequest;
+import main.api.response.PostResponse;
 import main.errors.NoPostEntityException;
 import main.model.entities.Person;
 import main.model.entities.Post;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Service
 public class PostsService {
@@ -87,5 +89,9 @@ public class PostsService {
         tagList.remove(tag);
         post.setTags(tagList);
         return postsRepository.save(post);
+    }
+
+    public List<PostResponse> postsToResponse(List<Post> posts) {
+        return posts.stream().map(PostResponse::new).collect(Collectors.toList());
     }
 }
