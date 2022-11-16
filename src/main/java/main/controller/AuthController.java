@@ -5,6 +5,7 @@ import main.api.request.LoginRequest;
 import main.api.response.CaptchaRs;
 import main.api.response.CommonResponse;
 import main.api.response.ComplexRs;
+import main.api.response.PersonResponse;
 import main.model.entities.Person;
 import main.security.jwt.JWTUtil;
 import main.service.AuthenticatesService;
@@ -34,21 +35,22 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<CommonResponse<Person>> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<CommonResponse<PersonResponse>> login(@RequestBody LoginRequest request) {
         Logger.getLogger(this.getClass().getName()).info("/api/v1/auth/login endpoint with request " + request.getEmail() + " - " + request.getPassword());
         Person person = personsService.getPersonByEmail(request.getEmail());
         if (person == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
-        person.setToken(jwtUtil.createToken(person.getEmail()));
+        PersonResponse response = new PersonResponse(person);
+        response.setToken(jwtUtil.createToken(person.getEmail()));
         if (authenticatesService.validatePassword(person, request.getPassword())) {
-            return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<Person>builder()
+            return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<PersonResponse>builder()
                     .error("success")
                     .errorDescription("")
                     .offset(0)
                     .perPage(0)
                     .timestamp(System.currentTimeMillis())
-                    .data(person)
+                    .data(response)
                     .build());
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);

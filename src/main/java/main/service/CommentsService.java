@@ -1,6 +1,7 @@
 package main.service;
 
 import main.api.request.CommentRequest;
+import main.api.response.CommentResponse;
 import main.model.entities.Comment;
 import main.model.entities.Post;
 import main.repository.CommentsRepository;
@@ -11,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CommentsService {
@@ -47,5 +50,9 @@ public class CommentsService {
         Comment comment = commentRepository.findById(commentId).get();
         comment.setIsDeleted(true);
         return commentRepository.save(comment);
+    }
+
+    public List<CommentResponse> commentsToResponse(List<Comment> comments) {
+        return comments.stream().map(CommentResponse::new).collect(Collectors.toList());
     }
 }
