@@ -51,6 +51,7 @@ public class AccountService {
             person.setLastName(regRequest.getLastName());
             person.setPassword(regRequest.getPasswd1());
             person.setRegDate(LocalDateTime.now());
+            person.setPhoto("/uploadDefault/default.png");
             personsRepository.save(person);
         }
 
