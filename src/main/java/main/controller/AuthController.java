@@ -3,36 +3,42 @@ package main.controller;
 import lombok.RequiredArgsConstructor;
 import main.api.request.LoginRq;
 import main.api.response.CaptchaRs;
-import main.api.response.LoginRs;
+import main.api.response.CommonResponse;
+import main.api.response.ComplexRs;
+import main.api.response.PersonResponse;
+import main.service.AuthService;
 import main.service.CaptchaService;
-import main.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/api/v1/auth/")
+import java.util.logging.Logger;
+
+@RestController
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final UserService userService;
     private final CaptchaService captchaService;
-
-    @PostMapping("/login")
-    public ResponseEntity<LoginRs> login(@RequestBody LoginRq loginRq) {
-        return ResponseEntity.ok(userService.login(loginRq));
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
-        return null;
-    }
+    private final AuthService authService;
 
     @GetMapping("/captcha")
     public ResponseEntity<CaptchaRs> captchaCheck() {
         return ResponseEntity.ok(captchaService.getCaptchaCode());
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<CommonResponse<PersonResponse>> login(@RequestBody LoginRq loginRq) {
+        Logger.getLogger(this.getClass().getName()).info("/api/v1/auth/login endpoint with request " + loginRq.getEmail() + " - " + loginRq.getPassword());
+        CommonResponse<PersonResponse> commonResponse = authService.loginUser(loginRq);
+        return commonResponse != null ?
+                ResponseEntity.ok(commonResponse) :
+                ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<CommonResponse<ComplexRs>> logout() {
+        Logger.getLogger(this.getClass().getName()).info("/api/v1/auth/logout endpoint");
+        return ResponseEntity.ok(authService.logoutUser());
     }
 }

@@ -1,6 +1,5 @@
 package main.model.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import main.model.enums.MessagePermissionTypes;
 
@@ -86,7 +85,6 @@ public class Person {
     private List<BlockHistory> blockHistoryList;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
-    @JsonIgnore
     private List<Post> posts;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)

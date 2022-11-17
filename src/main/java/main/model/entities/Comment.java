@@ -17,7 +17,7 @@ public class Comment {
     private LocalDateTime time;
 
     @ManyToOne
-    @JoinColumn(name = "post_id", nullable = false)
+    @JoinColumn(name = "post_id")
     private Post post;
 
     @ManyToOne

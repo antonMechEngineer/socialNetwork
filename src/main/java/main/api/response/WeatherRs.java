@@ -1,11 +1,12 @@
 package main.api.response;
+
+import lombok.Builder;
 import lombok.Data;
 
-import javax.persistence.Entity;
-
 @Data
+@Builder
 public class WeatherRs {
-    private Long id;
+
     private String clouds;
     private String temp;
     private String city;

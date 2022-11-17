@@ -2,20 +2,20 @@ server:
   port: 8086
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/social
+    url: jdbc:postgresql://localhost:5432/network
     username: postgres
     password: 123
     driver-class-name: org.postgresql.Driver
     initialization-mode: never
+    data: classpath:/db/changelog/data.sql
   jpa:
-    show-sql: true
+    show-sql: false
     database-platform: org.hibernate.dialect.PostgreSQL9Dialect
     hibernate:
       ddl-auto: none
   liquibase:
     change-log: classpath:db/changelog/changelog-master.yaml
     enabled: true
-
 auth:
   secret: someSecretCode
 
@@ -24,3 +24,7 @@ socialNetwork:
   default:
     page: 0
     size: 20
+
+
+
+
