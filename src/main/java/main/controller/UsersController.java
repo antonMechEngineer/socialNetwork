@@ -1,10 +1,7 @@
 package main.controller;
 
 import lombok.RequiredArgsConstructor;
-import main.api.response.CommonResponse;
-import main.api.response.PersonResponse;
-import main.api.response.PostResponse;
-import main.api.response.UserRs;
+import main.api.response.*;
 import main.model.entities.Post;
 import main.security.jwt.JWTUtil;
 import main.service.PersonsService;
@@ -32,6 +29,11 @@ public class UsersController {
     private final PersonsService usersService;
     private final JWTUtil jwtUtil;
 
+    @GetMapping("/{id}")
+    public ResponseEntity<PersonResponse> getUserById(@PathVariable long id) {
+        return ResponseEntity.ok(usersService.getPersonResponse(usersService.getPersonById(id)));
+    }
+
     @GetMapping("/{id}/wall")
     public ResponseEntity<CommonResponse<List<PostResponse>>> getUsersPosts(
             @PathVariable long id,
@@ -51,7 +53,7 @@ public class UsersController {
     @GetMapping("/me")
     public ResponseEntity<CommonResponse<PersonResponse>> getAuthorized(@RequestHeader(name = "Authorization") String auth) {
         Logger.getLogger(this.getClass().getName()).info("/api/v1/users/me endpoint with auth " + auth);
-        if (jwtUtil.validateToken(auth)) {
+        if (jwtUtil.isValidToken(auth)) {
             return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<PersonResponse>builder()
                     .error("success")
                     .timestamp(System.currentTimeMillis())
@@ -71,10 +73,14 @@ public class UsersController {
             @RequestParam(value = "last_name", required = false) String last_name,
             @RequestParam(value = "birth_date", required = false) String birth_date,
             @RequestParam(value = "message_permission", required = false) String message_permission,
-            Principal principal)throws IOException { return ResponseEntity
-            .ok(usersService.editImage(principal, photo,phone,about,city,country,first_name,
-                    last_name,birth_date,message_permission));}
+            Principal principal) throws IOException {
+        return ResponseEntity
+                .ok(usersService.editImage(principal, photo, phone, about, city, country, first_name,
+                        last_name, birth_date, message_permission));
+    }
 
     @DeleteMapping("/me")
-    ResponseEntity<UserRs>deleteMyData(){return null;}
+    ResponseEntity<UserRs> deleteMyData() {
+        return null;
+    }
 }

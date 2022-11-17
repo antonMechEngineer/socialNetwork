@@ -1,17 +1,13 @@
 package main.controller;
 
 import lombok.RequiredArgsConstructor;
-import main.api.request.LoginRequest;
+import main.api.request.LoginRq;
 import main.api.response.CaptchaRs;
 import main.api.response.CommonResponse;
 import main.api.response.ComplexRs;
 import main.api.response.PersonResponse;
-import main.model.entities.Person;
-import main.security.jwt.JWTUtil;
-import main.service.AuthenticatesService;
+import main.service.AuthService;
 import main.service.CaptchaService;
-import main.service.PersonsService;
-import main.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,11 +19,8 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final UserService userService;
     private final CaptchaService captchaService;
-    private final PersonsService personsService;
-    private final AuthenticatesService authenticatesService;
-    private final JWTUtil jwtUtil;
+    private final AuthService authService;
 
     @GetMapping("/captcha")
     public ResponseEntity<CaptchaRs> captchaCheck() {
@@ -35,37 +28,17 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<CommonResponse<PersonResponse>> login(@RequestBody LoginRequest request) {
-        Logger.getLogger(this.getClass().getName()).info("/api/v1/auth/login endpoint with request " + request.getEmail() + " - " + request.getPassword());
-        Person person = personsService.getPersonByEmail(request.getEmail());
-        if (person == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-        }
-        PersonResponse response = new PersonResponse(person);
-        response.setToken(jwtUtil.createToken(person.getEmail()));
-        if (authenticatesService.validatePassword(person, request.getPassword())) {
-            return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<PersonResponse>builder()
-                    .error("success")
-                    .errorDescription("")
-                    .offset(0)
-                    .perPage(0)
-                    .timestamp(System.currentTimeMillis())
-                    .data(response)
-                    .build());
-        }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    public ResponseEntity<CommonResponse<PersonResponse>> login(@RequestBody LoginRq loginRq) {
+        Logger.getLogger(this.getClass().getName()).info("/api/v1/auth/login endpoint with request " + loginRq.getEmail() + " - " + loginRq.getPassword());
+        CommonResponse<PersonResponse> commonResponse = authService.loginUser(loginRq);
+        return commonResponse != null ?
+                ResponseEntity.ok(commonResponse) :
+                ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
     }
 
     @PostMapping("/logout")
     public ResponseEntity<CommonResponse<ComplexRs>> logout() {
         Logger.getLogger(this.getClass().getName()).info("/api/v1/auth/logout endpoint");
-        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<ComplexRs>builder()
-                .error("logout")
-                .timestamp(System.currentTimeMillis())
-                .offset(0)
-                .perPage(0)
-                .errorDescription("")
-                .data(new ComplexRs())
-                .build());
+        return ResponseEntity.ok(authService.logoutUser());
     }
 }
