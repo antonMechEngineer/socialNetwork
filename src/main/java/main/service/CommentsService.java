@@ -7,11 +7,11 @@ import main.model.entities.Post;
 import main.repository.CommentsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +35,7 @@ public class CommentsService {
     }
 
     public Page<Comment> getAllComments(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = NetworkPageRequest.of(page, size);
         return commentRepository.findAll(pageable);
     }
 
@@ -52,7 +52,7 @@ public class CommentsService {
         return commentRepository.save(comment);
     }
 
-    public List<CommentResponse> commentsToResponse(List<Comment> comments) {
+    public static List<CommentResponse> commentsToResponse(List<Comment> comments) {
         return comments.stream().map(CommentResponse::new).collect(Collectors.toList());
     }
 }
