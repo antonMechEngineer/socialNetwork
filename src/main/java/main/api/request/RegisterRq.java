@@ -22,7 +22,7 @@ public class RegisterRq {
             message = "Введите корректное имя")
     private String lastName;
     private String code;
-    @JsonProperty("secret_code")
+    //@JsonProperty("secret_code")
     private String codeSecret;
     @Min(PASSWORD_LENGTH)
     private String passwd1;

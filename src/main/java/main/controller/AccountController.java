@@ -17,7 +17,7 @@ public class AccountController {
     private final AccountService accountService;
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterRs> register(@RequestBody RegisterRq regRequest) {
+    public ResponseEntity<RegisterRs> register(@RequestBody RegisterRq regRequest) {System.out.println(regRequest.getCode());
         return ResponseEntity.ok(accountService.getRegResponse(regRequest));
     }
 
