@@ -77,9 +77,10 @@ public class PersonResponse {
         this.phone = person.getPhone();
         this.photo = person.getPhoto();
         this.about = person.getAbout();
-        this.city = person.getCity().getTitle();
-        this.country = person.getCity().getCountry().getTitle();
-        this.weather = WeatherRs.builder().clouds("clouds").temp("9").city(person.getCity().getTitle()).build();
+        this.city = person.getCity() == null ? null : person.getCity().getTitle();
+        this.country = person.getCity() == null ? null : person.getCity().getCountry().getTitle();
+        this.weather = person.getCity() == null ? null : WeatherRs.builder()
+                .clouds("clouds").temp("9").city(person.getCity().getTitle()).build();
         this.currency = CurrencyRateRs.builder().usd("60").euro("62").build();
         this.online = true;
         this.firstName = person.getFirstName();

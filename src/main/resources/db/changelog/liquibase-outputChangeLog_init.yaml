@@ -528,8 +528,6 @@ databaseChangeLog:
             name: author_id
             type: BIGINT
         - column:
-            constraints:
-              nullable: false
             name: post_id
             type: BIGINT
         tableName: post_comments
