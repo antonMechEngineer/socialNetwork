@@ -21,7 +21,6 @@ public class AccountService {
     private final CaptchaRepository captchaRepository;
 
     public RegisterRs getRegResponse(RegisterRq regRequest){
-        System.out.println("code "+regRequest.getCode()+" secrcode "+regRequest.getCodeSecret()+" email "+regRequest.getEmail());
         RegisterRs registerRs = new RegisterRs();
         ComplexRs data = new ComplexRs();
         data.setMessage("OK");
@@ -53,6 +52,7 @@ public class AccountService {
             person.setLastName(regRequest.getLastName());
             person.setPassword(regRequest.getPasswd1());
             person.setRegDate(LocalDateTime.now());
+            person.setEmail(regRequest.getEmail());
             person.setPhoto("/uploadDefault/default.png");
             person.setIsApproved(false);
             person.setIsBlocked(false);
