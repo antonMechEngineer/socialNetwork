@@ -27,7 +27,7 @@ public class FriendsRecommendationService {
     public List<PersonResponse> getFriendsRecommendation(Principal principal) throws PersonNotFoundByEmailException {
         Optional<Person> optionalPerson = personsRepository.findPersonByEmail(principal.getName());
         Person person;
-        Pageable page = NetworkPageRequest.of(0, 8);
+        Pageable page = PageRequest.of(0, 8);
         if (optionalPerson.isPresent()) {
             person = optionalPerson.get();
         } else {
