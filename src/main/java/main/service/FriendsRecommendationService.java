@@ -33,10 +33,11 @@ public class FriendsRecommendationService {
         } else {
             throw new PersonNotFoundByEmailException("Person with email - " + principal.getName() + " not found");
         }
-        if (person.getCity() == null) {
+        List<PersonResponse> personResponses = personsToPersonResponses(personsRepository.findAllByCity(person.getCity(), page).getContent());
+        if (person.getCity() == null || personResponses.size() == 0) {
             return personsToPersonResponses(personsRepository.findPageOrderByRegDate(page).getContent());
         }
-        return personsToPersonResponses(personsRepository.findAllByCity(person.getCity(), page).getContent());
+        return personResponses;
     }
 
     private List<PersonResponse> personsToPersonResponses(List<Person> persons) {
