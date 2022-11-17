@@ -18,41 +18,42 @@ public class FriendsController {
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<FriendshipRs> addFriend(@RequestHeader("Authorization") String token, @PathVariable Long id) {
-
-        return ResponseEntity.ok(friendsService.addFriend(token, id));
+    public FriendshipRs addFriend(@RequestHeader("Authorization") String token, @PathVariable Long id) {
+        return friendsService.addFriend(token, id);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<FriendshipRs> deleteFriend(@RequestHeader("Authorization") String token, @PathVariable Long id) {
-        return ResponseEntity.ok(friendsService.deleteFriend(token, id));
+    public FriendshipRs deleteFriend(@RequestHeader("Authorization") String token, @PathVariable Long id) {
+        return friendsService.deleteFriend(token, id);
     }
 
     @GetMapping()
-    public ResponseEntity<ListResponseRsPersonRs> getFriend(@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(friendsService.getFriends(token));
-    }
-
-    @GetMapping("/recommendations")
-    public ResponseEntity<ListResponseRsPersonRs> getFriendRecommendations(@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(new ListResponseRsPersonRs());
+    public ListResponseRsPersonRs getFriends(
+            @RequestHeader("Authorization") String token,
+            @RequestParam(name = "page", required = false) int page,
+            @RequestParam(name = "size", required = false) int size)
+    {
+        return friendsService.getFriends(token, page, size);
     }
 
     @PostMapping("/request/{id}")
-    public ResponseEntity<FriendshipRs> sendFriendshipRequest(@RequestHeader("Authorization") String token,
+    public FriendshipRs sendFriendshipRequest(@RequestHeader("Authorization") String token,
                                                               @PathVariable Long id) {
-        return ResponseEntity.ok(friendsService.sendFriendshipRequest(token, id));
+        return friendsService.sendFriendshipRequest(token, id);
     }
 
     @GetMapping("/request")
-    public ResponseEntity<ListResponseRsPersonRs> getPotentialFriends(@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(friendsService.getRequestedPersons(token));
+    public ListResponseRsPersonRs getPotentialFriends(
+            @RequestHeader("Authorization") String token,
+            @RequestParam(name = "page", required = false) int page,
+            @RequestParam(name = "size", required = false) int size) {
+        return friendsService.getRequestedPersons(token, page, size);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<FriendshipRs> deleteSentFriendshipRequest (@RequestHeader("Authorization") String token,
+    public FriendshipRs deleteSentFriendshipRequest (@RequestHeader("Authorization") String token,
                                                                      @PathVariable Long id) {
-        return ResponseEntity.ok(friendsService.deleteSentFriendshipRequest(token, id));
+        return friendsService.deleteSentFriendshipRequest(token, id);
     }
 
 }

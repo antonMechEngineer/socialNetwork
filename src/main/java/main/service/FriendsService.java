@@ -1,6 +1,8 @@
 package main.service;
+import lombok.RequiredArgsConstructor;
 import main.api.response.FriendshipRs;
 import main.api.response.ListResponseRsPersonRs;
+import main.api.response.PersonRs;
 import main.model.entities.Friendship;
 import main.model.entities.FriendshipStatus;
 import main.model.entities.Person;
@@ -10,11 +12,16 @@ import main.repository.FriendshipsRepository;
 import main.repository.PersonsRepository;
 import main.security.jwt.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class FriendsService {
 
@@ -22,17 +29,6 @@ public class FriendsService {
     private final FriendshipStatusesRepository friendshipStatusesRepository;
     private final PersonsRepository personsRepository;
     private final JWTUtil jwtUtil;
-
-    @Autowired
-    public FriendsService(FriendshipsRepository friendshipsRepository,
-                          FriendshipStatusesRepository friendshipStatusesRepository,
-                          PersonsRepository personsRepository,
-                          JWTUtil jwtUtil) {
-        this.friendshipsRepository = friendshipsRepository;
-        this.friendshipStatusesRepository = friendshipStatusesRepository;
-        this.personsRepository = personsRepository;
-        this.jwtUtil = jwtUtil;
-    }
 
     public FriendshipRs addFriend(String token, Long futureFriendId){
         Person srcPerson = getPersonByToken(token);
@@ -46,14 +42,17 @@ public class FriendsService {
         Person srcPerson = getPersonByToken(token);
         Person dstPerson = personsRepository.findPersonById(idDeletableFriend);
         modifyFriendShipStatus(srcPerson, dstPerson, FriendshipStatusTypes.REQUEST, FriendshipStatusTypes.SUBSCRIBED);
-
         return new FriendshipRs();
     }
 
-    public ListResponseRsPersonRs getFriends(String token){
-        List<Person> requestedPersons = getPersons(token, FriendshipStatusTypes.FRIEND);
-
-        return new ListResponseRsPersonRs();
+    public ListResponseRsPersonRs getFriends(String token, Integer page, Integer size){
+        Page<Person> requestedPersons = getPagePersons(token, FriendshipStatusTypes.FRIEND, page, size);
+        return new ListResponseRsPersonRs("ok",
+                System.currentTimeMillis(),
+                Long.valueOf(requestedPersons.getTotalElements()).intValue(),
+                buildPersonRs(requestedPersons.getContent()),
+                requestedPersons.getNumberOfElements(),
+                "");
     }
 
     public FriendshipRs sendFriendshipRequest(String token, Long potentialFriendId){
@@ -88,19 +87,25 @@ public class FriendsService {
         return new FriendshipRs();
     }
 
-    public ListResponseRsPersonRs getRequestedPersons(String token){
-        List<Person> requestedPersons = getPersons(token, FriendshipStatusTypes.REQUEST);
+    public ListResponseRsPersonRs getRequestedPersons(String token, Integer page, Integer size){
+        Page<Person> requestedPersons = getPagePersons(token, FriendshipStatusTypes.REQUEST, page, size);
 
         return new ListResponseRsPersonRs();
     }
 
-    private List<Person> getPersons(String token, FriendshipStatusTypes friendshipStatusTypes){
+    private Page<Person> getPagePersons(String token, FriendshipStatusTypes friendshipStatusTypes,
+                                        Integer page, Integer size){
         Person srcPerson = getPersonByToken(token);
         List<Friendship> srcPersonFriendships = friendshipsRepository.findFriendshipBySrcPerson(srcPerson).stream().
                 filter(friendship -> friendship.getFriendshipStatus().getCode() == friendshipStatusTypes).
                 collect(Collectors.toList());
-        List<Person> persons = personsRepository.findPersonByDstFriendships(srcPersonFriendships);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("last_name").descending());
+        Page<Person> persons = personsRepository.findPersonByDstFriendships(srcPersonFriendships, pageable);
         return persons;
+    }
+
+    private List<PersonRs> buildPersonRs(List<Person> persons){
+        return persons.stream().map(PersonRs::new).collect(Collectors.toList());
     }
 
     private void modifyFriendShipStatus(Person srcPerson, Person dstPerson,
