@@ -57,6 +57,9 @@ public class UsersController {
             return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<PersonResponse>builder()
                     .error("success")
                     .timestamp(System.currentTimeMillis())
+                    .perPage(0)
+                    .data(usersService.getPersonResponse(
+                            usersService.getPersonByEmail(jwtUtil.extractUserName(auth))))
                     .build());
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
