@@ -2,8 +2,9 @@ package main.api.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import main.model.entities.Person;
 import main.model.enums.FriendshipStatusTypes;
 import main.model.enums.MessagePermissionTypes;
@@ -13,7 +14,8 @@ import java.time.LocalDateTime;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @Data
-@NoArgsConstructor
+@Builder
+@AllArgsConstructor
 @JsonInclude(NON_NULL)
 public class PersonResponse {
 
