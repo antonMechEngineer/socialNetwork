@@ -38,7 +38,7 @@ public class PostsController {
                 .build());
     }
 
-    @PostMapping("/posts")
+    @PostMapping("/post")
     public ResponseEntity<CommonResponse<PostResponse>> createPost(@RequestBody PostRequest postRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<PostResponse>builder()
                         .error("success")
@@ -48,7 +48,7 @@ public class PostsController {
         );
     }
 
-    @GetMapping("/posts/{id}")
+    @GetMapping("/post/{id}")
     public ResponseEntity<CommonResponse<PostResponse>> getPost(@PathVariable int id) throws NoPostEntityException {
         return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<PostResponse>builder()
                 .error("success")
@@ -58,7 +58,7 @@ public class PostsController {
         );
     }
 
-    @PutMapping("/posts/{id}")
+    @PutMapping("/post/{id}")
     public ResponseEntity<CommonResponse<PostResponse>> updatePost(@PathVariable int id, @RequestBody PostRequest postRequest) throws NoPostEntityException {
         return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<PostResponse>builder()
                 .error("success")
@@ -68,7 +68,7 @@ public class PostsController {
         );
     }
 
-    @DeleteMapping("/posts/{id}")
+    @DeleteMapping("/post/{id}")
     public ResponseEntity<CommonResponse<PostResponse>> deletePost(@PathVariable int id) throws NoPostEntityException {
         Post post = postsService.deletePost(id);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<PostResponse>builder()

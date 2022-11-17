@@ -5,6 +5,7 @@ import lombok.Data;
 import main.model.entities.Post;
 import main.model.entities.Tag;
 import main.model.enums.PostTypes;
+import main.service.CommentsService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class PostResponse {
         this.title = post.getTitle();
         this.likes = post.getPostLikes().size();
         this.tags = post.getTags();
-        this.comments = new ArrayList<>();
+        this.comments = new ArrayList<>(CommentsService.commentsToResponse(post.getComments()));
         this.type = PostTypes.getType(post.getIsDeleted(), post.getTime());
         this.postText = post.getPostText();
         this.isBlocked = post.getIsBlocked();
