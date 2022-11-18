@@ -57,6 +57,7 @@ public class AccountService {
             person.setIsApproved(false);
             person.setIsBlocked(false);
             person.setIsDeleted(false);
+            person.setEmail(regRequest.getEmail());
             person.setMessagePermission(MessagePermissionTypes.ALL);
             personsRepository.save(person);
    //     }

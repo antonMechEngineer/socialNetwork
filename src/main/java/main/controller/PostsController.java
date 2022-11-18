@@ -5,6 +5,7 @@ import main.api.request.PostRequest;
 import main.api.response.CommonResponse;
 import main.api.response.PostResponse;
 import main.errors.NoPostEntityException;
+import main.mappers.PostMapper;
 import main.model.entities.Post;
 import main.service.PostsService;
 import org.springframework.data.domain.Page;
@@ -43,7 +44,7 @@ public class PostsController {
         return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<PostResponse>builder()
                         .error("success")
                         .timestamp(System.currentTimeMillis())
-                        .data(new PostResponse(postsService.createPost(postRequest)))
+                        .data(PostMapper.INSTANCE.postToResponse(postsService.createPost(postRequest)))
                         .build()
         );
     }
@@ -53,7 +54,7 @@ public class PostsController {
         return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<PostResponse>builder()
                 .error("success")
                 .timestamp(System.currentTimeMillis())
-                .data(new PostResponse(postsService.findPostById(id)))
+                .data(PostMapper.INSTANCE.postToResponse(postsService.findPostById(id)))
                 .build()
         );
     }
@@ -63,7 +64,7 @@ public class PostsController {
         return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<PostResponse>builder()
                 .error("success")
                 .timestamp(System.currentTimeMillis())
-                .data(new PostResponse(postsService.updatePost(id, postRequest)))
+                .data(PostMapper.INSTANCE.postToResponse(postsService.updatePost(id, postRequest)))
                 .build()
         );
     }
@@ -74,7 +75,7 @@ public class PostsController {
         return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<PostResponse>builder()
                 .error("success")
                 .timestamp(System.currentTimeMillis())
-                .data(new PostResponse(post))
+                .data(PostMapper.INSTANCE.postToResponse(post))
                 .build()
         );
     }
