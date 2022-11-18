@@ -6,6 +6,7 @@ import main.model.entities.Post;
 import main.security.jwt.JWTUtil;
 import main.service.PersonsService;
 import main.service.PostsService;
+import main.service.UsersService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,12 +27,13 @@ import java.util.logging.Logger;
 public class UsersController {
 
     private final PostsService postsService;
-    private final PersonsService usersService;
+    private final PersonsService personsService;
+    private final UsersService usersService;
     private final JWTUtil jwtUtil;
 
     @GetMapping("/{id}")
     public ResponseEntity<PersonResponse> getUserById(@PathVariable long id) {
-        return ResponseEntity.ok(usersService.getPersonResponse(usersService.getPersonById(id)));
+        return ResponseEntity.ok(personsService.getPersonResponse(personsService.getPersonById(id)));
     }
 
     @GetMapping("/{id}/wall")
@@ -39,7 +41,7 @@ public class UsersController {
             @PathVariable long id,
             @RequestParam(name = "page", required = false, defaultValue = "${socialNetwork.default.page}") int page,
             @RequestParam(name = "size", required = false, defaultValue = "${socialNetwork.default.size}") int size) {
-        Page<Post> postPage = postsService.getAllPostsByAuthor(page, size, usersService.getPersonById(id));
+        Page<Post> postPage = postsService.getAllPostsByAuthor(page, size, personsService.getPersonById(id));
         return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<List<PostResponse>>builder()
                 .error("success")
                 .timestamp(System.currentTimeMillis())
