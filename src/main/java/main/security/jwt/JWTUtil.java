@@ -27,7 +27,7 @@ public class JWTUtil {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 3000))
                 .signWith(SignatureAlgorithm.HS256, secret).compact();
     }
 
@@ -40,8 +40,8 @@ public class JWTUtil {
     }
 
     public Boolean isValidToken(String token) {
-        return getTokenBody(token).getExpiration().after(new Date()) &&
-                !getTokenBody(token).isEmpty();
+            return getTokenBody(token).getExpiration().after(new Date()) &&
+                    !getTokenBody(token).isEmpty();
     }
 
     public String resolveToken(HttpServletRequest request) {

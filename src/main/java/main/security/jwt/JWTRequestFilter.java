@@ -2,9 +2,6 @@ package main.security.jwt;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
-import main.service.AuthService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -24,7 +21,7 @@ public class JWTRequestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException, ExpiredJwtException {
+            throws ServletException, IOException {
         try {
             String token = jwtUtil.resolveToken(request);
             if (token != null && jwtUtil.isValidToken(token)) {
@@ -34,10 +31,9 @@ public class JWTRequestFilter extends OncePerRequestFilter {
                 }
             }
             filterChain.doFilter(request, response);
-        } catch (ExpiredJwtException ex) {
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            SecurityContextHolder.getContext().getAuthentication().setAuthenticated(false);
-            response.getWriter().write("");
+        } catch (ExpiredJwtException e) {
+            SecurityContextHolder.clearContext();
+            response.setStatus(401);
         }
     }
 }

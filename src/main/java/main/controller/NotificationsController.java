@@ -10,6 +10,6 @@ public class NotificationsController {
 
     @GetMapping("/api/v1/notifications")
     public ResponseEntity<?> notifications() {
-        return ResponseEntity.ok("");
+        return ResponseEntity.status(200).build();
     }
 }

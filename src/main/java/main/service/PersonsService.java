@@ -7,7 +7,6 @@ import main.api.response.UserRs;
 import main.api.response.WeatherRs;
 import main.model.entities.Person;
 import main.repository.PersonsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
