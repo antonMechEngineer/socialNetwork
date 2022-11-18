@@ -47,7 +47,6 @@ public class PostsService {
     }
 
     public Page<Post> getAllPostsByAuthor(int page, int size, Person postsAuthor) {
-        Logger.getLogger(this.getClass().getName()).info("getAllPostsByAuthor by " + postsAuthor + " with page " + page + " and size " + size);
         Pageable pageable = NetworkPageRequest.of(page, size);
         return postsRepository.findPostsByAuthorOrderByTimeDesc(pageable, postsAuthor);
     }
