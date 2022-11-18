@@ -3,6 +3,7 @@ package main.service;
 import main.api.request.PostRequest;
 import main.api.response.PostResponse;
 import main.errors.NoPostEntityException;
+import main.mappers.PostMapper;
 import main.model.entities.Person;
 import main.model.entities.Post;
 import main.model.entities.Tag;
@@ -91,6 +92,6 @@ public class PostsService {
     }
 
     public List<PostResponse> postsToResponse(List<Post> posts) {
-        return posts.stream().map(PostResponse::new).collect(Collectors.toList());
+        return posts.stream().map(PostMapper.INSTANCE::postToResponse).collect(Collectors.toList());
     }
 }
