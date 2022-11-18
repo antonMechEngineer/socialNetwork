@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -130,8 +131,9 @@ public class FriendsService {
 
     private Person getPersonByToken(String token){
         String personEmail = jwtUtil.extractUserName(token);
-        Person currentPerson = personsRepository.findPersonByEmail(personEmail);
-        return currentPerson;
+        Optional <Person> currentPerson = personsRepository.findPersonByEmail(personEmail);
+        Person person = currentPerson.get();
+        return person;
     }
 }
 
