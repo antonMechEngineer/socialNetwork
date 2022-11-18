@@ -6,7 +6,6 @@ import lombok.Data;
 @Data
 @Builder
 public class WeatherRs {
-
     private String clouds;
     private String temp;
     private String city;

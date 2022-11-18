@@ -14,4 +14,8 @@ public class ComplexRs {
     private int count;
     private String message;
     private int message_id;
+
+    public ComplexRs(String message) {
+        this.message = message;
+    }
 }

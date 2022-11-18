@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-
 @AllArgsConstructor
 @Data
 public class ListResponseRsPersonRs {

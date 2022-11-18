@@ -1,5 +1,6 @@
 package main.service;
 import lombok.RequiredArgsConstructor;
+import main.api.response.ComplexRs;
 import main.api.response.FriendshipRs;
 import main.api.response.ListResponseRsPersonRs;
 import main.api.response.PersonRs;
@@ -11,12 +12,12 @@ import main.repository.FriendshipStatusesRepository;
 import main.repository.FriendshipsRepository;
 import main.repository.PersonsRepository;
 import main.security.jwt.JWTUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,24 +35,23 @@ public class FriendsService {
         Person srcPerson = getPersonByToken(token);
         Person dstPerson = personsRepository.findPersonById(futureFriendId);
         modifyFriendShipStatus(srcPerson, dstPerson, FriendshipStatusTypes.FRIEND, FriendshipStatusTypes.FRIEND);
-
-        return new FriendshipRs();
+        return new FriendshipRs("ok", LocalDateTime.now().toString(), new ComplexRs("ok"));
     }
 
     public FriendshipRs deleteFriend(String token, Long idDeletableFriend){
         Person srcPerson = getPersonByToken(token);
         Person dstPerson = personsRepository.findPersonById(idDeletableFriend);
         modifyFriendShipStatus(srcPerson, dstPerson, FriendshipStatusTypes.REQUEST, FriendshipStatusTypes.SUBSCRIBED);
-        return new FriendshipRs();
+        return new FriendshipRs("ok", LocalDateTime.now().toString(), new ComplexRs("ok"));
     }
 
     public ListResponseRsPersonRs getFriends(String token, Integer page, Integer size){
-        Page<Person> requestedPersons = getPagePersons(token, FriendshipStatusTypes.FRIEND, page, size);
+        Page<Person> friends = getPagePersons(token, FriendshipStatusTypes.FRIEND, page, size);
         return new ListResponseRsPersonRs("ok",
                 System.currentTimeMillis(),
-                Long.valueOf(requestedPersons.getTotalElements()).intValue(),
-                buildPersonRs(requestedPersons.getContent()),
-                requestedPersons.getNumberOfElements(),
+                Long.valueOf(friends.getTotalElements()).intValue(),
+                buildPersonRs(friends.getContent()),
+                friends.getNumberOfElements(),
                 "");
     }
 
@@ -66,8 +66,7 @@ public class FriendsService {
         Friendship dstFriendship = new Friendship(dstFriendshipStatus, LocalDateTime.now(), dstPerson, srcPerson);
         friendshipsRepository.save(srcFriendship);
         friendshipsRepository.save(dstFriendship);
-
-        return new FriendshipRs();
+        return new FriendshipRs("ok", LocalDateTime.now().toString(), new ComplexRs("ok"));
     }
 
     public FriendshipRs deleteSentFriendshipRequest(String token, Long requestedPersonId){
@@ -83,14 +82,17 @@ public class FriendsService {
         friendshipsRepository.delete(dstFriendship);
         friendshipStatusesRepository.delete(srcFriendshipStatus);
         friendshipStatusesRepository.delete(dstFriendshipStatus);
-
-        return new FriendshipRs();
+        return new FriendshipRs("ok", LocalDateTime.now().toString(), new ComplexRs("ok"));
     }
 
     public ListResponseRsPersonRs getRequestedPersons(String token, Integer page, Integer size){
         Page<Person> requestedPersons = getPagePersons(token, FriendshipStatusTypes.REQUEST, page, size);
-
-        return new ListResponseRsPersonRs();
+        return new ListResponseRsPersonRs("ok",
+                System.currentTimeMillis(),
+                Long.valueOf(requestedPersons.getTotalElements()).intValue(),
+                buildPersonRs(requestedPersons.getContent()),
+                requestedPersons.getNumberOfElements(),
+                "");
     }
 
     private Page<Person> getPagePersons(String token, FriendshipStatusTypes friendshipStatusTypes,
