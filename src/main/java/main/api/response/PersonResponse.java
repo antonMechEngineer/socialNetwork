@@ -2,10 +2,8 @@ package main.api.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import main.model.entities.Person;
 import main.model.enums.FriendshipStatusTypes;
 import main.model.enums.MessagePermissionTypes;
 
@@ -15,7 +13,6 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @Data
 @Builder
-@AllArgsConstructor
 @JsonInclude(NON_NULL)
 public class PersonResponse {
 
@@ -64,32 +61,8 @@ public class PersonResponse {
     private Boolean isBlocked;
 
     @JsonProperty("friend_status")
-    private FriendshipStatusTypes friendStatus() {
-        return FriendshipStatusTypes.REQUEST;
-    }
+    private FriendshipStatusTypes friendStatus;
 
     @JsonProperty("user_deleted")
     private Boolean isDeleted;
-
-    public PersonResponse(Person person) {
-        this.id = person.getId();
-        this.email = person.getEmail();
-        this.phone = person.getPhone();
-        this.photo = person.getPhoto();
-        this.about = person.getAbout();
-        this.city = person.getCity() == null ? null : person.getCity().getTitle();
-        this.country = person.getCity() == null ? null : person.getCity().getCountry().getTitle();
-        this.weather = person.getCity() == null ? null : WeatherRs.builder()
-                .clouds("clouds").temp("9").city(person.getCity().getTitle()).build();
-        this.currency = CurrencyRateRs.builder().usd("60").euro("62").build();
-        this.online = true;
-        this.firstName = person.getFirstName();
-        this.lastName = person.getLastName();
-        this.regDate = person.getRegDate();
-        this.birthDate = person.getBirthDate();
-        this.messagePermission = person.getMessagePermission();
-        this.lastOnlineTime = person.getLastOnlineTime();
-        this.isBlocked = person.getIsBlocked();
-        this.isDeleted = person.getIsDeleted();
-    }
 }

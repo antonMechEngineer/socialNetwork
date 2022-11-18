@@ -1,13 +1,11 @@
 package main.service;
 
 import lombok.RequiredArgsConstructor;
-import main.api.response.CurrencyRateRs;
 import main.api.response.PersonResponse;
 import main.api.response.UserRs;
-import main.api.response.WeatherRs;
+import main.mappers.PersonMapper;
 import main.model.entities.Person;
 import main.repository.PersonsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,32 +40,6 @@ public class PersonsService {
     }
 
     public PersonResponse getPersonResponse(Person person) {
-        return PersonResponse.builder()
-                .id(person.getId())
-                .email(person.getEmail())
-                .phone(person.getPhone())
-                .photo(person.getPhoto())
-                .about(person.getAbout())
-                .city(person.getCity().getTitle())
-                .country(person.getCity().getCountry().getTitle())
-                .token(person.getChangePasswordToken())
-                .weather(WeatherRs.builder()
-                        .temp(person.getCity().getTemp())
-                        .clouds(person.getCity().getClouds())
-                        .build())
-                .currency(CurrencyRateRs.builder()
-                        .euro(currencyService.getCurrencyByName("EUR").getPrice())
-                        .usd(currencyService.getCurrencyByName("USD").getPrice())
-                        .build())
-                .online(Boolean.valueOf(person.getOnlineStatus()))
-                .firstName(person.getFirstName())
-                .lastName(person.getLastName())
-                .regDate(person.getRegDate())
-                .birthDate(person.getBirthDate())
-                .messagePermission(person.getMessagePermission())
-                .lastOnlineTime(person.getLastOnlineTime())
-                .isBlocked(person.getIsBlocked())
-                .isDeleted(person.getIsDeleted())
-                .build();
+        return PersonMapper.INSTANCE.toPersonResponse(person);
     }
 }

@@ -2,6 +2,7 @@ package main.service;
 
 import main.api.response.PersonResponse;
 import main.errors.PersonNotFoundByEmailException;
+import main.mappers.PersonMapper;
 import main.model.entities.Person;
 import main.repository.PersonsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ public class FriendsRecommendationService {
     private List<PersonResponse> personsToPersonResponses(List<Person> persons) {
         List<PersonResponse> personResponses = new ArrayList<>();
         for (Person person : persons) {
-            personResponses.add(new PersonResponse(person));
+            personResponses.add(PersonMapper.INSTANCE.toPersonResponse(person));
         }
         return personResponses;
     }
