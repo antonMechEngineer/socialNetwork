@@ -2,6 +2,7 @@ package main.controller;
 
 import lombok.RequiredArgsConstructor;
 import main.api.response.*;
+import main.mappers.PersonMapper;
 import main.model.entities.Post;
 import main.security.jwt.JWTUtil;
 import main.service.PersonsService;
@@ -57,9 +58,7 @@ public class UsersController {
             return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<PersonResponse>builder()
                     .error("success")
                     .timestamp(System.currentTimeMillis())
-                    .perPage(0)
-                    .data(usersService.getPersonResponse(
-                            usersService.getPersonByEmail(jwtUtil.extractUserName(auth))))
+                    .data(PersonMapper.INSTANCE.toPersonResponse(usersService.getPersonById(1)))
                     .build());
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);

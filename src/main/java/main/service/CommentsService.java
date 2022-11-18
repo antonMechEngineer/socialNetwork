@@ -2,6 +2,7 @@ package main.service;
 
 import main.api.request.CommentRequest;
 import main.api.response.CommentResponse;
+import main.mappers.CommentMapper;
 import main.model.entities.Comment;
 import main.model.entities.Post;
 import main.repository.CommentsRepository;
@@ -53,6 +54,22 @@ public class CommentsService {
     }
 
     public static List<CommentResponse> commentsToResponse(List<Comment> comments) {
-        return comments.stream().map(CommentResponse::new).collect(Collectors.toList());
+        return comments.stream().map(comment -> {
+            CommentResponse commentResponse = CommentMapper.INSTANCE.commentToResponse(comment);
+            commentResponse.setEmbeddedComments(getEmbeddedCommentsResponse(comment));
+            return commentResponse;
+        }).collect(Collectors.toList());
+    }
+
+    private static List<CommentResponse> getEmbeddedCommentsResponse(Comment comment) {
+        List<CommentResponse> commentResponses = new ArrayList<>();
+        if (!comment.getEmbeddedComments().isEmpty()) {
+            comment.getEmbeddedComments().stream().map(c -> {
+                CommentResponse commentResponse = CommentMapper.INSTANCE.commentToResponse(c);
+                commentResponse.setEmbeddedComments(getEmbeddedCommentsResponse(c));
+                return commentResponse;
+            }).forEach(commentResponses::add);
+        }
+        return commentResponses;
     }
 }

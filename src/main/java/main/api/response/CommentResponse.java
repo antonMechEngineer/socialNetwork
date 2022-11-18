@@ -1,15 +1,14 @@
 package main.api.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Data;
-import main.model.entities.Comment;
-import main.service.CommentsService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@Builder
 public class CommentResponse {
 
     private Long id;
@@ -39,18 +38,4 @@ public class CommentResponse {
     private Integer likes;
 
     private Boolean myLike;
-
-    public CommentResponse(Comment comment) {
-        this.id = comment.getId();
-        this.time = comment.getTime();
-        this.postId = comment.getPost() == null ? null : comment.getPost().getId();
-        this.parentId = comment.getParentComment() == null ? null : comment.getParentComment().getId();
-        this.author = new PersonResponse(comment.getPerson());
-        this.commentText = comment.getCommentText();
-        this.isBlocked = comment.getIsBlocked();
-        this.isDeleted = comment.getIsDeleted();
-//        this.embeddedComments = new ArrayList<>(CommentsService.commentsToResponse(comment.getEmbeddedComments()));
-        this.likes = 0;
-        this.myLike = false;
-    }
 }
