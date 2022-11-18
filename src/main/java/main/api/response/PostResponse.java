@@ -1,17 +1,15 @@
 package main.api.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Data;
-import main.model.entities.Post;
-import main.model.entities.Tag;
 import main.model.enums.PostTypes;
-import main.service.CommentsService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@Builder
 public class PostResponse {
 
     private Long id;
@@ -24,7 +22,7 @@ public class PostResponse {
 
     private Integer likes;
 
-    private List<Tag> tags;
+    private List<String> tags;
 
     private List<CommentResponse> comments;
 
@@ -37,18 +35,4 @@ public class PostResponse {
     private Boolean isBlocked;
 
     private Boolean myLike;
-
-    public PostResponse(Post post) {
-        this.id = post.getId();
-        this.time = post.getTime();
-        this.author = new PersonResponse(post.getAuthor());
-        this.title = post.getTitle();
-        this.likes = post.getPostLikes().size();
-        this.tags = post.getTags();
-        this.comments = new ArrayList<>(CommentsService.commentsToResponse(post.getComments()));
-        this.type = PostTypes.getType(post.getIsDeleted(), post.getTime());
-        this.postText = post.getPostText();
-        this.isBlocked = post.getIsBlocked();
-        this.myLike = false;
-    }
 }
