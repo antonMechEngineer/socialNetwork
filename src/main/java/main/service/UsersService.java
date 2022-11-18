@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 
 import main.api.response.PersonResponse;
 import main.api.response.UserRs;
+import main.mappers.PersonMapper;
 import main.model.entities.Person;
 import main.repository.CaptchaRepository;
 import main.repository.PersonsRepository;
@@ -30,7 +31,7 @@ public class UsersService {
                             String birth_date, String message_permission) throws IOException {
         Person person = personsRepository.findPersonByEmail(principal.getName()).get();
         UserRs response =new UserRs();
-        PersonResponse personResponse = new PersonResponse(person);
+        PersonResponse personResponse = PersonMapper.INSTANCE.toPersonResponse(person);
 
         String extension = (photo.getOriginalFilename());
         cloudaryService.uploadImage((File) photo);
