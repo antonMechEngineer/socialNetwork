@@ -44,7 +44,7 @@ public class AuthService {
     }
 
     public CommonResponse<ComplexRs> logoutUser() {
-        SecurityContextHolder.getContext().getAuthentication().setAuthenticated(false);
+        SecurityContextHolder.clearContext();
         return CommonResponse.<ComplexRs>builder()
                 .error("logout")
                 .timestamp(System.currentTimeMillis())

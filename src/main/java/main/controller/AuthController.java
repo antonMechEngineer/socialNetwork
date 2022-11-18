@@ -8,7 +8,6 @@ import main.api.response.ComplexRs;
 import main.api.response.PersonResponse;
 import main.service.AuthService;
 import main.service.CaptchaService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,9 +30,7 @@ public class AuthController {
     public ResponseEntity<CommonResponse<PersonResponse>> login(@RequestBody LoginRq loginRq) {
         Logger.getLogger(this.getClass().getName()).info("/api/v1/auth/login endpoint with request " + loginRq.getEmail() + " - " + loginRq.getPassword());
         CommonResponse<PersonResponse> commonResponse = authService.loginUser(loginRq);
-        return commonResponse != null ?
-                ResponseEntity.ok(commonResponse) :
-                ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        return ResponseEntity.ok(commonResponse);
     }
 
     @PostMapping("/logout")
