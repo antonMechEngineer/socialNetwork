@@ -2,6 +2,7 @@ package main.model.entities;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.List;
@@ -21,6 +22,7 @@ public class Tag {
 
     @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(name = "post2tag", joinColumns = @JoinColumn(name = "tag_id"), inverseJoinColumns = @JoinColumn(name = "post_id"))
+    @ToString.Exclude
     private List<Post> posts;
 
     public Tag(String tagName) {

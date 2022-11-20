@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.logging.Logger;
 
 @Service
 @RequiredArgsConstructor
@@ -37,12 +36,10 @@ public class PersonsService {
     }
 
     public Person getPersonById(long personId) {
-        Logger.getLogger(this.getClass().getName()).info("getPersonById with id " + personId);
         return personRepository.findById(personId).orElse(null);
     }
 
     public Person getPersonByEmail(String email) {
-        Logger.getLogger(this.getClass().getName()).info("getPersonByEmail with email " + email);
         return personRepository.findPersonByEmail(email).orElse(null);
     }
 

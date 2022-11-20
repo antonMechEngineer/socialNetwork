@@ -6,7 +6,6 @@ import main.api.request.PasswordRq;
 import main.api.request.RegisterRq;
 import main.api.response.RegisterRs;
 import main.service.AccountService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
