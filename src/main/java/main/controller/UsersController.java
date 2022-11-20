@@ -1,6 +1,7 @@
 package main.controller;
 
 import lombok.RequiredArgsConstructor;
+import main.api.request.UserRq;
 import main.api.response.*;
 import main.mappers.PersonMapper;
 import main.model.entities.Post;
@@ -60,7 +61,7 @@ public class UsersController {
             return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<PersonResponse>builder()
                     .error("success")
                     .timestamp(System.currentTimeMillis())
-                    .data(PersonMapper.INSTANCE.toPersonResponse(usersService.getPersonById(1)))
+                    .data(PersonMapper.INSTANCE.toPersonResponse(personsService.getPersonById(1)))
                     .build());
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
@@ -81,6 +82,12 @@ public class UsersController {
         return ResponseEntity
                 .ok(usersService.editImage(principal, photo, phone, about, city, country, first_name,
                         last_name, birth_date, message_permission));
+    }
+
+    @PutMapping("/me")
+    ResponseEntity<UserRs> updateMyData(@RequestBody UserRq userRq,
+            Principal principal) throws IOException {
+        return ResponseEntity.ok(usersService.editProfile(principal, userRq));
     }
 
     @DeleteMapping("/me")

@@ -3,6 +3,7 @@ package main.service;
 import liquibase.util.file.FilenameUtils;
 import lombok.AllArgsConstructor;
 
+import main.api.request.UserRq;
 import main.api.response.PersonResponse;
 import main.api.response.UserRs;
 import main.mappers.PersonMapper;
@@ -36,6 +37,25 @@ public class UsersService {
         String extension = (photo.getOriginalFilename());
         cloudaryService.uploadImage((File) photo);
         personResponse.setPhoto(cloudaryService.getImage(photo.getOriginalFilename()));
+
+        return response;
+    }
+
+    public UserRs editProfile(Principal principal, UserRq userRq) throws IOException {
+        Person person = personsRepository.findPersonByEmail(principal.getName()).get();
+        UserRs response =new UserRs();
+        PersonResponse personResponse = PersonMapper.INSTANCE.toPersonResponse(person);
+        if (userRq.getAbout() != null) {
+            person.setAbout(userRq.getAbout());
+        }
+        if (userRq.getBirth_date() != null) {
+           // person.setBirthDate(userRq.getBirth_date());
+        }
+        if (userRq.getCity() != null) {
+       //     person.setCity(userRq.getCity());
+        }
+
+
 
         return response;
     }
