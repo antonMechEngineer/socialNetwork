@@ -1,44 +1,44 @@
 package main.service;
 
+import lombok.RequiredArgsConstructor;
+import main.api.response.CommonResponse;
 import main.api.response.PersonResponse;
-import main.errors.PersonNotFoundByEmailException;
 import main.mappers.PersonMapper;
 import main.model.entities.Person;
 import main.repository.PersonsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class FriendsRecommendationService {
 
     private final PersonsRepository personsRepository;
 
-    @Autowired
-    public FriendsRecommendationService(PersonsRepository personsRepository) {
-        this.personsRepository = personsRepository;
-    }
-
-    public List<PersonResponse> getFriendsRecommendation(Principal principal) throws PersonNotFoundByEmailException {
-        Optional<Person> optionalPerson = personsRepository.findPersonByEmail(principal.getName());
-        Person person;
+    public CommonResponse<List<PersonResponse>> getFriendsRecommendation() {
+        Optional<Person> optionalPerson = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         Pageable page = PageRequest.of(0, 8);
-        if (optionalPerson.isPresent()) {
-            person = optionalPerson.get();
-        } else {
-            throw new PersonNotFoundByEmailException("Person with email - " + principal.getName() + " not found");
-        }
+        Person person = optionalPerson.get();
         List<PersonResponse> personResponses = personsToPersonResponses(personsRepository.findAllByCity(person.getCity(), page).getContent());
         if (person.getCity() == null || personResponses.size() == 0) {
-            return personsToPersonResponses(personsRepository.findPageOrderByRegDate(page).getContent());
+            personResponses = personsToPersonResponses(personsRepository.findPageOrderByRegDate(page).getContent());
+            return buildCommonResponse(personResponses);
         }
-        return personResponses;
+        return buildCommonResponse(personResponses);
+    }
+
+    private CommonResponse<List<PersonResponse>> buildCommonResponse (List<PersonResponse> personResponses) {
+        return CommonResponse.<List<PersonResponse>>builder()
+                .timestamp(System.currentTimeMillis())
+                .total((long) personResponses.size())
+                .data(personResponses)
+                .build();
     }
 
     private List<PersonResponse> personsToPersonResponses(List<Person> persons) {
