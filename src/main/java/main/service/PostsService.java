@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,7 +32,6 @@ public class PostsService {
     }
 
     public Post createPost(PostRequest postRequest) {
-        Logger.getLogger(this.getClass().getName()).info("createPost with title " + postRequest.getTitle() + " and text " + postRequest.getPostText());
         Post post = new Post();
         post.setTitle(postRequest.getTitle());
         post.setPostText(postRequest.getPostText());
@@ -41,7 +39,6 @@ public class PostsService {
     }
 
     public Page<Post> getAllPosts(int page, int size) {
-        Logger.getLogger(this.getClass().getName()).info("getAllPosts with page " + page + " and size " + size);
         Pageable pageable = NetworkPageRequest.of(page, size, Sort.by("time").descending());
         return postsRepository.findAll(pageable);
     }
@@ -52,12 +49,10 @@ public class PostsService {
     }
 
     public Post findPostById(long postId) throws NoPostEntityException {
-        Logger.getLogger(this.getClass().getName()).info("findPostById with postId " + postId);
         return postsRepository.findById(postId).orElseThrow(() -> new NoPostEntityException("Post with id " + postId + " does not exist"));
     }
 
     public Post updatePost(long postId, PostRequest postRequest) throws NoPostEntityException {
-        Logger.getLogger(this.getClass().getName()).info("updatePost with title " + postRequest.getTitle() + " and text " + postRequest.getPostText());
         Post post = findPostById(postId);
         post.setTitle(postRequest.getTitle());
         post.setPostText(postRequest.getPostText());
@@ -65,7 +60,6 @@ public class PostsService {
     }
 
     public Post deletePost(long postId) throws NoPostEntityException {
-        Logger.getLogger(this.getClass().getName()).info("deletePost with postId " + postId);
         Post post = findPostById(postId);
         post.setIsDeleted(true);
         post.setTimeDelete(LocalDateTime.now());

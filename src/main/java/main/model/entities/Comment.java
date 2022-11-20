@@ -1,5 +1,7 @@
 package main.model.entities;
 import lombok.Data;
+import lombok.ToString;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,21 +18,6 @@ public class Comment {
     @Column(nullable = false)
     private LocalDateTime time;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id")
-    private Post post;
-
-    @ManyToOne
-    @JoinColumn(name = "parent_id")
-    private Comment parentComment;
-
-    @OneToMany(mappedBy = "parentComment")
-    private List<Comment> embeddedComments;
-
-    @ManyToOne
-    @JoinColumn(name = "author_id", nullable = false)
-    private Person person;
-
     @Column(name = "comment_text", nullable = false, columnDefinition = "TEXT")
     private String commentText;
 
@@ -39,4 +26,23 @@ public class Comment {
 
     @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isDeleted;
+
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    @ToString.Exclude
+    private Post post;
+
+    @ManyToOne
+    @JoinColumn(name = "parent_id")
+    @ToString.Exclude
+    private Comment parentComment;
+
+    @OneToMany(mappedBy = "parentComment")
+    @ToString.Exclude
+    private List<Comment> embeddedComments;
+
+    @ManyToOne
+    @JoinColumn(name = "author_id", nullable = false)
+    @ToString.Exclude
+    private Person person;
 }

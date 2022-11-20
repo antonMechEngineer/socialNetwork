@@ -19,7 +19,6 @@ import java.security.Principal;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -53,7 +52,6 @@ public class UsersController {
 
     @GetMapping("/me")
     public ResponseEntity<CommonResponse<PersonResponse>> getAuthorized(@RequestHeader(name = "Authorization") String auth) {
-        Logger.getLogger(this.getClass().getName()).info("/api/v1/users/me endpoint with auth " + auth);
         if (jwtUtil.isValidToken(auth)) {
             return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<PersonResponse>builder()
                     .error("success")

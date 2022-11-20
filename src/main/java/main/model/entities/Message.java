@@ -1,6 +1,7 @@
 package main.model.entities;
 
 import lombok.Data;
+import lombok.ToString;
 import main.model.enums.ReadStatusTypes;
 
 import javax.persistence.*;
@@ -18,14 +19,6 @@ public class Message {
     @Column(nullable = false)
     private LocalDateTime time;
 
-    @ManyToOne
-    @JoinColumn(name = "author_id", nullable = false)
-    private Person author;
-
-    @ManyToOne
-    @JoinColumn(name = "recipient_id", nullable = false)
-    private Person recipient;
-
     @Column(name = "message_text", nullable = false, columnDefinition = "TEXT")
     private String messageText;
 
@@ -33,10 +26,21 @@ public class Message {
     @Enumerated(EnumType.STRING)
     private ReadStatusTypes readStatus;
 
-    @ManyToOne
-    @JoinColumn(name = "dialog_id", nullable = false)
-    private Dialog dialog;
-
     @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isDeleted;
+
+    @ManyToOne
+    @JoinColumn(name = "author_id", nullable = false)
+    @ToString.Exclude
+    private Person author;
+
+    @ManyToOne
+    @JoinColumn(name = "recipient_id", nullable = false)
+    @ToString.Exclude
+    private Person recipient;
+
+    @ManyToOne
+    @JoinColumn(name = "dialog_id", nullable = false)
+    @ToString.Exclude
+    private Dialog dialog;
 }

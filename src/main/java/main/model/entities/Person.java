@@ -1,6 +1,7 @@
 package main.model.entities;
 
 import lombok.Data;
+import lombok.ToString;
 import main.model.enums.MessagePermissionTypes;
 
 import javax.persistence.*;
@@ -38,10 +39,6 @@ public class Person {
 
     private String about;
 
-    @ManyToOne
-    @JoinColumn(name = "city_id")
-    private City city;
-
     @Column(name = "confirmation_code")
     private Integer confirmationCode;
 
@@ -75,36 +72,52 @@ public class Person {
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "friendship", joinColumns = @JoinColumn(name = "src_person_id"), inverseJoinColumns = @JoinColumn(name = "dst_person_id"))
+    @ToString.Exclude
     private List<Person> srcFriendships;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "friendship", joinColumns = @JoinColumn(name = "dst_person_id"), inverseJoinColumns = @JoinColumn(name = "src_person_id"))
+    @ToString.Exclude
     private List<Person> dstFriendships;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<BlockHistory> blockHistoryList;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Post> posts;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Comment> comments;
 
     @OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private PersonSettings personSettings;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Notification> notifications;
 
     @OneToMany(mappedBy = "firstPerson", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ToString.Exclude
     private List<Dialog> firstPersonDialogs;
 
     @OneToMany(mappedBy = "secondPerson", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ToString.Exclude
     private List<Dialog> secondPersonDialogs;
 
     @OneToMany(mappedBy = "author", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ToString.Exclude
     private List<Message> messages;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<PostLike> postLikes;
+
+    @ManyToOne
+    @JoinColumn(name = "city_id")
+    @ToString.Exclude
+    private City city;
 }

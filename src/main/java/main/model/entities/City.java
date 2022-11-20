@@ -1,6 +1,9 @@
 package main.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.ToString;
+
 import javax.persistence.*;
 
 @Entity
@@ -15,11 +18,12 @@ public class City {
     @Column(nullable = false)
     private String title;
 
-    @ManyToOne
-    @JoinColumn(name = "country_id")
-    private Country country;
-
     private String temp;
 
     private String clouds;
+
+    @ManyToOne
+    @JoinColumn(name = "country_id")
+    @ToString.Exclude
+    private Country country;
 }

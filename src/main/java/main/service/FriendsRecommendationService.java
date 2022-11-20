@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,9 +21,8 @@ public class FriendsRecommendationService {
     private final PersonsRepository personsRepository;
 
     public CommonResponse<List<PersonResponse>> getFriendsRecommendation() {
-        Optional<Person> optionalPerson = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+        Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
         Pageable page = PageRequest.of(0, 8);
-        Person person = optionalPerson.get();
         List<PersonResponse> personResponses = personsToPersonResponses(personsRepository.findAllByCity(person.getCity(), page).getContent());
         if (person.getCity() == null || personResponses.size() == 0) {
             personResponses = personsToPersonResponses(personsRepository.findPageOrderByRegDate(page).getContent());
@@ -33,7 +31,7 @@ public class FriendsRecommendationService {
         return buildCommonResponse(personResponses);
     }
 
-    private CommonResponse<List<PersonResponse>> buildCommonResponse (List<PersonResponse> personResponses) {
+    private CommonResponse<List<PersonResponse>> buildCommonResponse(List<PersonResponse> personResponses) {
         return CommonResponse.<List<PersonResponse>>builder()
                 .timestamp(System.currentTimeMillis())
                 .total((long) personResponses.size())

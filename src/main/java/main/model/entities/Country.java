@@ -1,6 +1,8 @@
 package main.model.entities;
 
 import lombok.Data;
+import lombok.ToString;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -16,5 +18,6 @@ public class Country {
     private String title;
 
     @OneToMany(mappedBy = "country")
+    @ToString.Exclude
     private List<City> cities;
 }

@@ -1,6 +1,7 @@
 package main.model.entities;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -18,10 +19,6 @@ public class Post {
     @Column(nullable = false)
     private LocalDateTime time;
 
-    @ManyToOne
-    @JoinColumn(name = "author_id", nullable = false)
-    private Person author;
-
     @Column(name = "title", nullable = false)
     private String title;
 
@@ -37,15 +34,24 @@ public class Post {
     @Column (name = "time_delete")
     private LocalDateTime timeDelete;
 
+    @ManyToOne
+    @JoinColumn(name = "author_id", nullable = false)
+    @ToString.Exclude
+    private Person author;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Comment> comments;
 
     @ManyToMany(mappedBy = "posts", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ToString.Exclude
     private List<Tag> tags;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<PostFile> postFiles;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<PostLike> postLikes;
 }
