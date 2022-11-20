@@ -1,6 +1,6 @@
 package main.model.entities;
 
-import lombok.Data;
+import lombok.*;
 import main.model.enums.MessagePermissionTypes;
 
 import javax.persistence.*;
@@ -8,7 +8,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Data
+//@Data
+@ToString
+@Getter
+@Setter
+@RequiredArgsConstructor
+@EqualsAndHashCode
+
 @Table(name = "persons", indexes = @Index(name = "full_name_index", columnList = "first_name, last_name", unique = true))
 public class Person {
 

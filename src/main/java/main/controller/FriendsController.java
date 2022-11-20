@@ -40,11 +40,11 @@ public class FriendsController {
 
     @GetMapping()
     public ListResponseRsPersonRs getFriends(
-            @RequestHeader("Authorization") String token,
-            @RequestParam(name = "page", required = false) int page,
-            @RequestParam(name = "size", required = false) int size)
+            @RequestHeader("Authorization") String token)
+//            @RequestParam(name = "page", required = false, defaultValue = "${socialNetwork.default.page}") int page,
+//            @RequestParam(name = "size", required = false, defaultValue = "${socialNetwork.default.size}") int size)
     {
-        return friendsService.getFriends(token, page, size);
+        return friendsService.getFriends(token, 0, 20);
     }
 
     @PostMapping("/request/{id}")
@@ -61,7 +61,7 @@ public class FriendsController {
         return friendsService.getRequestedPersons(token, page, size);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("request/{id}")
     public FriendshipRs deleteSentFriendshipRequest (@RequestHeader("Authorization") String token,
                                                                      @PathVariable Long id) {
         return friendsService.deleteSentFriendshipRequest(token, id);

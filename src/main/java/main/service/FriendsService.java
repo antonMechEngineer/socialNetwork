@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 @Service
 public class FriendsService {
 
+    //локальный: docker run -d -p 8080:80 -t chuchos/javapro_teams27_frontend_localhost
     private final FriendshipsRepository friendshipsRepository;
     private final FriendshipStatusesRepository friendshipStatusesRepository;
     private final PersonsRepository personsRepository;
@@ -34,14 +35,24 @@ public class FriendsService {
 
     public FriendshipRs addFriend(String token, Long futureFriendId){
         Person srcPerson = getPersonByToken(token);
-        Person dstPerson = personsRepository.findPersonById(futureFriendId);
+        Optional<Person> optionalDstPerson = personsRepository.findPersonById(futureFriendId);
+        if (!optionalDstPerson.isPresent()){
+            String descriptionError = "Person with ID" + futureFriendId + " doesn't exist";
+            return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), new ComplexRs(descriptionError));
+        }
+        Person dstPerson = optionalDstPerson.get();
         modifyFriendShipStatus(srcPerson, dstPerson, FriendshipStatusTypes.FRIEND, FriendshipStatusTypes.FRIEND);
         return new FriendshipRs("ok", LocalDateTime.now().toString(), new ComplexRs("ok"));
     }
 
     public FriendshipRs deleteFriend(String token, Long idDeletableFriend){
         Person srcPerson = getPersonByToken(token);
-        Person dstPerson = personsRepository.findPersonById(idDeletableFriend);
+        Optional<Person> optionalDstPerson = personsRepository.findPersonById(idDeletableFriend);
+        if (!optionalDstPerson.isPresent()){
+            String descriptionError = "Person with ID" + idDeletableFriend + " isn't your friend";
+            return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), new ComplexRs(descriptionError));
+        }
+        Person dstPerson = optionalDstPerson.get();
         modifyFriendShipStatus(srcPerson, dstPerson, FriendshipStatusTypes.REQUEST, FriendshipStatusTypes.SUBSCRIBED);
         return new FriendshipRs("ok", LocalDateTime.now().toString(), new ComplexRs("ok"));
     }
@@ -58,7 +69,8 @@ public class FriendsService {
 
     public FriendshipRs sendFriendshipRequest(String token, Long potentialFriendId){
         Person srcPerson = getPersonByToken(token);
-        Person dstPerson = personsRepository.findPersonById(potentialFriendId);
+        Optional <Person> dstPersonOptional = personsRepository.findPersonById(potentialFriendId);
+        Person dstPerson = dstPersonOptional.get();
         FriendshipStatus srcFriendshipStatus = new FriendshipStatus(LocalDateTime.now(), FriendshipStatusTypes.SUBSCRIBED);
         FriendshipStatus dstFriendshipStatus = new FriendshipStatus(LocalDateTime.now(), FriendshipStatusTypes.REQUEST);
         friendshipStatusesRepository.save(srcFriendshipStatus);
@@ -72,7 +84,8 @@ public class FriendsService {
 
     public FriendshipRs deleteSentFriendshipRequest(String token, Long requestedPersonId){
         Person srcPerson = getPersonByToken(token);
-        Person dstPerson = personsRepository.findPersonById(requestedPersonId);
+        Optional <Person> dstPersonOptional = personsRepository.findPersonById(requestedPersonId);
+        Person dstPerson = dstPersonOptional.get();
         Friendship srcFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(srcPerson, dstPerson);
         Friendship dstFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(dstPerson, srcPerson);
         FriendshipStatus srcFriendshipStatus = friendshipStatusesRepository.
@@ -103,7 +116,7 @@ public class FriendsService {
                 filter(friendship -> friendship.getFriendshipStatus().getCode() == friendshipStatusTypes).
                 collect(Collectors.toList());
         Pageable pageable = PageRequest.of(page, size, Sort.by("last_name").descending());
-        Page<Person> persons = personsRepository.findPersonByDstFriendships(srcPersonFriendships, pageable);
+        Page<Person> persons = personsRepository.findPersonByDstFriendshipsIn(srcPersonFriendships, pageable);
         return persons;
     }
 
@@ -114,7 +127,6 @@ public class FriendsService {
     private void modifyFriendShipStatus(Person srcPerson, Person dstPerson,
                                         FriendshipStatusTypes srcFriendshipStatusTypes,
                                         FriendshipStatusTypes dstFriendshipStatusTypes){
-
         Friendship srcFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(srcPerson, dstPerson);
         Friendship dstFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(dstPerson, srcPerson);
         FriendshipStatus srcFriendshipStatus = friendshipStatusesRepository.
@@ -131,8 +143,7 @@ public class FriendsService {
 
     private Person getPersonByToken(String token){
         String personEmail = jwtUtil.extractUserName(token);
-        Optional <Person> currentPerson = personsRepository.findPersonByEmail(personEmail);
-        Person person = currentPerson.get();
+        Person person = personsRepository.findPersonByEmail(personEmail).orElseThrow();
         return person;
     }
 }

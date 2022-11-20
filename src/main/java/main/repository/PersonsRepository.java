@@ -16,10 +16,15 @@ import java.util.Optional;
 @Repository
 public interface PersonsRepository extends JpaRepository<Person, Long> {
     boolean existsPersonByEmail(String email);
-    Person findPersonById(Long id);
-    Page<Person> findPersonByDstFriendships(List<Friendship> friendships, Pageable pageable);
+
+    Optional<Person>findPersonById(Long id);
+
+    Page<Person> findPersonByDstFriendshipsIn(List<Friendship> friendships, Pageable pageable);
+
     Optional<Person> findPersonByEmail(String email);
+
     Page<Person> findAllByCity(City city, Pageable page);
+
     @Query("FROM Person AS p " +
             "ORDER BY p.regDate DESC")
     Page<Person> findPageOrderByRegDate(Pageable page);

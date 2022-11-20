@@ -1,10 +1,17 @@
 package main.model.entities;
 
-import lombok.Data;
+import lombok.*;
+
 import javax.persistence.*;
 
 @Entity
 @Data
+//@ToString
+//@Getter
+//@Setter
+//@RequiredArgsConstructor
+//@EqualsAndHashCode
+
 @Table(name = "cities")
 public class City {
 
