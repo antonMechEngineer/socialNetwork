@@ -38,10 +38,4 @@ public class Friendship {
     @JoinColumn(name = "dst_person_id", nullable = false)
     private Person dstPerson;
 
-    public Friendship(FriendshipStatus friendshipStatus, LocalDateTime sentTime, Person srcPerson, Person dstPerson) {
-        this.friendshipStatus = friendshipStatus;
-        this.sentTime = sentTime;
-        this.srcPerson = srcPerson;
-        this.dstPerson = dstPerson;
-    }
 }
