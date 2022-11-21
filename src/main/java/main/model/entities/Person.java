@@ -28,6 +28,7 @@ public class Person {
     @Column(name = "birth_date")
     private LocalDateTime birthDate;
 
+    @Column(nullable = false)
     private String email;
 
     private String phone;
@@ -106,5 +107,5 @@ public class Person {
     private List<Message> messages;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
-    private List<PostLike> postLikes;
+    private List<Like> likes;
 }

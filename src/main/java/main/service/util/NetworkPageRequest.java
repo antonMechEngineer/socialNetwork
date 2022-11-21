@@ -1,4 +1,4 @@
-package main.service;
+package main.service.util;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;

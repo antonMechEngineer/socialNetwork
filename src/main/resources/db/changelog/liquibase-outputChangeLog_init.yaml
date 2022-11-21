@@ -1,6 +1,6 @@
 databaseChangeLog:
 - changeSet:
-    id: 1668264569196-1
+    id: sprint-1-1
     author: YurK
     changes:
     - createTable:
@@ -35,7 +35,7 @@ databaseChangeLog:
             type: BIGINT
         tableName: block_history
 - changeSet:
-    id: 1668264569196-2
+    id: sprint-1-2
     author: YurK
     changes:
     - createTable:
@@ -61,7 +61,7 @@ databaseChangeLog:
             type: TIMESTAMP WITHOUT TIME ZONE
         tableName: captcha
 - changeSet:
-    id: 1668264569196-3
+    id: sprint-1-3
     author: YurK
     changes:
     - createTable:
@@ -90,7 +90,7 @@ databaseChangeLog:
             type: BIGINT
         tableName: cities
 - changeSet:
-    id: 1668264569196-4
+    id: sprint-1-4
     author: YurK
     changes:
     - createTable:
@@ -108,7 +108,7 @@ databaseChangeLog:
             type: VARCHAR(255)
         tableName: countries
 - changeSet:
-    id: 1668264569196-5
+    id: sprint-1-5
     author: YurK
     changes:
     - createTable:
@@ -129,7 +129,7 @@ databaseChangeLog:
             type: VARCHAR(255)
         tableName: currencies
 - changeSet:
-    id: 1668264569196-6
+    id: sprint-1-6
     author: YurK
     changes:
     - createTable:
@@ -157,7 +157,7 @@ databaseChangeLog:
             type: BIGINT
         tableName: dialogs
 - changeSet:
-    id: 1668264569196-7
+    id: sprint-1-7
     author: YurK
     changes:
     - createTable:
@@ -187,7 +187,7 @@ databaseChangeLog:
             type: TIMESTAMP WITHOUT TIME ZONE
         tableName: friendship_statuses
 - changeSet:
-    id: 1668264569196-8
+    id: sprint-1-8
     author: YurK
     changes:
     - createTable:
@@ -220,7 +220,38 @@ databaseChangeLog:
             type: BIGINT
         tableName: friendships
 - changeSet:
-    id: 1668264569196-9
+    id: sprint-1-9
+    author: YurK
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: likes_pkey
+            name: id
+            type: BIGINT
+        - column:
+            name: type
+            type: VARCHAR(255)
+        - column:
+            name: entity_id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: time
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            name: person_id
+            type: BIGINT
+        tableName: likes
+- changeSet:
+    id: sprint-1-10
     author: YurK
     changes:
     - createTable:
@@ -272,7 +303,7 @@ databaseChangeLog:
             type: BIGINT
         tableName: messages
 - changeSet:
-    id: 1668264569196-10
+    id: sprint-1-11
     author: YurK
     changes:
     - createTable:
@@ -310,7 +341,7 @@ databaseChangeLog:
             type: BIGINT
         tableName: notifications
 - changeSet:
-    id: 1668264569196-11
+    id: sprint-1-12
     author: YurK
     changes:
     - createTable:
@@ -372,7 +403,7 @@ databaseChangeLog:
             type: BIGINT
         tableName: person_settings
 - changeSet:
-    id: 1668264569196-12
+    id: sprint-1-13
     author: YurK
     changes:
     - createTable:
@@ -401,6 +432,8 @@ databaseChangeLog:
             name: deleted_time
             type: TIMESTAMP WITHOUT TIME ZONE
         - column:
+            constraints:
+              nullable: false
             name: email
             type: VARCHAR(255)
         - column:
@@ -463,7 +496,7 @@ databaseChangeLog:
             type: BIGINT
         tableName: persons
 - changeSet:
-    id: 1668264569196-13
+    id: sprint-1-14
     author: YurK
     changes:
     - createTable:
@@ -484,7 +517,7 @@ databaseChangeLog:
             type: BIGINT
         tableName: post2tag
 - changeSet:
-    id: 1668264569196-14
+    id: sprint-1-15
     author: YurK
     changes:
     - createTable:
@@ -532,7 +565,7 @@ databaseChangeLog:
             type: BIGINT
         tableName: post_comments
 - changeSet:
-    id: 1668264569196-15
+    id: sprint-1-16
     author: YurK
     changes:
     - createTable:
@@ -562,42 +595,7 @@ databaseChangeLog:
             type: BIGINT
         tableName: post_files
 - changeSet:
-    id: 1668264569196-16
-    author: YurK
-    changes:
-    - createTable:
-        columns:
-        - column:
-            autoIncrement: true
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: post_likes_pkey
-            name: id
-            type: BIGINT
-        - column:
-            constraints:
-              nullable: false
-            name: time
-            type: TIMESTAMP WITHOUT TIME ZONE
-        - column:
-            constraints:
-              nullable: false
-            name: type
-            type: VARCHAR(255)
-        - column:
-            constraints:
-              nullable: false
-            name: person_id
-            type: BIGINT
-        - column:
-            constraints:
-              nullable: false
-            name: post_id
-            type: BIGINT
-        tableName: post_likes
-- changeSet:
-    id: 1668264569196-17
+    id: sprint-1-17
     author: YurK
     changes:
     - createTable:
@@ -647,7 +645,7 @@ databaseChangeLog:
             type: BIGINT
         tableName: posts
 - changeSet:
-    id: 1668264569196-18
+    id: sprint-1-18
     author: YurK
     changes:
     - createTable:
@@ -667,7 +665,7 @@ databaseChangeLog:
             type: VARCHAR(255)
         tableName: tags
 - changeSet:
-    id: 1668264569196-19
+    id: sprint-1-19
     author: YurK
     changes:
     - addUniqueConstraint:
@@ -675,7 +673,15 @@ databaseChangeLog:
         constraintName: full_name_index
         tableName: persons
 - changeSet:
-    id: 1668264569196-20
+    id: sprint-1-20
+    author: YurK
+    changes:
+    - addUniqueConstraint:
+        columnNames: tag_id, post_id
+        constraintName: post2tag_index
+        tableName: post2tag
+- changeSet:
+    id: sprint-1-21
     author: YurK
     changes:
     - createIndex:
@@ -685,7 +691,7 @@ databaseChangeLog:
         indexName: post_name_index
         tableName: posts
 - changeSet:
-    id: 1668264569196-21
+    id: sprint-1-22
     author: YurK
     changes:
     - addUniqueConstraint:
@@ -693,7 +699,7 @@ databaseChangeLog:
         constraintName: tag_index
         tableName: tags
 - changeSet:
-    id: 1668264569196-22
+    id: sprint-1-23
     author: YurK
     changes:
     - createTable:
@@ -710,7 +716,7 @@ databaseChangeLog:
             type: BIGINT
         tableName: friendship
 - changeSet:
-    id: 1668264569196-23
+    id: sprint-1-24
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -725,7 +731,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: 1668264569196-24
+    id: sprint-1-25
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -740,7 +746,22 @@ databaseChangeLog:
         referencedTableName: post_comments
         validate: true
 - changeSet:
-    id: 1668264569196-25
+    id: sprint-1-26
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: person_id
+        baseTableName: likes
+        constraintName: fk2bgnjb3394d7a02rsqbmqbdg9
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: persons
+        validate: true
+- changeSet:
+    id: sprint-1-27
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -755,7 +776,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: 1668264569196-26
+    id: sprint-1-28
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -770,7 +791,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: 1668264569196-27
+    id: sprint-1-29
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -785,7 +806,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: 1668264569196-28
+    id: sprint-1-30
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -800,7 +821,7 @@ databaseChangeLog:
         referencedTableName: posts
         validate: true
 - changeSet:
-    id: 1668264569196-29
+    id: sprint-1-31
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -815,7 +836,7 @@ databaseChangeLog:
         referencedTableName: countries
         validate: true
 - changeSet:
-    id: 1668264569196-30
+    id: sprint-1-32
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -830,22 +851,7 @@ databaseChangeLog:
         referencedTableName: posts
         validate: true
 - changeSet:
-    id: 1668264569196-31
-    author: YurK
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: post_id
-        baseTableName: post_likes
-        constraintName: fka5wxsgl4doibhbed9gm7ikie2
-        deferrable: false
-        initiallyDeferred: false
-        onDelete: NO ACTION
-        onUpdate: NO ACTION
-        referencedColumnNames: id
-        referencedTableName: posts
-        validate: true
-- changeSet:
-    id: 1668264569196-32
+    id: sprint-1-33
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -860,22 +866,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: 1668264569196-33
-    author: YurK
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: person_id
-        baseTableName: post_likes
-        constraintName: fka9oua9nyomg75dxgcpxaa8dtr
-        deferrable: false
-        initiallyDeferred: false
-        onDelete: NO ACTION
-        onUpdate: NO ACTION
-        referencedColumnNames: id
-        referencedTableName: persons
-        validate: true
-- changeSet:
-    id: 1668264569196-34
+    id: sprint-1-34
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -890,7 +881,7 @@ databaseChangeLog:
         referencedTableName: posts
         validate: true
 - changeSet:
-    id: 1668264569196-35
+    id: sprint-1-35
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -905,7 +896,7 @@ databaseChangeLog:
         referencedTableName: friendship_statuses
         validate: true
 - changeSet:
-    id: 1668264569196-36
+    id: sprint-1-36
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -920,7 +911,7 @@ databaseChangeLog:
         referencedTableName: post_comments
         validate: true
 - changeSet:
-    id: 1668264569196-37
+    id: sprint-1-37
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -935,7 +926,7 @@ databaseChangeLog:
         referencedTableName: tags
         validate: true
 - changeSet:
-    id: 1668264569196-38
+    id: sprint-1-38
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -950,7 +941,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: 1668264569196-39
+    id: sprint-1-39
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -965,7 +956,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: 1668264569196-40
+    id: sprint-1-40
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -980,7 +971,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: 1668264569196-41
+    id: sprint-1-41
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -995,7 +986,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: 1668264569196-42
+    id: sprint-1-42
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -1010,7 +1001,7 @@ databaseChangeLog:
         referencedTableName: cities
         validate: true
 - changeSet:
-    id: 1668264569196-43
+    id: sprint-1-43
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -1025,7 +1016,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: 1668264569196-44
+    id: sprint-1-44
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -1040,7 +1031,7 @@ databaseChangeLog:
         referencedTableName: dialogs
         validate: true
 - changeSet:
-    id: 1668264569196-45
+    id: sprint-1-45
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -1055,7 +1046,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: 1668264569196-46
+    id: sprint-1-46
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -1070,7 +1061,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: 1668264569196-47
+    id: sprint-1-47
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -1085,7 +1076,7 @@ databaseChangeLog:
         referencedTableName: posts
         validate: true
 - changeSet:
-    id: 1668264569196-48
+    id: sprint-1-48
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -1099,11 +1090,4 @@ databaseChangeLog:
         referencedColumnNames: id
         referencedTableName: persons
         validate: true
-- changeSet:
-      id: 1668264569196-49
-      author: YurK
-      changes:
-          - addUniqueConstraint:
-                columnNames: tag_id, post_id
-                constraintName: post2tag_index
-                tableName: post2tag
+
