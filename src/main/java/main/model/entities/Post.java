@@ -4,6 +4,7 @@ import lombok.Data;
 import main.model.enums.LikeTypes;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.ManyToAny;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -41,12 +42,15 @@ public class Post implements Liked{
     private LocalDateTime timeDelete;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Comment> comments;
 
     @ManyToMany(mappedBy = "posts", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ToString.Exclude
     private List<Tag> tags;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<PostFile> postFiles;
 
 //    @OneToMany(mappedBy = "entity", cascade = CascadeType.ALL)

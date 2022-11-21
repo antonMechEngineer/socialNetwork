@@ -1,6 +1,7 @@
 package main.model.entities;
 
 import lombok.Data;
+import lombok.ToString;
 import main.model.enums.NotificationTypes;
 import org.hibernate.annotations.Any;
 import org.hibernate.annotations.AnyMetaDef;
@@ -24,10 +25,6 @@ public class Notification {
     @Column(name = "sent_time")
     private LocalDateTime sentTime;
 
-    @ManyToOne
-    @JoinColumn(name = "person_id", nullable = false)
-    private Person person;
-
     @Any(metaColumn = @Column(name = "notification_type"), fetch = FetchType.EAGER)
     @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
             @MetaValue(targetEntity = Post.class, value = "POST"),
@@ -43,4 +40,9 @@ public class Notification {
 
     @Column(name = "is_read", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isRead;
+
+    @ManyToOne
+    @JoinColumn(name = "person_id", nullable = false)
+    @ToString.Exclude
+    private Person person;
 }
