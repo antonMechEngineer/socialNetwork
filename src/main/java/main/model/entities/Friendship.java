@@ -12,6 +12,13 @@ import java.time.LocalDateTime;
 @Table(name = "friendships")
 public class Friendship {
 
+    public Friendship(FriendshipStatus friendshipStatus, LocalDateTime sentTime, Person srcPerson, Person dstPerson) {
+        this.friendshipStatus = friendshipStatus;
+        this.sentTime = sentTime;
+        this.srcPerson = srcPerson;
+        this.dstPerson = dstPerson;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
