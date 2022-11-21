@@ -1,14 +1,15 @@
 package main.service;
 
 import main.api.request.PostRequest;
+import main.api.response.PostResponse;
 import main.errors.NoPostEntityException;
+import main.mappers.PostMapper;
 import main.model.entities.Person;
 import main.model.entities.Post;
 import main.model.entities.Tag;
 import main.repository.PostsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Service
 public class PostsService {
@@ -40,13 +42,12 @@ public class PostsService {
 
     public Page<Post> getAllPosts(int page, int size) {
         Logger.getLogger(this.getClass().getName()).info("getAllPosts with page " + page + " and size " + size);
-        Pageable pageable = PageRequest.of(page, size, Sort.by("time").descending());
+        Pageable pageable = NetworkPageRequest.of(page, size, Sort.by("time").descending());
         return postsRepository.findAll(pageable);
     }
 
     public Page<Post> getAllPostsByAuthor(int page, int size, Person postsAuthor) {
-        Logger.getLogger(this.getClass().getName()).info("getAllPostsByAuthor by " + postsAuthor + " with page " + page + " and size " + size);
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = NetworkPageRequest.of(page, size);
         return postsRepository.findPostsByAuthorOrderByTimeDesc(pageable, postsAuthor);
     }
 
@@ -87,5 +88,9 @@ public class PostsService {
         tagList.remove(tag);
         post.setTags(tagList);
         return postsRepository.save(post);
+    }
+
+    public List<PostResponse> postsToResponse(List<Post> posts) {
+        return posts.stream().map(PostMapper.INSTANCE::postToResponse).collect(Collectors.toList());
     }
 }
