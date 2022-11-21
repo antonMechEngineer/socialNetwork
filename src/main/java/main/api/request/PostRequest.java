@@ -1,7 +1,7 @@
 package main.api.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import main.model.entities.Tag;
 
 import java.util.List;
 
@@ -9,7 +9,9 @@ import java.util.List;
 public class PostRequest {
 
     private String title;
-    private List<Tag> tags;
+    private List<String> tags;
+    @JsonProperty("post_text")
     private String postText;
-    private boolean getDeleted;
+//    @JsonProperty("get_deleted")
+//    private boolean getDeleted;
 }

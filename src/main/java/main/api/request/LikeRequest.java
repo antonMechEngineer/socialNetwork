@@ -1,11 +1,12 @@
 package main.api.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import main.model.enums.PostLikeTypes;
 
 @Data
 public class LikeRequest {
 
-    private PostLikeTypes type;
+    private String type;
+    @JsonProperty("item_id")
     private long itemId;
 }

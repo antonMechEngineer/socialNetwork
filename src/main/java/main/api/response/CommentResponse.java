@@ -37,5 +37,6 @@ public class CommentResponse {
 
     private Integer likes;
 
+    @JsonProperty("my_like")
     private Boolean myLike;
 }
