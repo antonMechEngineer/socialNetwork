@@ -53,7 +53,7 @@ public class AccountService {
             person.setPassword(regRequest.getPasswd1());
             person.setRegDate(LocalDateTime.now());
             person.setEmail(regRequest.getEmail());
-            person.setPhoto("/uploadDefault/default.png");
+            person.setPhoto("https://res.cloudinary.com/dre3qhjvh/image/upload/v1669013824/default-1_wzqelg.png");
             person.setIsApproved(false);
             person.setIsBlocked(false);
             person.setIsDeleted(false);

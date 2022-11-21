@@ -54,6 +54,18 @@ public class UsersService {
         if (userRq.getCity() != null) {
        //     person.setCity(userRq.getCity());
         }
+        if (userRq.getCountry() != null) {
+       //     person.setCountry(userRq.getCountry());
+        }
+        if (userRq.getFirst_name() != null) {
+            person.setFirstName(userRq.getFirst_name());
+        }
+        if (userRq.getLast_name() != null) {
+            person.setLastName(userRq.getLast_name());
+        }
+        if (userRq.getPhone() != null) {
+            person.setPhone(userRq.getPhone());
+        }
 
 
 
