@@ -9,6 +9,7 @@ import main.api.response.UserRs;
 import main.errors.BadAuthorizationException;
 import main.service.PersonsService;
 import main.service.PostsService;
+import main.service.UsersService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,11 +25,12 @@ import java.util.List;
 public class UsersController {
 
     private final PostsService postsService;
-    private final PersonsService usersService;
+    private final PersonsService personsService;
+    private final UsersService usersService;
 
     @GetMapping("/{id}")
     public ResponseEntity<PersonResponse> getUserById(@PathVariable long id) {
-        return ResponseEntity.ok(usersService.getPersonResponse(usersService.getPersonById(id)));
+        return ResponseEntity.ok(personsService.getPersonResponse(personsService.getPersonById(id)));
     }
 
     @GetMapping("/{id}/wall")
@@ -37,7 +39,7 @@ public class UsersController {
             @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
             @RequestParam(name = "itemPerPage", required = false, defaultValue = "${socialNetwork.default.size}") int size) {
 
-        return postsService.getAllPostsByAuthor(offset, size, usersService.getPersonById(id));
+        return postsService.getAllPostsByAuthor(offset, size, personsService.getPersonById(id));
     }
 
     @PostMapping("/{id}/wall")
@@ -53,7 +55,7 @@ public class UsersController {
     public CommonResponse<PersonResponse> getAuthorized(
             @RequestHeader(name = "Authorization") String token) throws BadAuthorizationException {
 
-        return usersService.getAuthorized(token);
+        return personsService.getAuthorized(token);
     }
 
     @PutMapping(value = "/me", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
