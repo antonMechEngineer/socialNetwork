@@ -141,6 +141,7 @@ public class FriendsService {
         friendshipStatusesRepository.save(dstFriendshipStatus);
     }
 
+
     private Person getPersonByToken(String token){
         String personEmail = jwtUtil.extractUserName(token);
         Person person = personsRepository.findPersonByEmail(personEmail).orElseThrow();
