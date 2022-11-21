@@ -1,6 +1,6 @@
 package main.model.entities;
 
-import lombok.Data;
+import lombok.*;
 import main.model.enums.MessagePermissionTypes;
 
 import javax.persistence.*;
@@ -8,7 +8,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Data
+//@Data
+@RequiredArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+
 @Table(name = "persons", indexes = @Index(name = "full_name_index", columnList = "first_name, last_name", unique = true))
 public class Person {
 
@@ -74,11 +79,11 @@ public class Person {
     private LocalDateTime deletedTime;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "friendship", joinColumns = @JoinColumn(name = "src_person_id"), inverseJoinColumns = @JoinColumn(name = "dst_person_id"))
+    @JoinTable(name = "friendships", joinColumns = @JoinColumn(name = "src_person_id"), inverseJoinColumns = @JoinColumn(name = "dst_person_id"))
     private List<Person> srcFriendships;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "friendship", joinColumns = @JoinColumn(name = "dst_person_id"), inverseJoinColumns = @JoinColumn(name = "src_person_id"))
+    @JoinTable(name = "friendships", joinColumns = @JoinColumn(name = "dst_person_id"), inverseJoinColumns = @JoinColumn(name = "src_person_id"))
     private List<Person> dstFriendships;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
