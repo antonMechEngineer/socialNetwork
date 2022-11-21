@@ -7,12 +7,9 @@ import main.model.entities.Person;
 import main.model.enums.FriendshipStatusTypes;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface PersonMapper {
-
-    PersonMapper INSTANCE = Mappers.getMapper(PersonMapper.class);
 
     @Mapping(target = "city", source = "city.title")
     @Mapping(target = "country", source = "city.country.title")

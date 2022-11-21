@@ -1,14 +1,14 @@
 package main.controller;
 
 import lombok.RequiredArgsConstructor;
-import main.api.response.*;
-import main.mappers.PersonMapper;
-import main.model.entities.Post;
-import main.security.jwt.JWTUtil;
+import main.api.request.PostRequest;
+import main.api.response.CommonResponse;
+import main.api.response.PersonResponse;
+import main.api.response.PostResponse;
+import main.api.response.UserRs;
+import main.errors.BadAuthorizationException;
 import main.service.PersonsService;
 import main.service.PostsService;
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -28,7 +25,6 @@ public class UsersController {
 
     private final PostsService postsService;
     private final PersonsService usersService;
-    private final JWTUtil jwtUtil;
 
     @GetMapping("/{id}")
     public ResponseEntity<PersonResponse> getUserById(@PathVariable long id) {
@@ -36,32 +32,28 @@ public class UsersController {
     }
 
     @GetMapping("/{id}/wall")
-    public ResponseEntity<CommonResponse<List<PostResponse>>> getUsersPosts(
+    public CommonResponse<List<PostResponse>> getUsersPosts(
             @PathVariable long id,
-            @RequestParam(name = "page", required = false, defaultValue = "${socialNetwork.default.page}") int page,
-            @RequestParam(name = "size", required = false, defaultValue = "${socialNetwork.default.size}") int size) {
-        Page<Post> postPage = postsService.getAllPostsByAuthor(page, size, usersService.getPersonById(id));
-        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<List<PostResponse>>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .offset(page)
-                .perPage(size)
-                .total(postPage.getTotalElements())
-                .data(new ArrayList<>(postsService.postsToResponse(postPage.getContent())))
-                .build());
+            @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
+            @RequestParam(name = "itemPerPage", required = false, defaultValue = "${socialNetwork.default.size}") int size) {
+
+        return postsService.getAllPostsByAuthor(offset, size, usersService.getPersonById(id));
+    }
+
+    @PostMapping("/{id}/wall")
+    public CommonResponse<PostResponse> createPost(
+            @PathVariable(name = "id") Long personId,
+            @RequestParam(name = "publish_date", required = false) Long publishingDate,
+            @RequestBody PostRequest postRequest) {
+
+        return postsService.createPost(postRequest, personId, publishingDate);
     }
 
     @GetMapping("/me")
-    public ResponseEntity<CommonResponse<PersonResponse>> getAuthorized(@RequestHeader(name = "Authorization") String auth) {
-        Logger.getLogger(this.getClass().getName()).info("/api/v1/users/me endpoint with auth " + auth);
-        if (jwtUtil.isValidToken(auth)) {
-            return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<PersonResponse>builder()
-                    .error("success")
-                    .timestamp(System.currentTimeMillis())
-                    .data(PersonMapper.INSTANCE.toPersonResponse(usersService.getPersonById(1)))
-                    .build());
-        }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    public CommonResponse<PersonResponse> getAuthorized(
+            @RequestHeader(name = "Authorization") String token) throws BadAuthorizationException {
+
+        return usersService.getAuthorized(token);
     }
 
     @PutMapping(value = "/me", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
