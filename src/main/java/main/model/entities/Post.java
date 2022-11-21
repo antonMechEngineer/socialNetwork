@@ -1,8 +1,6 @@
 package main.model.entities;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import main.model.enums.PostTypes;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -50,9 +48,4 @@ public class Post {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<PostLike> postLikes;
-
-    @JsonProperty("type")
-    public PostTypes getPostType() {
-        return PostTypes.getType(isDeleted, time);
-    }
 }

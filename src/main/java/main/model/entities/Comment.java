@@ -17,7 +17,7 @@ public class Comment {
     private LocalDateTime time;
 
     @ManyToOne
-    @JoinColumn(name = "post_id", nullable = false)
+    @JoinColumn(name = "post_id")
     private Post post;
 
     @ManyToOne
@@ -31,7 +31,7 @@ public class Comment {
     @JoinColumn(name = "author_id", nullable = false)
     private Person person;
 
-    @Column(name = "comment_text", nullable = false)
+    @Column(name = "comment_text", nullable = false, columnDefinition = "TEXT")
     private String commentText;
 
     @Column(name = "is_blocked", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")

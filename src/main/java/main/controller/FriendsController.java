@@ -1,5 +1,6 @@
 package main.controller;
 
+<<<<<<< HEAD
 import main.service.FriendsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -38,4 +39,29 @@ public class FriendsController {
     ///api/v1/friends/request
     //api/v1/friends/recommendations
 
+=======
+import lombok.RequiredArgsConstructor;
+import main.api.response.CommonResponse;
+import main.api.response.PersonResponse;
+import main.service.FriendsRecommendationService;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
+
+@Controller
+@RequestMapping("/api/v1/friends")
+@RequiredArgsConstructor
+public class FriendsController {
+
+    private final FriendsRecommendationService friendsRecommendationService;
+
+    @GetMapping("/recommendations")
+    @ResponseBody
+    public CommonResponse<List<PersonResponse>> getRecommendedFriends() {
+        return friendsRecommendationService.getFriendsRecommendation();
+    }
+>>>>>>> origin/dev
 }

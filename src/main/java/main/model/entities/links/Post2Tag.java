@@ -6,7 +6,7 @@ import main.model.entities.Tag;
 import javax.persistence.*;
 @Entity
 @Data
-@Table(name = "post2tag")
+@Table(name = "post2tag", indexes = @Index(name = "post2tag_index", columnList = "tag_id, post_id", unique = true))
 public class Post2Tag {
 
     @Id

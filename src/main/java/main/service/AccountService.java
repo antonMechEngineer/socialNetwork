@@ -6,6 +6,7 @@ import main.api.response.ComplexRs;
 import main.api.response.RegisterRs;
 import main.model.entities.Captcha;
 import main.model.entities.Person;
+import main.model.enums.MessagePermissionTypes;
 import main.repository.CaptchaRepository;
 import main.repository.PersonsRepository;
 import org.springframework.stereotype.Service;
@@ -45,14 +46,21 @@ public class AccountService {
         registerRs.setEmail(regRequest.getEmail());
         registerRs.setData(data);
 
-        if (registerRs.getError().isEmpty()) {
+  //      if (registerRs.getError().equals(null)) {
             Person person = new Person();
             person.setFirstName(regRequest.getFirstName());
             person.setLastName(regRequest.getLastName());
             person.setPassword(regRequest.getPasswd1());
             person.setRegDate(LocalDateTime.now());
+            person.setEmail(regRequest.getEmail());
+            person.setPhoto("/uploadDefault/default.png");
+            person.setIsApproved(false);
+            person.setIsBlocked(false);
+            person.setIsDeleted(false);
+            person.setEmail(regRequest.getEmail());
+            person.setMessagePermission(MessagePermissionTypes.ALL);
             personsRepository.save(person);
-        }
+   //     }
 
         return registerRs;
     }
