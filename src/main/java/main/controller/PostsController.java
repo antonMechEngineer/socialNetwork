@@ -4,16 +4,9 @@ import lombok.RequiredArgsConstructor;
 import main.api.request.PostRequest;
 import main.api.response.CommonResponse;
 import main.api.response.PostResponse;
-import main.errors.NoPostEntityException;
-import main.mappers.PostMapper;
-import main.model.entities.Post;
 import main.service.PostsService;
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -24,59 +17,39 @@ public class PostsController {
     private final PostsService postsService;
 
     @GetMapping("/feeds")
-    public ResponseEntity<CommonResponse<List<PostResponse>>> getFeeds(
-            @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int page,
+    public CommonResponse<List<PostResponse>> getFeeds(
+            @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
             @RequestParam(name = "perPage", required = false, defaultValue = "${socialNetwork.default.size}") int size) {
-        Page<Post> postPage = postsService.getAllPosts(page, size);
-        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<List<PostResponse>>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .total(postPage.getTotalElements())
-                .itemPerPage(size)
-                .offset(page)
-                .data(new ArrayList<>(postsService.postsToResponse(postPage.getContent())))
-                .errorDescription("")
-                .build());
-    }
 
-    @PostMapping("/post")
-    public ResponseEntity<CommonResponse<PostResponse>> createPost(@RequestBody PostRequest postRequest) {
-        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<PostResponse>builder()
-                        .error("success")
-                        .timestamp(System.currentTimeMillis())
-                        .data(PostMapper.INSTANCE.postToResponse(postsService.createPost(postRequest)))
-                        .build()
-        );
+        return postsService.getFeeds(offset, size);
     }
 
     @GetMapping("/post/{id}")
-    public ResponseEntity<CommonResponse<PostResponse>> getPost(@PathVariable int id) throws NoPostEntityException {
-        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<PostResponse>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .data(PostMapper.INSTANCE.postToResponse(postsService.findPostById(id)))
-                .build()
-        );
+    public CommonResponse<PostResponse> getPost(
+            @PathVariable(name = "id") Long postId) {
+
+        return postsService.getPostById(postId);
     }
 
     @PutMapping("/post/{id}")
-    public ResponseEntity<CommonResponse<PostResponse>> updatePost(@PathVariable int id, @RequestBody PostRequest postRequest) throws NoPostEntityException {
-        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<PostResponse>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .data(PostMapper.INSTANCE.postToResponse(postsService.updatePost(id, postRequest)))
-                .build()
-        );
+    public CommonResponse<PostResponse> updatePost(
+            @PathVariable int id,
+            @RequestBody PostRequest postRequest) {
+
+        return postsService.updatePost(id, postRequest);
     }
 
     @DeleteMapping("/post/{id}")
-    public ResponseEntity<CommonResponse<PostResponse>> deletePost(@PathVariable int id) throws NoPostEntityException {
-        Post post = postsService.deletePost(id);
-        return ResponseEntity.status(HttpStatus.OK).body(CommonResponse.<PostResponse>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .data(PostMapper.INSTANCE.postToResponse(post))
-                .build()
-        );
+    public CommonResponse<PostResponse> deletePost(
+            @PathVariable long id) {
+
+        return postsService.changeDeleteStatusInPost(id, true);
+    }
+
+    @PutMapping("/post/{id}/recover")
+    public CommonResponse<PostResponse> recoverPost(
+            @PathVariable long id) {
+
+        return postsService.changeDeleteStatusInPost(id, false);
     }
 }

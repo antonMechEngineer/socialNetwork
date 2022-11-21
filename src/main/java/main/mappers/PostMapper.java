@@ -1,39 +1,40 @@
 package main.mappers;
 
-import main.api.response.CommentResponse;
+import main.api.request.PostRequest;
 import main.api.response.PostResponse;
+import main.model.entities.Person;
 import main.model.entities.Post;
-import main.model.entities.Tag;
 import main.model.enums.PostTypes;
 import main.service.CommentsService;
+import main.service.TagsService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
-@Mapper(uses = {PersonMapper.class})
+@Mapper(componentModel = "spring",
+        uses = {PersonMapper.class, CommentsService.class, TagsService.class})
 public interface PostMapper {
 
-    PostMapper INSTANCE = Mappers.getMapper(PostMapper.class);
-
-    @Mapping(target = "likes", expression = "java(post.getPostLikes().size())")
-    @Mapping(target = "tags", source = "post")
-    @Mapping(target = "comments", source = "post")
+//    @Mapping(target = "likes", source = "post", qualifiedByName = "getLikesCount")
+    @Mapping(target = "likes", source = "likes")
+    @Mapping(target = "tags", qualifiedByName = "getStringsByTags")
+    @Mapping(target = "comments", qualifiedByName = "commentsToResponse")
     @Mapping(target = "type", source = "post")
-    @Mapping(target = "myLike" , constant = "false")
-    PostResponse postToResponse(Post post);
+    @Mapping(target = "myLike" , source = "myLike")
+    PostResponse postToResponse(Post post, int likes, boolean myLike);
 
-
-    default List<String> tagsToString(Post post) {
-        return post.getTags().stream().map(Tag::getTagName).collect(Collectors.toList());
-    }
-
-    default List<CommentResponse> getCommentsResponse(Post post) {
-        return new ArrayList<>(CommentsService.commentsToResponse(post.getComments()));
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "time", source = "time")
+    @Mapping(target = "author", source = "person")
+    @Mapping(target = "isBlocked", defaultValue = "false")
+    @Mapping(target = "isDeleted", defaultValue = "false")
+    @Mapping(target = "timeDelete", ignore = true)
+    @Mapping(target = "comments", ignore = true)
+    @Mapping(target = "tags", qualifiedByName = "getTagsByStrings")
+    @Mapping(target = "postFiles", ignore = true)
+//    @Mapping(target = "likes", ignore = true)
+    Post postRequestToNewPost(PostRequest request, Person person, LocalDateTime time);
 
     default PostTypes getPostType(Post post) {
         return PostTypes.getType(post.getIsDeleted(), post.getTime());

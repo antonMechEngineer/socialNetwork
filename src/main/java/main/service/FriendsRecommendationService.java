@@ -20,6 +20,7 @@ import java.util.Optional;
 public class FriendsRecommendationService {
 
     private final PersonsRepository personsRepository;
+    private final PersonMapper personMapper;
 
     public CommonResponse<List<PersonResponse>> getFriendsRecommendation() {
         Optional<Person> optionalPerson = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -44,7 +45,7 @@ public class FriendsRecommendationService {
     private List<PersonResponse> personsToPersonResponses(List<Person> persons) {
         List<PersonResponse> personResponses = new ArrayList<>();
         for (Person person : persons) {
-            personResponses.add(PersonMapper.INSTANCE.toPersonResponse(person));
+            personResponses.add(personMapper.toPersonResponse(person));
         }
         return personResponses;
     }

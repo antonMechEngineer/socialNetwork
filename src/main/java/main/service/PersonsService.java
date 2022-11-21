@@ -1,11 +1,14 @@
 package main.service;
 
 import lombok.RequiredArgsConstructor;
+import main.api.response.CommonResponse;
 import main.api.response.PersonResponse;
 import main.api.response.UserRs;
+import main.errors.BadAuthorizationException;
 import main.mappers.PersonMapper;
 import main.model.entities.Person;
 import main.repository.PersonsRepository;
+import main.security.jwt.JWTUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,6 +22,19 @@ public class PersonsService {
 
     private final PersonsRepository personRepository;
     private final CurrencyService currencyService;
+    private final JWTUtil jwtUtil;
+    private final PersonMapper personMapper;
+
+    public CommonResponse<PersonResponse> getAuthorized(String token) throws BadAuthorizationException {
+        if (jwtUtil.isValidToken(token)) {
+            throw new BadAuthorizationException("Invalid token");
+        }
+        return CommonResponse.<PersonResponse>builder()
+                .error("success")
+                .timestamp(System.currentTimeMillis())
+                .data(personMapper.toPersonResponse(getPersonByEmail(jwtUtil.extractUserName(token))))
+                .build();
+    }
 
     public Person getPersonById(long personId) {
         Logger.getLogger(this.getClass().getName()).info("getPersonById with id " + personId);
@@ -32,6 +48,6 @@ public class PersonsService {
 
 
     public PersonResponse getPersonResponse(Person person) {
-        return PersonMapper.INSTANCE.toPersonResponse(person);
+        return personMapper.toPersonResponse(person);
     }
 }

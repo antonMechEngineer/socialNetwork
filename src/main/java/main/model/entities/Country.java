@@ -14,7 +14,4 @@ public class Country {
     private Long id;
 
     private String title;
-
-    @OneToMany(mappedBy = "country")
-    private List<City> cities;
 }

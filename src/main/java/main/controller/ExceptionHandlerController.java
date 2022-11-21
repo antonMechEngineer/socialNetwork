@@ -3,6 +3,7 @@ package main.controller;
 import lombok.RequiredArgsConstructor;
 import main.api.response.CommonResponse;
 import main.api.response.PersonResponse;
+import main.errors.BadAuthorizationException;
 import main.errors.NoPostEntityException;
 import main.errors.PersonNotFoundException;
 import main.model.entities.Post;
@@ -20,7 +21,6 @@ public class ExceptionHandlerController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResponse.<Post>builder()
                 .error(NoPostEntityException.class.getName())
                 .timestamp(System.currentTimeMillis())
-                .data(new Post())
                 .errorDescription(e.getMessage())
                 .build());
     }
@@ -34,4 +34,12 @@ public class ExceptionHandlerController {
                 .build());
     }
 
+    @ExceptionHandler(BadAuthorizationException.class)
+    public ResponseEntity<CommonResponse<PersonResponse>> handleBadAuthorizationException(Exception e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(CommonResponse.<PersonResponse>builder()
+                .error(BadAuthorizationException.class.getName())
+                .timestamp(System.currentTimeMillis())
+                .errorDescription(e.getMessage())
+                .build());
+    }
 }
