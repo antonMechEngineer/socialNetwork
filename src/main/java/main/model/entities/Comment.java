@@ -1,12 +1,11 @@
 package main.model.entities;
 
 import lombok.Data;
-import lombok.ToString;
-
 import main.model.enums.LikeTypes;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,21 +22,17 @@ public class Comment implements Liked {
 
     @ManyToOne
     @JoinColumn(name = "post_id")
-    @ToString.Exclude
     private Post post;
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
-    @ToString.Exclude
     private Comment parentComment;
 
     @OneToMany(mappedBy = "parentComment")
-    @ToString.Exclude
-    private List<Comment> embeddedComments;
+    private List<Comment> embeddedComments = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
-    @ToString.Exclude
     private Person person;
 
     @Column(name = "comment_text", nullable = false, columnDefinition = "TEXT")
@@ -49,12 +44,6 @@ public class Comment implements Liked {
     @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isDeleted;
 
-//    @ManyToAny(metaDef = "likesMetaDef", metaColumn = @Column(name = "meta_column"))
-//    @Cascade(org.hibernate.annotations.CascadeType.ALL)
-//    @JoinTable(name = "post_likes", joinColumns = @JoinColumn(name = "entity_id"), inverseJoinColumns = @JoinColumn(name = "ent_id"))
-//    private List<Like> likes;
-
-
     @Override
     public Person getAuthor() {
         return person;
@@ -63,5 +52,18 @@ public class Comment implements Liked {
     @Override
     public LikeTypes getType() {
         return LikeTypes.COMMENT;
+    }
+
+    @Override
+    public String toString() {
+        return "Comment{" +
+                "id=" + id +
+                ", postId=" + (post == null ? "no post" : post.getId()) +
+                ", parentCommentId=" + (parentComment == null ? "no parent comment" : parentComment.getId()) +
+                ", embeddedCommentsCount=" + embeddedComments.size() +
+                ", authorId=" + person.getId() +
+                ", isBlocked=" + isBlocked +
+                ", isDeleted=" + isDeleted +
+                '}';
     }
 }
