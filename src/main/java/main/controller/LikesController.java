@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/likes")
+@RequestMapping("/likes")
 @RequiredArgsConstructor
 public class LikesController {
 

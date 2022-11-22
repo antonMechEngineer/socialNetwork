@@ -8,7 +8,10 @@ import main.model.entities.Like;
 import main.model.entities.Liked;
 import main.model.entities.Person;
 import main.model.enums.LikeTypes;
+import main.repository.CommentsRepository;
 import main.repository.LikesRepository;
+import main.repository.PersonsRepository;
+import main.repository.PostsRepository;
 import org.mapstruct.Named;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -22,25 +25,13 @@ import java.util.stream.Collectors;
 public class LikesService {
 
     private final LikesRepository likesRepository;
-    private final PostsService postsService;
-    private final CommentsService commentsService;
-    private final PersonsService personsService;
+    private final PostsRepository postsRepository;
+    private final CommentsRepository commentsRepository;
+    private final PersonsRepository personsRepository;
 
     public CommonResponse<LikeResponse> putLike(LikeRequest likeRequest) {
-        Person person = personsService.getPersonByEmail((SecurityContextHolder.getContext().getAuthentication().getName()));
-        Liked liked;
-        switch (likeRequest.getType()) {
-            case "Post" : {
-                liked = postsService.findPostById(likeRequest.getItemId());
-                break;
-            }
-            case "Comment" : {
-                liked = commentsService.getCommentById(likeRequest.getItemId());
-                break;
-            }
-            default: liked = null;
-        }
-        assert liked != null;
+        Person person = getPerson();
+        Liked liked = getLikedEntity(likeRequest.getItemId(), likeRequest.getType());
         if (validateLikeFromCurrentPerson(person, liked)) {
             Like like = new Like();
             like.setEntity(liked);
@@ -52,8 +43,8 @@ public class LikesService {
     }
 
     public CommonResponse<LikeResponse> getLikesByType(long entityId, String type) {
-        List<Like> likes = likesRepository.findLikesByEntity(type, entityId);
-        List<Long> users = likes.stream().map(l -> l.getPerson().getId()).collect(Collectors.toList());
+        List<Like> likes = likesRepository.findLikesByEntity(LikeTypes.getType(type), getLikedEntity(entityId, type));
+        List<Long> users = likes.stream().map(like -> like.getPerson().getId()).collect(Collectors.toList());
         LikeResponse likeResponse = LikeResponse.builder()
                 .likes(likes.size())
                 .users(users)
@@ -66,20 +57,48 @@ public class LikesService {
     }
 
     public boolean validateLikeFromCurrentPerson(Person person, Liked liked) {
-        Like like = likesRepository.findLikesByPersonAndEntity(String.valueOf(liked.getType()), liked.getId(), person.getId()).stream().findFirst().orElse(null);
+        Like like = likesRepository.findLikeByPersonAndEntity(liked.getType(), liked, person).orElse(null);
         return like == null || !person.getId().equals(like.getPerson().getId());
     }
 
     public CommonResponse<LikeResponse> deleteLike(long entityId, String type) {
-        Person person = personsService.getPersonByEmail((SecurityContextHolder.getContext().getAuthentication().getName()));
+        Person person = getPerson();
+        Liked liked = getLikedEntity(entityId, type);
         likesRepository.delete(
-                likesRepository.findLikesByPersonAndEntity(
-                        String.valueOf(LikeTypes.getType(type)), entityId, person.getId()).stream().findFirst().get());
+                likesRepository.findLikeByPersonAndEntity(LikeTypes.getType(type), liked, person).get());
         return getLikesByType(entityId, type);
     }
 
-    @Named("getLikesList")
-    public List<Like> getLikesList(Liked liked, LikeTypes type) {
-        return likesRepository.findLikesByEntity(String.valueOf(type), liked.getId());
+    private Liked getLikedEntity(long entityId, String type) {
+        Liked liked;
+        switch (type) {
+            case "Post" : {
+                liked = postsRepository.findById(entityId).orElse(null);
+                break;
+            }
+            case "Comment" : {
+                liked = commentsRepository.findById(entityId).orElse(null);
+                break;
+            }
+            default: liked = null;
+        }
+        return liked;
+    }
+
+    private Person getPerson() {
+        return personsRepository.findPersonByEmail((SecurityContextHolder.getContext().getAuthentication().getName()))
+                .orElse(null);
+    }
+
+    @Named("getLikesCount")
+    public Integer getLikesCount(Liked liked) {
+        return likesRepository.findLikesByEntity(liked.getType(), liked).size();
+    }
+
+    @Named("getMyLike")
+    public Boolean getMyLike(Liked liked) {
+        Person person = getPerson();
+        Like like = likesRepository.findLikeByPersonAndEntity(liked.getType(), liked, person).orElse(null);
+        return like != null && person.getId().equals(like.getPerson().getId());
     }
 }

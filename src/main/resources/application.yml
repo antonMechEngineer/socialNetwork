@@ -26,7 +26,7 @@ socialNetwork:
 server:
   port: 8086
   servlet:
-    context-path: "/"
+    context-path: "/api/v1"
 
 
 auth:

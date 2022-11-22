@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,7 +24,7 @@ public class Tag {
     @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(name = "post2tag", joinColumns = @JoinColumn(name = "tag_id"), inverseJoinColumns = @JoinColumn(name = "post_id"))
     @ToString.Exclude
-    private List<Post> posts;
+    private List<Post> posts = new ArrayList<>();;
 
     public Tag(String tagName) {
         this.tagName = tagName;

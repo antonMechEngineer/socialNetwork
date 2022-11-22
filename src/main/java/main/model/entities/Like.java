@@ -25,17 +25,13 @@ public class Like {
     @JoinColumn(name = "person_id", nullable = false)
     private Person person;
 
-//    @ManyToOne
-//    @JoinColumn(name = "post_id", nullable = false)
-//    private Post post;
-
     @Any(metaDef = "likesMetaDef",metaColumn = @Column(name = "type"), fetch = FetchType.EAGER)
     @AnyMetaDef(name = "likesMetaDef", idType = "long", metaType = "string", metaValues = {
             @MetaValue(targetEntity = Post.class, value = "POST"),
             @MetaValue(targetEntity = Comment.class, value = "COMMENT")
     })
     @JoinColumn(name = "entity_id")
-    private Object entity;
+    private Liked entity;
 
     @Column(nullable = false, insertable = false, updatable = false)
     @Enumerated(EnumType.STRING)

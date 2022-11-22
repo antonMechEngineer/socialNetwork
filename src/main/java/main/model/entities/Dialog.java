@@ -5,6 +5,7 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,7 +22,7 @@ public class Dialog {
 
     @OneToMany(mappedBy = "dialog", cascade = CascadeType.ALL)
     @ToString.Exclude
-    private List<Message> messages;
+    private List<Message> messages = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "first_person_id", nullable = false)

@@ -24,10 +24,7 @@ public class PersonsService {
     private final JWTUtil jwtUtil;
     private final PersonMapper personMapper;
 
-    public CommonResponse<PersonResponse> getAuthorized(String token) throws BadAuthorizationException {
-        if (jwtUtil.isValidToken(token)) {
-            throw new BadAuthorizationException("Invalid token");
-        }
+    public CommonResponse<PersonResponse> getAuthorized(String token) {
         return CommonResponse.<PersonResponse>builder()
                 .error("success")
                 .timestamp(System.currentTimeMillis())

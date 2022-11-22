@@ -7,6 +7,7 @@ import main.api.response.PersonResponse;
 import main.api.response.PostResponse;
 import main.api.response.UserRs;
 import main.errors.BadAuthorizationException;
+import main.errors.PersonNotFoundException;
 import main.service.PersonsService;
 import main.service.PostsService;
 import org.springframework.http.MediaType;
@@ -19,7 +20,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UsersController {
 
@@ -44,14 +45,14 @@ public class UsersController {
     public CommonResponse<PostResponse> createPost(
             @PathVariable(name = "id") Long personId,
             @RequestParam(name = "publish_date", required = false) Long publishingDate,
-            @RequestBody PostRequest postRequest) {
+            @RequestBody PostRequest postRequest) throws PersonNotFoundException {
 
         return postsService.createPost(postRequest, personId, publishingDate);
     }
 
     @GetMapping("/me")
     public CommonResponse<PersonResponse> getAuthorized(
-            @RequestHeader(name = "Authorization") String token) throws BadAuthorizationException {
+            @RequestHeader(name = "Authorization") String token) {
 
         return usersService.getAuthorized(token);
     }
