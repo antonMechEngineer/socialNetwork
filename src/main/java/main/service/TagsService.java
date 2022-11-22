@@ -18,7 +18,7 @@ public class TagsService {
     private final TagsRepository tagRepository;
 
     private Tag createTag(String tagName) {
-        return tagRepository.save(new Tag(tagName));
+        return tagRepository.save(new Tag(tagName.replaceAll("[\\W]+", "")));
     }
 
     private Tag getTagByTagName(String tagName) {

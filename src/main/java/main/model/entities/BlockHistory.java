@@ -1,7 +1,6 @@
 package main.model.entities;
 
 import lombok.Data;
-import lombok.ToString;
 import main.model.enums.BlockActionTypes;
 
 import javax.persistence.*;
@@ -25,16 +24,25 @@ public class BlockHistory {
 
     @ManyToOne
     @JoinColumn(name = "person_id")
-    @ToString.Exclude
     private Person person;
 
     @OneToOne
     @JoinColumn(name = "post_id", referencedColumnName = "id")
-    @ToString.Exclude
     private Post post;
 
     @OneToOne
     @JoinColumn(name = "comment_id", referencedColumnName = "id")
-    @ToString.Exclude
     private Comment comment;
+
+    @Override
+    public String toString() {
+        return "BlockHistory{" +
+                "id=" + id +
+                ", time=" + time +
+                ", action=" + action +
+                ", personId=" + person.getId() +
+                ", postId=" + (post == null ? "no post" : post.getId()) +
+                ", commentId=" + (comment == null ? "no comment" : comment.getId()) +
+                '}';
+    }
 }

@@ -7,7 +7,6 @@ import main.api.response.UserRs;
 import main.mappers.PersonMapper;
 import main.model.entities.Person;
 import main.repository.PersonsRepository;
-import main.security.jwt.JWTUtil;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,7 +18,7 @@ import java.security.Principal;
 @RequiredArgsConstructor
 public class PersonsService {
 
-    private final PersonsRepository personRepository;
+    private final PersonsRepository personsRepository;
     private final CurrencyService currencyService;
     private final PersonMapper personMapper;
 
@@ -32,18 +31,27 @@ public class PersonsService {
     public UserRs editImage(Principal principal, MultipartFile photo, String phone, String about,
                             String city, String country, String first_name, String last_name,
                             String birth_date, String message_permission) throws IOException {
-        Person person = personRepository.findPersonByEmail(principal.getName()).get();
+        Person person = personsRepository.findPersonByEmail(principal.getName()).get();
         UserRs response =new UserRs();
 
         return response;
     }
 
     public Person getPersonById(long personId) {
-        return personRepository.findById(personId).orElse(null);
+        return personsRepository.findById(personId).orElse(null);
     }
 
     public Person getPersonByEmail(String email) {
-        return personRepository.findPersonByEmail(email).orElse(null);
+        return personsRepository.findPersonByEmail(email).orElse(null);
+    }
+
+    public Person getPersonByContext() {
+        return personsRepository.findPersonByEmail((SecurityContextHolder.getContext().getAuthentication().getName()))
+                .orElse(null);
+    }
+
+    public boolean validatePerson(Person person) {
+        return person != null && person.equals(getPersonByContext());
     }
 
     private CommonResponse<PersonResponse> getCommonPersonResponse(Person person) {

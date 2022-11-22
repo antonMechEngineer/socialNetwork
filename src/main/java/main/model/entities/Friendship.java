@@ -1,7 +1,6 @@
 package main.model.entities;
 
 import lombok.Data;
-import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -20,16 +19,24 @@ public class Friendship {
 
     @ManyToOne
     @JoinColumn(name = "src_person_id", nullable = false)
-    @ToString.Exclude
     private Person srcPerson;
 
     @ManyToOne
     @JoinColumn(name = "dst_person_id", nullable = false)
-    @ToString.Exclude
     private Person dstPerson;
 
     @OneToOne
     @JoinColumn(name = "status_id", nullable = false)
-    @ToString.Exclude
     private FriendshipStatus friendshipStatus;
+
+    @Override
+    public String toString() {
+        return "Friendship{" +
+                "id=" + id +
+                ", sentTime=" + sentTime +
+                ", srcPersonId=" + srcPerson.getId() +
+                ", dstPersonId=" + dstPerson.getId() +
+                ", friendshipStatusId=" + friendshipStatus.getId() +
+                '}';
+    }
 }

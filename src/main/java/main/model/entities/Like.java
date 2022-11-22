@@ -36,4 +36,14 @@ public class Like {
     @Column(nullable = false, insertable = false, updatable = false)
     @Enumerated(EnumType.STRING)
     private LikeTypes type;
+
+    @Override
+    public String toString() {
+        return "Like{" +
+                "id=" + id +
+                ", personId=" + person.getId() +
+                ", entity=" + entity.getId() +
+                ", type=" + type +
+                '}';
+    }
 }

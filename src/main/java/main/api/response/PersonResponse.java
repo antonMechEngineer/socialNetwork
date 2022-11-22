@@ -70,9 +70,9 @@ public class PersonResponse {
     public String toString() {
         return "PersonResponse{" +
                 "id=" + id +
-                ", email='" + email + '\'' +
-                ", name='" + firstName + ' ' + lastName + '\'' +
-                ", isBlocked=" + isBlocked +
+                ", email='" + email +
+                "', name='" + firstName + ' ' + lastName +
+                "', isBlocked=" + isBlocked +
                 ", isDeleted=" + isDeleted +
                 '}';
     }

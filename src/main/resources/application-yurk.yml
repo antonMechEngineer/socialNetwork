@@ -20,6 +20,7 @@ spring:
     enabled: true
 auth:
   secret: someSecretCode
+  time-to-live: 3600000000
 
 #applicationParams
 socialNetwork:

@@ -114,9 +114,9 @@ public class Person {
     public String toString() {
         return "Person{" +
                 "id=" + id +
-                ", name='" + firstName + ' ' + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", isBlocked=" + isBlocked +
+                ", name='" + firstName + ' ' + lastName +
+                "', email='" + email +
+                "', isBlocked=" + isBlocked +
                 ", isDeleted=" + isDeleted +
                 ", postsCount=" + posts.size() +
                 ", commentsCount=" + comments.size() +
