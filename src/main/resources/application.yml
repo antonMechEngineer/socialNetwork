@@ -31,3 +31,4 @@ server:
 
 auth:
   secret: someSecretCode
+  time-to-live: 3600000000

@@ -6,12 +6,12 @@ import main.api.response.CommonResponse;
 import main.api.response.PersonResponse;
 import main.api.response.PostResponse;
 import main.api.response.UserRs;
-import main.errors.BadAuthorizationException;
 import main.errors.PersonNotFoundException;
 import main.service.PersonsService;
 import main.service.PostsService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,8 +28,8 @@ public class UsersController {
     private final PersonsService usersService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<PersonResponse> getUserById(@PathVariable long id) {
-        return ResponseEntity.ok(usersService.getPersonResponse(usersService.getPersonById(id)));
+    public CommonResponse<PersonResponse> getUserById(@PathVariable long id) {
+        return usersService.getPersonDataById(id);
     }
 
     @GetMapping("/{id}/wall")
@@ -51,10 +51,8 @@ public class UsersController {
     }
 
     @GetMapping("/me")
-    public CommonResponse<PersonResponse> getAuthorized(
-            @RequestHeader(name = "Authorization") String token) {
-
-        return usersService.getAuthorized(token);
+    public CommonResponse<PersonResponse> getMyData() {
+        return usersService.getMyData();
     }
 
     @PutMapping(value = "/me", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
