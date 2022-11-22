@@ -2,6 +2,7 @@ package main.security.jwt;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
+import main.service.PersonsService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -33,7 +34,7 @@ public class JWTRequestFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException e) {
             SecurityContextHolder.clearContext();
-            response.setStatus(401);
+            response.sendError(401);
         }
     }
 }

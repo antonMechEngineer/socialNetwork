@@ -20,6 +20,8 @@ public class JWTUtil {
 
     @Value("${auth.secret}")
     private String secret;
+    @Value("${auth.time-to-live}")
+    private Long timeToLive;
 
     private final UserDetailsServiceImpl userDetailsService;
 
@@ -27,7 +29,7 @@ public class JWTUtil {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 3000))
+                .setExpiration(new Date(System.currentTimeMillis() + timeToLive))
                 .signWith(SignatureAlgorithm.HS256, secret).compact();
     }
 
