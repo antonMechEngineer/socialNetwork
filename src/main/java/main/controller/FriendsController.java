@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.List;
 
 @Controller
-@RequestMapping("/friends")
+@RequestMapping("/api/v1/friends")
 @RequiredArgsConstructor
 public class FriendsController {
 
