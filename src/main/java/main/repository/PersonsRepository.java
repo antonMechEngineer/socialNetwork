@@ -17,7 +17,7 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
 
     Optional<Person>findPersonById(Long id);
 
-    Page<Person> findPersonByDstFriendshipsIn(List<Friendship> friendships, Pageable pageable);
+    List<Person> findPersonByDstFriendshipsIn(List<Friendship> friendships);
 
     boolean existsPersonByEmail(String email);
 

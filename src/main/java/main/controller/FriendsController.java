@@ -1,10 +1,7 @@
 package main.controller;
 
 import lombok.RequiredArgsConstructor;
-import main.api.response.CommonResponse;
-import main.api.response.FriendshipRs;
-import main.api.response.ListResponseRsPersonRs;
-import main.api.response.PersonResponse;
+import main.api.response.*;
 import main.service.FriendsRecommendationService;
 import main.service.FriendsService;
 import org.springframework.stereotype.Controller;
@@ -37,12 +34,12 @@ public class FriendsController {
     }
 
     @GetMapping()
-    public ListResponseRsPersonRs getFriends(
+    public CommonResponse<List<PersonResponse>> getFriends(
             @RequestHeader("Authorization") String token)
 //            @RequestParam(name = "page", required = false, defaultValue = "${socialNetwork.default.page}") int page,
 //            @RequestParam(name = "size", required = false, defaultValue = "${socialNetwork.default.size}") int size)
     {
-        return friendsService.getFriends(token, 1, 20);
+        return friendsService.getFriends(token, 0, 20);
     }
 
     @PostMapping("/request/{id}")
@@ -52,7 +49,7 @@ public class FriendsController {
     }
 
     @GetMapping("/request")
-    public ListResponseRsPersonRs getPotentialFriends(
+    public CommonResponse<List<PersonResponse>> getPotentialFriends(
             @RequestHeader("Authorization") String token){
 //            @RequestParam(name = "page", required = false) int page,
 //            @RequestParam(name = "size", required = false) int size) {

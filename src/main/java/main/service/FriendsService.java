@@ -1,10 +1,8 @@
 package main.service;
 
 import lombok.RequiredArgsConstructor;
-import main.api.response.ComplexRs;
-import main.api.response.FriendshipRs;
-import main.api.response.ListResponseRsPersonRs;
-import main.api.response.PersonRs;
+import main.api.response.*;
+import main.mappers.PersonMapper;
 import main.model.entities.Friendship;
 import main.model.entities.FriendshipStatus;
 import main.model.entities.Person;
@@ -13,10 +11,10 @@ import main.repository.FriendshipStatusesRepository;
 import main.repository.FriendshipsRepository;
 import main.repository.PersonsRepository;
 import main.security.jwt.JWTUtil;
-import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,6 +27,7 @@ public class FriendsService {
     private final FriendshipStatusesRepository friendshipStatusesRepository;
     private final PersonsRepository personsRepository;
     private final JWTUtil jwtUtil;
+    private final PersonMapper personMapper;
 
     public FriendshipRs addFriend(String token, Long futureFriendId) {
         Person srcPerson = getPersonByToken(token);
@@ -54,15 +53,9 @@ public class FriendsService {
         return new FriendshipRs("ok", LocalDateTime.now().toString(), new ComplexRs("ok"));
     }
 
-    public ListResponseRsPersonRs getFriends(String token, Integer page, Integer size) {
-        Page<Person> friends = getPagePersons(token, FriendshipStatusTypes.FRIEND, page, size);
-        ListResponseRsPersonRs listResponseRsPersonRs = new ListResponseRsPersonRs("ok",
-                System.currentTimeMillis(),
-                Long.valueOf(friends.getTotalElements()).intValue(),
-                buildPersonRs(friends.getContent()),
-                friends.getNumberOfElements(),
-                "");
-        return listResponseRsPersonRs;
+    public CommonResponse<List<PersonResponse>> getFriends(String token, Integer page, Integer size) {
+        List<PersonResponse> requestedPersons = getPersons(token, FriendshipStatusTypes.FRIEND, page, size);
+        return buildCommonResponse(requestedPersons);
     }
 
     public FriendshipRs sendFriendshipRequest(String token, Long potentialFriendId) {
@@ -73,8 +66,8 @@ public class FriendsService {
         FriendshipStatus dstFriendshipStatus = new FriendshipStatus(LocalDateTime.now(), FriendshipStatusTypes.REQUEST);
         friendshipStatusesRepository.save(srcFriendshipStatus);
         friendshipStatusesRepository.save(dstFriendshipStatus);
-        Friendship srcFriendship = new Friendship(srcFriendshipStatus, LocalDateTime.now(), srcPerson, dstPerson);
-        Friendship dstFriendship = new Friendship(dstFriendshipStatus, LocalDateTime.now(), dstPerson, srcPerson);
+        Friendship srcFriendship = new Friendship(LocalDateTime.now(), srcPerson, dstPerson, srcFriendshipStatus);
+        Friendship dstFriendship = new Friendship(LocalDateTime.now(), dstPerson, srcPerson, srcFriendshipStatus);
         friendshipsRepository.save(srcFriendship);
         friendshipsRepository.save(dstFriendship);
         return new FriendshipRs("ok", LocalDateTime.now().toString(), new ComplexRs("ok"));
@@ -97,36 +90,32 @@ public class FriendsService {
         return new FriendshipRs("ok", LocalDateTime.now().toString(), new ComplexRs("ok"));
     }
 
-    public ListResponseRsPersonRs getRequestedPersons(String token, Integer page, Integer size) {
-        Page<Person> requestedPersons = getPagePersons(token, FriendshipStatusTypes.REQUEST, page, size);
-        return new ListResponseRsPersonRs("ok",
-                System.currentTimeMillis(),
-                Long.valueOf(requestedPersons.getTotalElements()).intValue(),
-                buildPersonRs(requestedPersons.getContent()),
-                requestedPersons.getNumberOfElements(),
-                "");
+    public CommonResponse<List<PersonResponse>> getRequestedPersons(String token, Integer page, Integer size) {
+        List<PersonResponse> requestedPersons = getPersons(token, FriendshipStatusTypes.REQUEST, page, size);
+        return buildCommonResponse(requestedPersons);
     }
 
-    private Page<Person> getPagePersons(String token, FriendshipStatusTypes friendshipStatusTypes,
-                                        Integer page, Integer size) {
+    private List<PersonResponse> getPersons(String token, FriendshipStatusTypes friendshipStatusTypes,
+                                      Integer page, Integer size) {
         Person srcPerson = getPersonByToken(token);
         List<Friendship> srcPersonFriendships = friendshipsRepository.findFriendshipBySrcPerson(srcPerson).stream().
                 filter(friendship -> friendship.getFriendshipStatus().getCode() == friendshipStatusTypes).
                 collect(Collectors.toList());
-        List<Person> frs = srcPerson.getSrcFriendships();
-        List<Person> frd = srcPerson.getDstFriendships();
-        Pageable pageable = PageRequest.of(page, size, Sort.by("last_name").descending());
-        Page<Person> pages = new PageImpl<>(frd, pageable, frd.size());
-        if (frd.size() == 0) {
-            return Page.empty();
+        if (srcPersonFriendships.size() == 0) {
+            return new ArrayList<>();
         } else {
-            return pages;
+            List<Person> persons = personsRepository.findPersonByDstFriendshipsIn(srcPersonFriendships);
+            List<PersonResponse> responsePersons = personsToPersonResponses(persons);
+            return responsePersons;
         }
-
     }
 
-    private List<PersonRs> buildPersonRs(List<Person> persons) {
-        return persons.stream().map(PersonRs::new).collect(Collectors.toList());
+    private List<PersonResponse> personsToPersonResponses(List<Person> persons) {
+        List<PersonResponse> personResponses = new ArrayList<>();
+        for (Person person : persons) {
+            personResponses.add(personMapper.toPersonResponse(person));
+        }
+        return personResponses;
     }
 
     private void modifyFriendShipStatus(Person srcPerson, Person dstPerson,
@@ -150,5 +139,13 @@ public class FriendsService {
         String personEmail = jwtUtil.extractUserName(token);
         Person person = personsRepository.findPersonByEmail(personEmail).orElseThrow();
         return person;
+    }
+
+    private CommonResponse<List<PersonResponse>> buildCommonResponse(List<PersonResponse> personResponses) {
+        return CommonResponse.<List<PersonResponse>>builder()
+                .timestamp(System.currentTimeMillis())
+                .total((long) personResponses.size())
+                .data(personResponses)
+                .build();
     }
 }

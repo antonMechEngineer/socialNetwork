@@ -1,11 +1,13 @@
 package main.model.entities;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@NoArgsConstructor
 @Entity
 @Data
 @Table(name = "friendships")
@@ -32,4 +34,11 @@ public class Friendship {
     @JoinColumn(name = "status_id", nullable = false)
     @ToString.Exclude
     private FriendshipStatus friendshipStatus;
+
+    public Friendship(LocalDateTime sentTime, Person srcPerson, Person dstPerson, FriendshipStatus friendshipStatus) {
+        this.sentTime = sentTime;
+        this.srcPerson = srcPerson;
+        this.dstPerson = dstPerson;
+        this.friendshipStatus = friendshipStatus;
+    }
 }
