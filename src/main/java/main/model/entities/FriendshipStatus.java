@@ -1,12 +1,13 @@
 package main.model.entities;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import main.model.enums.FriendshipStatusTypes;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-
+@NoArgsConstructor
 @Entity
 @Data
 @Table(name = "friendship_statuses")
@@ -19,10 +20,14 @@ public class FriendshipStatus {
     @Column(nullable = false)
     private LocalDateTime time;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private FriendshipStatusTypes name;
+    private String name;
 
     @Column(nullable = false)
-    private String code;
+    @Enumerated(EnumType.STRING)
+    private FriendshipStatusTypes code;
+
+    public FriendshipStatus(LocalDateTime time, FriendshipStatusTypes code) {
+        this.time = time;
+        this.code = code;
+    }
 }

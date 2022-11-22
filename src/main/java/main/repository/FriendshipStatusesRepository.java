@@ -5,4 +5,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FriendshipStatusesRepository extends JpaRepository <FriendshipStatus, Long> {
+
+    FriendshipStatus findFriendshipStatusesById(Long id);
+
 }
