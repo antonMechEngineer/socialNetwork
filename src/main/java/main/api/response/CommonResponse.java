@@ -26,7 +26,7 @@ public class CommonResponse<T> {
     public String toString() {
         return "CommonResponse{" +
                 "error='" + error + '\'' +
-                ", data=" + data.getClass().getName() +
+                ", data=" + data +
                 '}';
     }
 }

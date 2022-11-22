@@ -42,11 +42,11 @@ public class PostResponse {
     @Override
     public String toString() {
         return "PostResponse{" +
-                "id=" + id +
+                "postId=" + id +
                 ", authorId=" + author.getId() +
-                ", title='" + title + '\'' +
-                ", likes=" + likes +
-                ", tags=" + tags +
+                ", title='" + (title.length() < 10 ? title : (title.substring(0, 8) + "..")) +
+                "', likes=" + likes +
+                ", tagsCount=" + tags.size() +
                 ", commentsCount=" + comments.size() +
                 ", isBlocked=" + isBlocked +
                 ", myLike=" + myLike +

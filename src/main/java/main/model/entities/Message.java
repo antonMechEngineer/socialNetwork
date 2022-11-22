@@ -1,7 +1,6 @@
 package main.model.entities;
 
 import lombok.Data;
-import lombok.ToString;
 import main.model.enums.ReadStatusTypes;
 
 import javax.persistence.*;
@@ -31,16 +30,26 @@ public class Message {
 
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
-    @ToString.Exclude
     private Person author;
 
     @ManyToOne
     @JoinColumn(name = "recipient_id", nullable = false)
-    @ToString.Exclude
     private Person recipient;
 
     @ManyToOne
     @JoinColumn(name = "dialog_id", nullable = false)
-    @ToString.Exclude
     private Dialog dialog;
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "id=" + id +
+                ", messageText='" + messageText +
+                "', readStatus=" + readStatus +
+                ", isDeleted=" + isDeleted +
+                ", authorId=" + author.getId() +
+                ", recipientId=" + recipient.getId() +
+                ", dialogId=" + dialog.getId() +
+                '}';
+    }
 }

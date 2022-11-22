@@ -60,8 +60,8 @@ public class Post implements Liked{
                 "id=" + id +
                 ", time=" + time +
                 ", authorId=" + author.getId() +
-                ", title='" + title + '\'' +
-                ", isBlocked=" + isBlocked +
+                ", title='" + title +
+                "', isBlocked=" + isBlocked +
                 ", isDeleted=" + isDeleted +
                 ", commentsCount=" + comments.size() +
                 ", tags=" + Arrays.toString(tags.stream().map(Tag::getTagName).toArray()) +

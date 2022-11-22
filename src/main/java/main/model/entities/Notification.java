@@ -1,7 +1,6 @@
 package main.model.entities;
 
 import lombok.Data;
-import lombok.ToString;
 import main.model.enums.NotificationTypes;
 import org.hibernate.annotations.Any;
 import org.hibernate.annotations.AnyMetaDef;
@@ -43,6 +42,18 @@ public class Notification {
 
     @ManyToOne
     @JoinColumn(name = "person_id", nullable = false)
-    @ToString.Exclude
     private Person person;
+
+    @Override
+    public String toString() {
+        return "Notification{" +
+                "id=" + id +
+                ", notificationType=" + notificationType +
+                ", sentTime=" + sentTime +
+                ", entity=" + entity.getClass().getName() +
+                ", contact='" + contact + '\'' +
+                ", isRead=" + isRead +
+                ", personId=" + person.getId() +
+                '}';
+    }
 }
