@@ -9,7 +9,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public class MappersUtil {
 
-    @Named("getLikesCount")
+//    @Named("getLikesCount")
     public int getLikesCount(List<Like> likes) {
         return likes == null ? 0 : likes.size();
     }

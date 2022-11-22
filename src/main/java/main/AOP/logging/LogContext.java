@@ -20,7 +20,11 @@ public class LogContext {
     public String getArgs(JoinPoint joinPoint) {
         Object[] argsList = joinPoint.getArgs();
         StringJoiner joiner = new StringJoiner(", ");
-        Arrays.stream(argsList).forEach(arg -> joiner.add(arg.getClass().getSimpleName() + " = " + arg));
+        Arrays.stream(argsList).forEach(arg -> {
+            if (arg != null) {
+                joiner.add(arg.getClass().getSimpleName() + " = " + arg);
+            }
+        });
         return joiner.toString();
     }
 }

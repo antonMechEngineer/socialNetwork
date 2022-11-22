@@ -702,38 +702,6 @@ databaseChangeLog:
     id: sprint-1-23
     author: YurK
     changes:
-    - createTable:
-        columns:
-        - column:
-            constraints:
-              nullable: false
-            name: src_person_id
-            type: BIGINT
-        - column:
-            constraints:
-              nullable: false
-            name: dst_person_id
-            type: BIGINT
-        tableName: friendship
-- changeSet:
-    id: sprint-1-24
-    author: YurK
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: src_person_id
-        baseTableName: friendship
-        constraintName: fk18m8yy9pp291xaqdjusvj9kxj
-        deferrable: false
-        initiallyDeferred: false
-        onDelete: NO ACTION
-        onUpdate: NO ACTION
-        referencedColumnNames: id
-        referencedTableName: persons
-        validate: true
-- changeSet:
-    id: sprint-1-25
-    author: YurK
-    changes:
     - addForeignKeyConstraint:
         baseColumnNames: comment_id
         baseTableName: block_history
@@ -746,7 +714,7 @@ databaseChangeLog:
         referencedTableName: post_comments
         validate: true
 - changeSet:
-    id: sprint-1-26
+    id: sprint-1-24
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -761,7 +729,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: sprint-1-27
+    id: sprint-1-25
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -776,7 +744,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: sprint-1-28
+    id: sprint-1-26
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -791,7 +759,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: sprint-1-29
+    id: sprint-1-27
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -806,7 +774,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: sprint-1-30
+    id: sprint-1-28
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -821,7 +789,7 @@ databaseChangeLog:
         referencedTableName: posts
         validate: true
 - changeSet:
-    id: sprint-1-31
+    id: sprint-1-29
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -836,7 +804,7 @@ databaseChangeLog:
         referencedTableName: countries
         validate: true
 - changeSet:
-    id: sprint-1-32
+    id: sprint-1-30
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -851,7 +819,7 @@ databaseChangeLog:
         referencedTableName: posts
         validate: true
 - changeSet:
-    id: sprint-1-33
+    id: sprint-1-31
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -866,7 +834,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: sprint-1-34
+    id: sprint-1-32
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -881,7 +849,7 @@ databaseChangeLog:
         referencedTableName: posts
         validate: true
 - changeSet:
-    id: sprint-1-35
+    id: sprint-1-33
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -896,7 +864,7 @@ databaseChangeLog:
         referencedTableName: friendship_statuses
         validate: true
 - changeSet:
-    id: sprint-1-36
+    id: sprint-1-34
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -911,7 +879,7 @@ databaseChangeLog:
         referencedTableName: post_comments
         validate: true
 - changeSet:
-    id: sprint-1-37
+    id: sprint-1-35
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -926,7 +894,7 @@ databaseChangeLog:
         referencedTableName: tags
         validate: true
 - changeSet:
-    id: sprint-1-38
+    id: sprint-1-36
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -941,22 +909,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: sprint-1-39
-    author: YurK
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: dst_person_id
-        baseTableName: friendship
-        constraintName: fkd7peios1ldfebilr8ia5h978x
-        deferrable: false
-        initiallyDeferred: false
-        onDelete: NO ACTION
-        onUpdate: NO ACTION
-        referencedColumnNames: id
-        referencedTableName: persons
-        validate: true
-- changeSet:
-    id: sprint-1-40
+    id: sprint-1-37
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -971,7 +924,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: sprint-1-41
+    id: sprint-1-38
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -986,7 +939,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: sprint-1-42
+    id: sprint-1-39
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -1001,7 +954,7 @@ databaseChangeLog:
         referencedTableName: cities
         validate: true
 - changeSet:
-    id: sprint-1-43
+    id: sprint-1-40
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -1016,7 +969,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: sprint-1-44
+    id: sprint-1-41
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -1031,7 +984,7 @@ databaseChangeLog:
         referencedTableName: dialogs
         validate: true
 - changeSet:
-    id: sprint-1-45
+    id: sprint-1-42
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -1046,7 +999,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: sprint-1-46
+    id: sprint-1-43
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -1061,7 +1014,7 @@ databaseChangeLog:
         referencedTableName: persons
         validate: true
 - changeSet:
-    id: sprint-1-47
+    id: sprint-1-44
     author: YurK
     changes:
     - addForeignKeyConstraint:
@@ -1076,7 +1029,7 @@ databaseChangeLog:
         referencedTableName: posts
         validate: true
 - changeSet:
-    id: sprint-1-48
+    id: sprint-1-45
     author: YurK
     changes:
     - addForeignKeyConstraint:

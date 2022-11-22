@@ -9,6 +9,7 @@ import main.model.entities.Comment;
 import main.model.entities.Person;
 import main.model.entities.Post;
 import main.repository.CommentsRepository;
+import main.repository.PersonsRepository;
 import main.service.util.NetworkPageRequest;
 import org.mapstruct.Named;
 import org.springframework.data.domain.Page;
@@ -27,11 +28,11 @@ import java.util.stream.Collectors;
 public class CommentsService {
 
     private final CommentsRepository commentRepository;
-    private final PersonsService personsService;
+    private final PersonsRepository personsRepository;
     private final CommentMapper commentMapper;
 
     public CommonResponse<CommentResponse> createComment(Post post, CommentRequest commentRequest) {
-        Person person = personsService.getPersonByEmail((SecurityContextHolder.getContext().getAuthentication().getName()));
+        Person person = personsRepository.findPersonByEmail((SecurityContextHolder.getContext().getAuthentication().getName())).orElse(null);
         Comment parentComment = getCommentById(commentRequest.getParentId());
         post = parentComment == null ? post : null;
         Comment comment = commentMapper.commentRequestToNewComment(commentRequest, post, person, parentComment, LocalDateTime.now());

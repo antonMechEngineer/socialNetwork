@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 public class NotificationsController {
 
-    @GetMapping("/api/v1/notifications")
+    @GetMapping("/notifications")
     public ResponseEntity<?> notifications() {
         return ResponseEntity.status(200).build();
     }
