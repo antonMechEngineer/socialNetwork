@@ -6,6 +6,7 @@ import main.model.entities.Person;
 import main.model.entities.Post;
 import main.model.enums.PostTypes;
 import main.service.CommentsService;
+import main.service.LikesService;
 import main.service.TagsService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,16 +14,15 @@ import org.mapstruct.Mapping;
 import java.time.LocalDateTime;
 
 @Mapper(componentModel = "spring",
-        uses = {PersonMapper.class, CommentsService.class, TagsService.class})
+        uses = {PersonMapper.class, CommentsService.class, TagsService.class, LikesService.class})
 public interface PostMapper {
 
-//    @Mapping(target = "likes", source = "post", qualifiedByName = "getLikesCount")
-    @Mapping(target = "likes", source = "likes")
+    @Mapping(target = "likes", source = "post", qualifiedByName = "getLikesCount")
     @Mapping(target = "tags", qualifiedByName = "getStringsByTags")
     @Mapping(target = "comments", qualifiedByName = "commentsToResponse")
     @Mapping(target = "type", source = "post")
-    @Mapping(target = "myLike" , source = "myLike")
-    PostResponse postToResponse(Post post, int likes, boolean myLike);
+    @Mapping(target = "myLike", source = "post", qualifiedByName = "getMyLike")
+    PostResponse postToResponse(Post post);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "time", source = "time")
@@ -33,7 +33,6 @@ public interface PostMapper {
     @Mapping(target = "comments", ignore = true)
     @Mapping(target = "tags", qualifiedByName = "getTagsByStrings")
     @Mapping(target = "postFiles", ignore = true)
-//    @Mapping(target = "likes", ignore = true)
     Post postRequestToNewPost(PostRequest request, Person person, LocalDateTime time);
 
     default PostTypes getPostType(Post post) {

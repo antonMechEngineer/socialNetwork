@@ -22,17 +22,14 @@ public class Friendship {
 
     @ManyToOne
     @JoinColumn(name = "src_person_id", nullable = false)
-    @ToString.Exclude
     private Person srcPerson;
 
     @ManyToOne
     @JoinColumn(name = "dst_person_id", nullable = false)
-    @ToString.Exclude
     private Person dstPerson;
 
     @OneToOne
     @JoinColumn(name = "status_id", nullable = false)
-    @ToString.Exclude
     private FriendshipStatus friendshipStatus;
 
     public Friendship(LocalDateTime sentTime, Person srcPerson, Person dstPerson, FriendshipStatus friendshipStatus) {
@@ -40,5 +37,16 @@ public class Friendship {
         this.srcPerson = srcPerson;
         this.dstPerson = dstPerson;
         this.friendshipStatus = friendshipStatus;
+    }
+
+    @Override
+    public String toString() {
+        return "Friendship{" +
+                "id=" + id +
+                ", sentTime=" + sentTime +
+                ", srcPersonId=" + srcPerson.getId() +
+                ", dstPersonId=" + dstPerson.getId() +
+                ", friendshipStatusId=" + friendshipStatus.getId() +
+                '}';
     }
 }

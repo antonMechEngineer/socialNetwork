@@ -1,8 +1,6 @@
 package main.model.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import lombok.ToString;
 
 import javax.persistence.*;
 
@@ -24,6 +22,16 @@ public class City {
 
     @ManyToOne
     @JoinColumn(name = "country_id")
-    @ToString.Exclude
     private Country country;
+
+    @Override
+    public String toString() {
+        return "City{" +
+                "id=" + id +
+                ", title='" + title +
+                "', temp='" + temp +
+                "', clouds='" + clouds +
+                "', country=" + country.getTitle() +
+                '}';
+    }
 }

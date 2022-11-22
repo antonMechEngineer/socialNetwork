@@ -1,23 +1,26 @@
 server:
   port: 8086
+#  servlet:
+#    context-path: /api/v1
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/network
     username: postgres
     password: 123
     driver-class-name: org.postgresql.Driver
-    initialization-mode: never
+    initialization-mode: always
     data: classpath:/db/changelog/data.sql
   jpa:
     show-sql: false
     database-platform: org.hibernate.dialect.PostgreSQL9Dialect
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
   liquibase:
     change-log: classpath:db/changelog/changelog-master.yaml
     enabled: true
 auth:
   secret: someSecretCode
+  time-to-live: 3600000000
 
 #applicationParams
 socialNetwork:

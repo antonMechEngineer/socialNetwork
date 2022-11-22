@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import main.api.request.PostRequest;
 import main.api.response.CommonResponse;
 import main.api.response.PostResponse;
+import main.errors.PersonNotFoundException;
 import main.mappers.PostMapper;
-import main.model.entities.*;
-import main.model.enums.LikeTypes;
-import main.repository.LikesRepository;
+import main.model.entities.Person;
+import main.model.entities.Post;
+import main.model.entities.Tag;
+import main.repository.PersonsRepository;
 import main.repository.PostsRepository;
 import main.service.util.NetworkPageRequest;
 import org.springframework.data.domain.Page;
@@ -26,20 +28,23 @@ import java.util.stream.Collectors;
 public class PostsService {
 
     private final PostsRepository postsRepository;
-    private final LikesRepository likesRepository;
-    private final PersonsService personsService;
+    private final PersonsRepository personsRepository;
     private final TagsService tagsService;
     private final PostMapper postMapper;
 
-    public CommonResponse<PostResponse> createPost(PostRequest postRequest, long userId, Long timestamp) {
+    public CommonResponse<PostResponse> createPost(PostRequest postRequest, long userId, Long timestamp) throws PersonNotFoundException {
+        Person person = personsRepository.findById(userId).orElse(null);
+        if (!validatePerson(person)) {
+            throw new PersonNotFoundException("Invalid user id");
+        }
         LocalDateTime postPublishingTime = timestamp == null ? LocalDateTime.now() : new Timestamp(timestamp).toLocalDateTime();
-        Post post = postMapper.postRequestToNewPost(postRequest, personsService.getPersonById(userId), postPublishingTime);
+        Post post = postMapper.postRequestToNewPost(postRequest, person, postPublishingTime);
         return CommonResponse.<PostResponse>builder()
                 .error("success")
                 .timestamp(System.currentTimeMillis())
                 .data(postMapper.postToResponse(
                         postsRepository.save(
-                                updateTagsInPost(new ArrayList<>(post.getTags()), post)), getLikesList(post, LikeTypes.POST).size(), getMyLike(post)))
+                                updateTagsInPost(new ArrayList<>(post.getTags()), post))))
                 .build();
     }
 
@@ -73,12 +78,15 @@ public class PostsService {
         return CommonResponse.<PostResponse>builder()
                 .error("success")
                 .timestamp(System.currentTimeMillis())
-                .data(postMapper.postToResponse(findPostById(postId), getLikesList(findPostById(postId), LikeTypes.POST).size(), getMyLike(findPostById(postId))))
+                .data(postMapper.postToResponse(findPostById(postId)))
                 .build();
     }
 
-    public CommonResponse<PostResponse> updatePost(long postId, PostRequest postRequest) {
+    public CommonResponse<PostResponse> updatePost(long postId, PostRequest postRequest) throws PersonNotFoundException {
         Post post = findPostById(postId);
+        if (!validatePerson(post.getAuthor())) {
+            throw new PersonNotFoundException("Invalid user id");
+        }
         post.setTitle(postRequest.getTitle());
         post.setPostText(postRequest.getPostText());
         List<Tag> tags = tagsService.stringsToTagsMapper(postRequest.getTags());
@@ -86,18 +94,21 @@ public class PostsService {
         return CommonResponse.<PostResponse>builder()
                 .error("success")
                 .timestamp(System.currentTimeMillis())
-                .data(postMapper.postToResponse(postsRepository.save(newPost), getLikesList(post, LikeTypes.POST).size(), getMyLike(post)))
+                .data(postMapper.postToResponse(postsRepository.save(newPost)))
                 .build();
     }
 
-    public CommonResponse<PostResponse> changeDeleteStatusInPost(long postId, boolean deleteStatus) {
+    public CommonResponse<PostResponse> changeDeleteStatusInPost(long postId, boolean deleteStatus) throws PersonNotFoundException {
         Post post = findPostById(postId);
+        if (!validatePerson(post.getAuthor())) {
+            throw new PersonNotFoundException("Invalid user id");
+        }
         post.setIsDeleted(deleteStatus);
         post.setTimeDelete(LocalDateTime.now());
         return CommonResponse.<PostResponse>builder()
                 .error("success")
                 .timestamp(System.currentTimeMillis())
-                .data(postMapper.postToResponse(postsRepository.save(post), getLikesList(post, LikeTypes.POST).size(), getMyLike(post)))
+                .data(postMapper.postToResponse(postsRepository.save(post)))
                 .build();
     }
 
@@ -117,16 +128,11 @@ public class PostsService {
     }
 
     private List<PostResponse> postsToResponse(List<Post> posts) {
-        return posts.stream().map(post -> postMapper.postToResponse(post, getLikesList(post, LikeTypes.POST).size(), getMyLike(post))).collect(Collectors.toList());
+        return posts.stream().map(postMapper::postToResponse).collect(Collectors.toList());
     }
 
-    private List<Like> getLikesList(Liked liked, LikeTypes type) {
-        return likesRepository.findLikesByEntity(String.valueOf(type), liked.getId());
-    }
-
-    private boolean getMyLike(Post post) {
-        Person person = personsService.getPersonByEmail((SecurityContextHolder.getContext().getAuthentication().getName()));
-        Like like = likesRepository.findLikesByPersonAndEntity(String.valueOf(post.getType()), post.getId(), person.getId()).stream().findFirst().orElse(null);
-        return like != null && person.getId().equals(like.getPerson().getId());
+    private boolean validatePerson(Person person) {
+        return person != null && person.equals(personsRepository.findPersonByEmail(
+                (SecurityContextHolder.getContext().getAuthentication().getName())).orElse(null));
     }
 }
