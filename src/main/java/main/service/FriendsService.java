@@ -37,7 +37,8 @@ public class FriendsService {
             return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), new ComplexRs(descriptionError));
         }
         Person dstPerson = optionalDstPerson.get();
-        modifyFriendShipStatus(srcPerson, dstPerson, FriendshipStatusTypes.FRIEND, FriendshipStatusTypes.FRIEND);
+        modifyFriendShipStatus(srcPerson, dstPerson, FriendshipStatusTypes.FRIEND);
+        modifyFriendShipStatus(dstPerson, srcPerson, FriendshipStatusTypes.FRIEND);
         return new FriendshipRs("ok", LocalDateTime.now().toString(), new ComplexRs("ok"));
     }
 
@@ -49,12 +50,13 @@ public class FriendsService {
             return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), new ComplexRs(descriptionError));
         }
         Person dstPerson = optionalDstPerson.get();
-        modifyFriendShipStatus(srcPerson, dstPerson, FriendshipStatusTypes.REQUEST, FriendshipStatusTypes.SUBSCRIBED);
+//        modifyFriendShipStatus(srcPerson, dstPerson, FriendshipStatusTypes.REQUEST);
+//        modifyFriendShipStatus(dstPerson, srcPerson, FriendshipStatusTypes.SUBSCRIBED);  //TODO: 22.11.2022 просто вырезать друга из базы
         return new FriendshipRs("ok", LocalDateTime.now().toString(), new ComplexRs("ok"));
     }
 
-    public CommonResponse<List<PersonResponse>> getFriends(String token, Integer page, Integer size) {
-        List<PersonResponse> requestedPersons = getPersons(token, FriendshipStatusTypes.FRIEND, page, size);
+    public CommonResponse<List<PersonResponse>> getFriends(String token) {
+        List<PersonResponse> requestedPersons = getPersons(token, FriendshipStatusTypes.FRIEND);
         return buildCommonResponse(requestedPersons);
     }
 
@@ -90,49 +92,40 @@ public class FriendsService {
         return new FriendshipRs("ok", LocalDateTime.now().toString(), new ComplexRs("ok"));
     }
 
-    public CommonResponse<List<PersonResponse>> getRequestedPersons(String token, Integer page, Integer size) {
-        List<PersonResponse> requestedPersons = getPersons(token, FriendshipStatusTypes.REQUEST, page, size);
+    public CommonResponse<List<PersonResponse>> getRequestedPersons(String token) {
+        List<PersonResponse> requestedPersons = getPersons(token, FriendshipStatusTypes.REQUEST);
         return buildCommonResponse(requestedPersons);
     }
 
-    private List<PersonResponse> getPersons(String token, FriendshipStatusTypes friendshipStatusTypes,
-                                      Integer page, Integer size) {
+    private List<PersonResponse> getPersons(String token, FriendshipStatusTypes friendshipStatusTypes) {
         Person srcPerson = getPersonByToken(token);
-        List<Friendship> srcPersonFriendships = friendshipsRepository.findFriendshipBySrcPerson(srcPerson).stream().
-                filter(friendship -> friendship.getFriendshipStatus().getCode() == friendshipStatusTypes).
-                collect(Collectors.toList());
+        List<Friendship> srcPersonFriendships = getFriendshipsByPersonByType(srcPerson, friendshipStatusTypes);
         if (srcPersonFriendships.size() == 0) {
             return new ArrayList<>();
         } else {
-            List<Person> persons = personsRepository.findPersonByDstFriendshipsIn(srcPersonFriendships);
+            List<Person> persons = srcPersonFriendships.stream().
+                    filter(fs -> fs.getFriendshipStatus().getCode() == friendshipStatusTypes).
+                    map(Friendship::getDstPerson).collect(Collectors.toList());
             List<PersonResponse> responsePersons = personsToPersonResponses(persons);
             return responsePersons;
         }
     }
 
-    private List<PersonResponse> personsToPersonResponses(List<Person> persons) {
-        List<PersonResponse> personResponses = new ArrayList<>();
-        for (Person person : persons) {
-            personResponses.add(personMapper.toPersonResponse(person));
-        }
-        return personResponses;
-    }
-
     private void modifyFriendShipStatus(Person srcPerson, Person dstPerson,
-                                        FriendshipStatusTypes srcFriendshipStatusTypes,
-                                        FriendshipStatusTypes dstFriendshipStatusTypes) {
-        Friendship srcFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(srcPerson, dstPerson);
-        Friendship dstFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(dstPerson, srcPerson);
-        FriendshipStatus srcFriendshipStatus = friendshipStatusesRepository.
-                findFriendshipStatusesById(srcFriendship.getFriendshipStatus().getId());
-        FriendshipStatus dstFriendshipStatus = friendshipStatusesRepository.
-                findFriendshipStatusesById(dstFriendship.getFriendshipStatus().getId());
+                                        FriendshipStatusTypes srcFriendshipStatusTypes) {
+        Friendship srcFriendship = getFriendshipsByPersonByType(srcPerson, srcFriendshipStatusTypes).stream().
+                filter(friendship -> friendship.getDstPerson().equals(dstPerson)).collect(Collectors.toList()).get(0);
+        FriendshipStatus srcFriendshipStatus = srcFriendship.getFriendshipStatus();
         srcFriendshipStatus.setCode(srcFriendshipStatusTypes);
         srcFriendshipStatus.setTime(LocalDateTime.now());
-        dstFriendshipStatus.setCode(dstFriendshipStatusTypes);
-        dstFriendshipStatus.setTime(LocalDateTime.now());
         friendshipStatusesRepository.save(srcFriendshipStatus);
-        friendshipStatusesRepository.save(dstFriendshipStatus);
+    }
+
+
+    private List<Friendship> getFriendshipsByPersonByType(Person person, FriendshipStatusTypes friendshipStatusTypes){
+        return friendshipsRepository.findFriendshipBySrcPerson(person).stream().
+                filter(friendship -> friendship.getFriendshipStatus().getCode() == friendshipStatusTypes).
+                collect(Collectors.toList());
     }
 
     private Person getPersonByToken(String token) {
@@ -148,4 +141,13 @@ public class FriendsService {
                 .data(personResponses)
                 .build();
     }
+
+    private List<PersonResponse> personsToPersonResponses(List<Person> persons) {
+        List<PersonResponse> personResponses = new ArrayList<>();
+        for (Person person : persons) {
+            personResponses.add(personMapper.toPersonResponse(person));
+        }
+        return personResponses;
+    }
+
 }
