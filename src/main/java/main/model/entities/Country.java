@@ -1,9 +1,8 @@
 package main.model.entities;
 
 import lombok.Data;
-import javax.persistence.*;
-import java.util.List;
 
+import javax.persistence.*;
 @Entity
 @Data
 @Table(name = "countries")
@@ -14,7 +13,4 @@ public class Country {
     private Long id;
 
     private String title;
-
-    @OneToMany(mappedBy = "country")
-    private List<City> cities;
 }

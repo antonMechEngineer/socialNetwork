@@ -8,10 +8,7 @@ import main.api.response.ComplexRs;
 import main.api.response.PersonResponse;
 import main.service.AuthService;
 import main.service.CaptchaService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -22,20 +19,17 @@ public class AuthController {
     private final AuthService authService;
 
     @GetMapping("/captcha")
-    public ResponseEntity<CaptchaRs> captchaCheck() {
-        return ResponseEntity.ok(captchaService.getCaptchaCode());
+    public CaptchaRs captchaCheck() {
+        return captchaService.getCaptchaCode();
     }
 
     @PostMapping("/login")
-    public ResponseEntity<CommonResponse<PersonResponse>> login(@RequestBody LoginRq loginRq) {
-        Logger.getLogger(this.getClass().getName()).info("/api/v1/auth/login endpoint with request " + loginRq.getEmail() + " - " + loginRq.getPassword());
-        CommonResponse<PersonResponse> commonResponse = authService.loginUser(loginRq);
-        return ResponseEntity.ok(commonResponse);
+    public CommonResponse<PersonResponse> login(@RequestBody LoginRq loginRq) {
+        return authService.loginUser(loginRq);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<CommonResponse<ComplexRs>> logout() {
-        Logger.getLogger(this.getClass().getName()).info("/api/v1/auth/logout endpoint");
-        return ResponseEntity.ok(authService.logoutUser());
+    public CommonResponse<ComplexRs> logout() {
+        return authService.logoutUser();
     }
 }

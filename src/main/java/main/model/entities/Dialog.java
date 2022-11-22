@@ -1,6 +1,7 @@
 package main.model.entities;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -15,17 +16,20 @@ public class Dialog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "first_person_id", nullable = false)
-    private Person firstPerson;
-
-    @ManyToOne
-    @JoinColumn(name = "second_person_id", nullable = false)
-    private Person secondPerson;
-
     @Column(name = "last_time_active")
     private LocalDateTime lastTimeActive;
 
     @OneToMany(mappedBy = "dialog", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Message> messages;
+
+    @ManyToOne
+    @JoinColumn(name = "first_person_id", nullable = false)
+    @ToString.Exclude
+    private Person firstPerson;
+
+    @ManyToOne
+    @JoinColumn(name = "second_person_id", nullable = false)
+    @ToString.Exclude
+    private Person secondPerson;
 }

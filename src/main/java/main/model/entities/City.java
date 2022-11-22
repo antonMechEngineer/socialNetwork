@@ -1,17 +1,13 @@
 package main.model.entities;
 
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 
 @Entity
 @Data
-//@ToString
-//@Getter
-//@Setter
-//@RequiredArgsConstructor
-//@EqualsAndHashCode
-
 @Table(name = "cities")
 public class City {
 
@@ -22,11 +18,12 @@ public class City {
     @Column(nullable = false)
     private String title;
 
-    @ManyToOne
-    @JoinColumn(name = "country_id")
-    private Country country;
-
     private String temp;
 
     private String clouds;
+
+    @ManyToOne
+    @JoinColumn(name = "country_id")
+    @ToString.Exclude
+    private Country country;
 }

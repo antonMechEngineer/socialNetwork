@@ -1,6 +1,7 @@
 package main.model.entities;
 
-import lombok.*;
+import lombok.Data;
+import lombok.ToString;
 import main.model.enums.MessagePermissionTypes;
 
 import javax.persistence.*;
@@ -8,12 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-//@Data
-@RequiredArgsConstructor
-@Getter
-@Setter
-@EqualsAndHashCode
-
+@Data
 @Table(name = "persons", indexes = @Index(name = "full_name_index", columnList = "first_name, last_name", unique = true))
 public class Person {
 
@@ -33,6 +29,7 @@ public class Person {
     @Column(name = "birth_date")
     private LocalDateTime birthDate;
 
+    @Column(nullable = false)
     private String email;
 
     private String phone;
@@ -79,37 +76,48 @@ public class Person {
     private LocalDateTime deletedTime;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "friendships", joinColumns = @JoinColumn(name = "src_person_id"), inverseJoinColumns = @JoinColumn(name = "dst_person_id"))
+    @JoinTable(name = "friendship", joinColumns = @JoinColumn(name = "src_person_id"), inverseJoinColumns = @JoinColumn(name = "dst_person_id"))
+    @ToString.Exclude
     private List<Person> srcFriendships;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "friendships", joinColumns = @JoinColumn(name = "dst_person_id"), inverseJoinColumns = @JoinColumn(name = "src_person_id"))
+    @JoinTable(name = "friendship", joinColumns = @JoinColumn(name = "dst_person_id"), inverseJoinColumns = @JoinColumn(name = "src_person_id"))
+    @ToString.Exclude
     private List<Person> dstFriendships;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<BlockHistory> blockHistoryList;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Post> posts;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Comment> comments;
 
     @OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private PersonSettings personSettings;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Notification> notifications;
 
     @OneToMany(mappedBy = "firstPerson", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ToString.Exclude
     private List<Dialog> firstPersonDialogs;
 
     @OneToMany(mappedBy = "secondPerson", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ToString.Exclude
     private List<Dialog> secondPersonDialogs;
 
     @OneToMany(mappedBy = "author", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ToString.Exclude
     private List<Message> messages;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
-    private List<PostLike> postLikes;
+    @ToString.Exclude
+    private List<Like> likes;
 }
