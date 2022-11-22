@@ -50,7 +50,7 @@ public class Person {
     @Column(name = "is_approved", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isApproved;
 
-    @Column (name = "message_permission", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'ALL'")
+    @Column(name = "message_permission", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'ALL'")
     @Enumerated(EnumType.STRING)
     private MessagePermissionTypes messagePermission;
 
@@ -60,13 +60,13 @@ public class Person {
     @Column(name = "is_blocked", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isBlocked;
 
-    @Column (name = "change_password_token")
+    @Column(name = "change_password_token")
     private String changePasswordToken;
 
-    @Column (name = "notifications_session_id")
+    @Column(name = "notifications_session_id")
     private String notificationSessionID;
 
-    @Column (name = "online_status")
+    @Column(name = "online_status")
     private String onlineStatus;
 
     @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")

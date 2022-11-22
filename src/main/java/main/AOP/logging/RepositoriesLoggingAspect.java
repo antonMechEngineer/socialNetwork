@@ -40,7 +40,7 @@ public class RepositoriesLoggingAspect {
     @AfterThrowing(value = "allRepositories()", throwing = "ex")
     private void afterError(JoinPoint joinPoint, Throwable ex) {
         logContext = new LogContext(joinPoint);
-        log.warn("Error {}.{}(" + logContext.getArgs(joinPoint) + ") - {}:{}",
+        log.warn("ERROR {}.{}(" + logContext.getArgs(joinPoint) + ") - {}:{}",
                 logContext.getClassName(),
                 logContext.getMethodName(),
                 ex.getClass().getSimpleName(),

@@ -2,17 +2,16 @@ package main.model.entities;
 
 import lombok.Data;
 import main.model.enums.LikeTypes;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Entity
 @Data
 @Table(name = "posts", indexes = @Index(name = "post_name_index", columnList = "title"))
-public class Post implements Liked{
+public class Post implements Liked {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,41 +30,38 @@ public class Post implements Liked{
     @Column(name = "post_text", nullable = false, columnDefinition = "TEXT")
     private String postText;
 
-    @Column (name = "is_blocked", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Column(name = "is_blocked", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isBlocked;
 
-    @Column (name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isDeleted;
 
-    @Column (name = "time_delete")
+    @Column(name = "time_delete")
     private LocalDateTime timeDelete;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    private List<Comment> comments = new ArrayList<>();
+    @ToString.Exclude
+    private List<Comment> comments;
 
     @ManyToMany(mappedBy = "posts", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Tag> tags = new ArrayList<>();
+    @ToString.Exclude
+    private List<Tag> tags;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    private List<PostFile> postFiles = new ArrayList<>();
+    @ToString.Exclude
+    private List<PostFile> postFiles;
+
+//    @OneToMany(mappedBy = "entity", cascade = CascadeType.ALL)
+//    private List<Like> likes;
+
+//    @ManyToAny(metaDef = "likesMetaDef", metaColumn = @Column(name = "meta_column"))
+//    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+//    @JoinTable(name = "post_likes", joinColumns = @JoinColumn(name = "entity_id"), inverseJoinColumns = @JoinColumn(name = "ent_id"))
+//    private List<Like> likes;
+
 
     @Override
     public LikeTypes getType() {
         return LikeTypes.POST;
-    }
-
-    @Override
-    public String toString() {
-        return "Post{" +
-                "id=" + id +
-                ", time=" + time +
-                ", authorId=" + author.getId() +
-                ", title='" + title +
-                "', isBlocked=" + isBlocked +
-                ", isDeleted=" + isDeleted +
-                ", commentsCount=" + comments.size() +
-                ", tags=" + Arrays.toString(tags.stream().map(Tag::getTagName).toArray()) +
-                ", postFilesCount=" + postFiles.size() +
-                '}';
     }
 }

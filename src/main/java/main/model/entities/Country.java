@@ -3,6 +3,7 @@ package main.model.entities;
 import lombok.Data;
 
 import javax.persistence.*;
+
 @Entity
 @Data
 @Table(name = "countries")
