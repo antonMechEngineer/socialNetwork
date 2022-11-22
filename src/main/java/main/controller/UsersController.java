@@ -5,7 +5,6 @@ import main.api.request.PostRequest;
 import main.api.request.UserRq;
 import main.api.response.CommonResponse;
 import main.api.response.PersonResponse;
-import main.api.response.PostResponse;
 import main.api.response.UserRs;
 import main.errors.BadAuthorizationException;
 import main.service.PersonsService;
@@ -34,23 +33,23 @@ public class UsersController {
         return ResponseEntity.ok(personsService.getPersonResponse(personsService.getPersonById(id)));
     }
 
-    @GetMapping("/{id}/wall")
-    public CommonResponse<List<PostResponse>> getUsersPosts(
-            @PathVariable long id,
-            @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
-            @RequestParam(name = "itemPerPage", required = false, defaultValue = "${socialNetwork.default.size}") int size) {
-
-        return postsService.getAllPostsByAuthor(offset, size, personsService.getPersonById(id));
-    }
-
-    @PostMapping("/{id}/wall")
-    public CommonResponse<PostResponse> createPost(
-            @PathVariable(name = "id") Long personId,
-            @RequestParam(name = "publish_date", required = false) Long publishingDate,
-            @RequestBody PostRequest postRequest) {
-
-        return postsService.createPost(postRequest, personId, publishingDate);
-    }
+//    @GetMapping("/{id}/wall")
+//    public CommonResponse<List<PostResponse>> getUsersPosts(
+//            @PathVariable long id,
+//            @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
+//            @RequestParam(name = "itemPerPage", required = false, defaultValue = "${socialNetwork.default.size}") int size) {
+//
+//        return postsService.getAllPostsByAuthor(offset, size, personsService.getPersonById(id));
+//    }
+//
+//    @PostMapping("/{id}/wall")
+//    public CommonResponse<PostResponse> createPost(
+//            @PathVariable(name = "id") Long personId,
+//            @RequestParam(name = "publish_date", required = false) Long publishingDate,
+//            @RequestBody PostRequest postRequest) {
+//
+//        return postsService.createPost(postRequest, personId, publishingDate);
+//    }
 
     @GetMapping("/me")
     public CommonResponse<PersonResponse> getAuthorized(
