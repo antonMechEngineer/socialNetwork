@@ -10,10 +10,8 @@ import main.model.entities.Person;
 import main.model.enums.LikeTypes;
 import main.repository.CommentsRepository;
 import main.repository.LikesRepository;
-import main.repository.PersonsRepository;
 import main.repository.PostsRepository;
 import org.mapstruct.Named;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

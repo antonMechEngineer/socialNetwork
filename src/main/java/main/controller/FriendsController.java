@@ -1,7 +1,9 @@
 package main.controller;
 
 import lombok.RequiredArgsConstructor;
-import main.api.response.*;
+import main.api.response.CommonResponse;
+import main.api.response.FriendshipRs;
+import main.api.response.PersonResponse;
 import main.service.FriendsRecommendationService;
 import main.service.FriendsService;
 import org.springframework.stereotype.Controller;
