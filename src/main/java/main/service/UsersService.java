@@ -80,18 +80,6 @@ public class UsersService {
     }
         return response;
     }
-//    public StorageRs editImage(Principal principal, MultipartFile photo) throws IOException {
-//        Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
-//        StorageRs response =new StorageRs();
-//        PersonResponse personResponse = personMapper.toPersonResponse(person);
-//
-//        String extension = (photo.getOriginalFilename());
-//        person.setPhoto(cloudaryService.getImage(photo.getOriginalFilename()));
-//        personResponse.setPhoto(cloudaryService.getImage(photo.getOriginalFilename()));
-//        personsRepository.save(person);
-//
-//        return response;
-//    }
 
     public UserRs editProfile(UserRq userRq){
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
