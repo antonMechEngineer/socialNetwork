@@ -30,28 +30,6 @@ public class UsersController {
     private final PersonsService personsService;
     private final UsersService usersService;
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<PersonResponse> getUserById(@PathVariable long id) {
-//        return ResponseEntity.ok(personsService.getPersonResponse(personsService.getPersonById(id)));
-//    }
-
-//    @GetMapping("/{id}/wall")
-//    public CommonResponse<List<PostResponse>> getUsersPosts(
-//            @PathVariable long id,
-//            @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
-//            @RequestParam(name = "itemPerPage", required = false, defaultValue = "${socialNetwork.default.size}") int size) {
-//
-//        return postsService.getAllPostsByAuthor(offset, size, personsService.getPersonById(id));
-//    }
-//
-//    @PostMapping("/{id}/wall")
-//    public CommonResponse<PostResponse> createPost(
-//            @PathVariable(name = "id") Long personId,
-//            @RequestParam(name = "publish_date", required = false) Long publishingDate,
-//            @RequestBody PostRequest postRequest) {
-//
-//        return postsService.createPost(postRequest, personId, publishingDate);
-//    }
 
 
 
