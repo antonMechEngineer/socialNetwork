@@ -65,4 +65,15 @@ public class PersonResponse {
 
     @JsonProperty("user_deleted")
     private Boolean isDeleted;
+
+    @Override
+    public String toString() {
+        return "PersonResponse{" +
+                "id=" + id +
+                ", email='" + email +
+                "', name='" + firstName + ' ' + lastName +
+                "', isBlocked=" + isBlocked +
+                ", isDeleted=" + isDeleted +
+                '}';
+    }
 }

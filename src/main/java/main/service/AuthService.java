@@ -27,17 +27,10 @@ public class AuthService {
             Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRq.getEmail(), loginRq.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(auth);
             if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-                PersonResponse response = personsService.getPersonResponse(personsService.getPersonByEmail(loginRq.getEmail()));
                 String token = jwtUtil.createToken(person.getEmail());
-                response.setToken(token);
-                return CommonResponse.<PersonResponse>builder()
-                        .error("success")
-                        .errorDescription("")
-                        .offset(0)
-                        .perPage(0)
-                        .timestamp(System.currentTimeMillis())
-                        .data(response)
-                        .build();
+                CommonResponse<PersonResponse> response = personsService.getMyData();
+                response.getData().setToken(token);
+                return response;
             }
         }
         return null;

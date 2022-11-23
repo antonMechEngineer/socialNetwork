@@ -5,6 +5,7 @@ import main.model.enums.MessagePermissionTypes;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -75,37 +76,52 @@ public class Person {
     private LocalDateTime deletedTime;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "friendship", joinColumns = @JoinColumn(name = "src_person_id"), inverseJoinColumns = @JoinColumn(name = "dst_person_id"))
-    private List<Person> srcFriendships;
+    @JoinTable(name = "friendships", joinColumns = @JoinColumn(name = "src_person_id"), inverseJoinColumns = @JoinColumn(name = "dst_person_id"))
+    private List<Person> srcFriendships = new ArrayList<>();
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "friendship", joinColumns = @JoinColumn(name = "dst_person_id"), inverseJoinColumns = @JoinColumn(name = "src_person_id"))
-    private List<Person> dstFriendships;
+    @JoinTable(name = "friendships", joinColumns = @JoinColumn(name = "dst_person_id"), inverseJoinColumns = @JoinColumn(name = "src_person_id"))
+    private List<Person> dstFriendships = new ArrayList<>();
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
-    private List<BlockHistory> blockHistoryList;
+    private List<BlockHistory> blockHistoryList = new ArrayList<>();
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
-    private List<Post> posts;
+    private List<Post> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 
     @OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
     private PersonSettings personSettings;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
-    private List<Notification> notifications;
+    private List<Notification> notifications = new ArrayList<>();
 
     @OneToMany(mappedBy = "firstPerson", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Dialog> firstPersonDialogs;
+    private List<Dialog> firstPersonDialogs = new ArrayList<>();
 
     @OneToMany(mappedBy = "secondPerson", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Dialog> secondPersonDialogs;
+    private List<Dialog> secondPersonDialogs = new ArrayList<>();
 
     @OneToMany(mappedBy = "author", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Message> messages;
+    private List<Message> messages = new ArrayList<>();
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
-    private List<Like> likes;
+    private List<Like> likes = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "id=" + id +
+                ", name='" + firstName + ' ' + lastName +
+                "', email='" + email +
+                "', isBlocked=" + isBlocked +
+                ", isDeleted=" + isDeleted +
+                ", postsCount=" + posts.size() +
+                ", commentsCount=" + comments.size() +
+                ", messagesCount=" + messages.size() +
+                ", likesCount=" + likes.size() +
+                '}';
+    }
 }

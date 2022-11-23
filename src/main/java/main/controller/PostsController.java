@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import main.api.request.PostRequest;
 import main.api.response.CommonResponse;
 import main.api.response.PostResponse;
+import main.errors.PersonNotFoundException;
 import main.service.PostsService;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,21 +35,21 @@ public class PostsController {
     @PutMapping("/post/{id}")
     public CommonResponse<PostResponse> updatePost(
             @PathVariable int id,
-            @RequestBody PostRequest postRequest) {
+            @RequestBody PostRequest postRequest) throws PersonNotFoundException {
 
         return postsService.updatePost(id, postRequest);
     }
 
     @DeleteMapping("/post/{id}")
     public CommonResponse<PostResponse> deletePost(
-            @PathVariable long id) {
+            @PathVariable long id) throws PersonNotFoundException {
 
         return postsService.changeDeleteStatusInPost(id, true);
     }
 
     @PutMapping("/post/{id}/recover")
     public CommonResponse<PostResponse> recoverPost(
-            @PathVariable long id) {
+            @PathVariable long id) throws PersonNotFoundException {
 
         return postsService.changeDeleteStatusInPost(id, false);
     }

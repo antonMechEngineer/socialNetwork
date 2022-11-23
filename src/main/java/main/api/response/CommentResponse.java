@@ -39,4 +39,19 @@ public class CommentResponse {
 
     @JsonProperty("my_like")
     private Boolean myLike;
+
+    @Override
+    public String toString() {
+        return "CommentResponse{" +
+                "commentId=" + id +
+                ", postId=" + postId +
+                ", parentCommentId=" + parentId +
+                ", authorId=" + author.getId() +
+                ", isBlocked=" + isBlocked +
+                ", isDeleted=" + isDeleted +
+                ", embeddedCommentsCount=" + embeddedComments.size() +
+                ", likes=" + likes +
+                ", myLike=" + myLike +
+                '}';
+    }
 }

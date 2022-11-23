@@ -18,6 +18,10 @@ public class BlockHistory {
     @Column(nullable = false)
     private LocalDateTime time;
 
+    @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'BLOCK'")
+    @Enumerated(EnumType.STRING)
+    private BlockActionTypes action;
+
     @ManyToOne
     @JoinColumn(name = "person_id")
     private Person person;
@@ -30,7 +34,15 @@ public class BlockHistory {
     @JoinColumn(name = "comment_id", referencedColumnName = "id")
     private Comment comment;
 
-    @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'BLOCK'")
-    @Enumerated(EnumType.STRING)
-    private BlockActionTypes action;
+    @Override
+    public String toString() {
+        return "BlockHistory{" +
+                "id=" + id +
+                ", time=" + time +
+                ", action=" + action +
+                ", personId=" + person.getId() +
+                ", postId=" + (post == null ? "no post" : post.getId()) +
+                ", commentId=" + (comment == null ? "no comment" : comment.getId()) +
+                '}';
+    }
 }

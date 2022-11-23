@@ -1,5 +1,7 @@
 package main.model.entities;
+
 import lombok.Data;
+
 import javax.persistence.*;
 @Entity
 @Data
@@ -9,10 +11,6 @@ public class PersonSettings {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @OneToOne
-    @JoinColumn(name = "person_id", referencedColumnName = "id", nullable = false)
-    private Person person;
 
     @Column(name = "post_comment_notification", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
     private Boolean postCommentNotification;
@@ -34,4 +32,23 @@ public class PersonSettings {
 
     @Column(name = "post_notification", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
     private Boolean postNotification;
+
+    @OneToOne
+    @JoinColumn(name = "person_id", referencedColumnName = "id", nullable = false)
+    private Person person;
+
+    @Override
+    public String toString() {
+        return "PersonSettings{" +
+                "id=" + id +
+                ", postCommentNotification=" + postCommentNotification +
+                ", commentCommentNotification=" + commentCommentNotification +
+                ", friendRequestNotification=" + friendRequestNotification +
+                ", messageNotification=" + messageNotification +
+                ", friendBirthdayNotification=" + friendBirthdayNotification +
+                ", likeNotification=" + likeNotification +
+                ", postNotification=" + postNotification +
+                ", personId=" + person.getId() +
+                '}';
+    }
 }

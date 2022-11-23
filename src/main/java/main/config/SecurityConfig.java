@@ -78,14 +78,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
                 .exceptionHandling()
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 .and()
-                .logout()
-                .addLogoutHandler(new HeaderWriterLogoutHandler(
-                        new ClearSiteDataHeaderWriter(
-                                ClearSiteDataHeaderWriter.Directive.CACHE,
-                                ClearSiteDataHeaderWriter.Directive.COOKIES,
-                                ClearSiteDataHeaderWriter.Directive.STORAGE)))
-                .and()
-                .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
-        ;
+                .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
     }
 }

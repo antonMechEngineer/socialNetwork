@@ -14,10 +14,6 @@ public class Friendship {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "status_id", nullable = false)
-    private FriendshipStatus friendshipStatus;
-
     @JoinColumn(name = "sent_time", nullable = false)
     private LocalDateTime sentTime;
 
@@ -28,4 +24,19 @@ public class Friendship {
     @ManyToOne
     @JoinColumn(name = "dst_person_id", nullable = false)
     private Person dstPerson;
+
+    @OneToOne
+    @JoinColumn(name = "status_id", nullable = false)
+    private FriendshipStatus friendshipStatus;
+
+    @Override
+    public String toString() {
+        return "Friendship{" +
+                "id=" + id +
+                ", sentTime=" + sentTime +
+                ", srcPersonId=" + srcPerson.getId() +
+                ", dstPersonId=" + dstPerson.getId() +
+                ", friendshipStatusId=" + friendshipStatus.getId() +
+                '}';
+    }
 }

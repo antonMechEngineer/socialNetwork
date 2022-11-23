@@ -1,6 +1,7 @@
 package main.model.entities;
 
 import lombok.Data;
+
 import javax.persistence.*;
 
 @Entity
@@ -15,11 +16,22 @@ public class City {
     @Column(nullable = false)
     private String title;
 
+    private String temp;
+
+    private String clouds;
+
     @ManyToOne
     @JoinColumn(name = "country_id")
     private Country country;
 
-    private String temp;
-
-    private String clouds;
+    @Override
+    public String toString() {
+        return "City{" +
+                "id=" + id +
+                ", title='" + title +
+                "', temp='" + temp +
+                "', clouds='" + clouds +
+                "', country=" + country.getTitle() +
+                '}';
+    }
 }
