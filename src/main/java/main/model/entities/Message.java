@@ -18,6 +18,16 @@ public class Message {
     @Column(nullable = false)
     private LocalDateTime time;
 
+    @Column(name = "message_text", nullable = false, columnDefinition = "TEXT")
+    private String messageText;
+
+    @Column(name = "read_status", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'SENT'")
+    @Enumerated(EnumType.STRING)
+    private ReadStatusTypes readStatus;
+
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean isDeleted;
+
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
     private Person author;
@@ -26,17 +36,20 @@ public class Message {
     @JoinColumn(name = "recipient_id", nullable = false)
     private Person recipient;
 
-    @Column(name = "message_text", nullable = false, columnDefinition = "TEXT")
-    private String messageText;
-
-    @Column(name = "read_status", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'SENT'")
-    @Enumerated(EnumType.STRING)
-    private ReadStatusTypes readStatus;
-
     @ManyToOne
     @JoinColumn(name = "dialog_id", nullable = false)
     private Dialog dialog;
 
-    @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private Boolean isDeleted;
+    @Override
+    public String toString() {
+        return "Message{" +
+                "id=" + id +
+                ", messageText='" + messageText +
+                "', readStatus=" + readStatus +
+                ", isDeleted=" + isDeleted +
+                ", authorId=" + author.getId() +
+                ", recipientId=" + recipient.getId() +
+                ", dialogId=" + dialog.getId() +
+                '}';
+    }
 }

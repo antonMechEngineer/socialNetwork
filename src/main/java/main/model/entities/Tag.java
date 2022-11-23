@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,9 +22,18 @@ public class Tag {
 
     @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(name = "post2tag", joinColumns = @JoinColumn(name = "tag_id"), inverseJoinColumns = @JoinColumn(name = "post_id"))
-    private List<Post> posts;
+    private List<Post> posts = new ArrayList<>();;
 
     public Tag(String tagName) {
         this.tagName = tagName;
+    }
+
+    @Override
+    public String toString() {
+        return "Tag{" +
+                "id=" + id +
+                ", tagName='" + tagName +
+                "', posts=" + posts.size() +
+                '}';
     }
 }

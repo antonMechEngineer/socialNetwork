@@ -21,4 +21,12 @@ public class CommonResponse<T> {
     private T data;
     @JsonProperty("error_description")
     private String errorDescription;
+
+    @Override
+    public String toString() {
+        return "CommonResponse{" +
+                "error='" + error + '\'' +
+                ", data=" + data +
+                '}';
+    }
 }

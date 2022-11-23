@@ -4,50 +4,61 @@ import lombok.RequiredArgsConstructor;
 import main.api.response.CommonResponse;
 import main.api.response.PersonResponse;
 import main.api.response.UserRs;
-import main.errors.BadAuthorizationException;
 import main.mappers.PersonMapper;
 import main.model.entities.Person;
 import main.repository.PersonsRepository;
-import main.security.jwt.JWTUtil;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.logging.Logger;
 
 @Service
 @RequiredArgsConstructor
 public class PersonsService {
 
-    private final PersonsRepository personRepository;
+    private final PersonsRepository personsRepository;
     private final CurrencyService currencyService;
-    private final JWTUtil jwtUtil;
     private final PersonMapper personMapper;
 
-    public CommonResponse<PersonResponse> getAuthorized(String token) throws BadAuthorizationException {
-        if (jwtUtil.isValidToken(token)) {
-            throw new BadAuthorizationException("Invalid token");
-        }
-        return CommonResponse.<PersonResponse>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .data(personMapper.toPersonResponse(getPersonByEmail(jwtUtil.extractUserName(token))))
-                .build();
+    public CommonResponse<PersonResponse> getPersonDataById(Long id) {
+        return getCommonPersonResponse(getPersonById(id));
+    }
+    public CommonResponse<PersonResponse> getMyData() {
+        return getCommonPersonResponse(getPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()));
+    }
+    public UserRs editImage(Principal principal, MultipartFile photo, String phone, String about,
+                            String city, String country, String first_name, String last_name,
+                            String birth_date, String message_permission) throws IOException {
+        Person person = personsRepository.findPersonByEmail(principal.getName()).get();
+        UserRs response =new UserRs();
+
+        return response;
     }
 
     public Person getPersonById(long personId) {
-        Logger.getLogger(this.getClass().getName()).info("getPersonById with id " + personId);
-        return personRepository.findById(personId).orElse(null);
+        return personsRepository.findById(personId).orElse(null);
     }
 
     public Person getPersonByEmail(String email) {
-        Logger.getLogger(this.getClass().getName()).info("getPersonByEmail with email " + email);
-        return personRepository.findPersonByEmail(email).orElse(null);
+        return personsRepository.findPersonByEmail(email).orElse(null);
     }
 
+    public Person getPersonByContext() {
+        return personsRepository.findPersonByEmail((SecurityContextHolder.getContext().getAuthentication().getName()))
+                .orElse(null);
+    }
 
-    public PersonResponse getPersonResponse(Person person) {
-        return personMapper.toPersonResponse(person);
+    public boolean validatePerson(Person person) {
+        return person != null && person.equals(getPersonByContext());
+    }
+
+    private CommonResponse<PersonResponse> getCommonPersonResponse(Person person) {
+        return CommonResponse.<PersonResponse>builder()
+                .error("success")
+                .timestamp(System.currentTimeMillis())
+                .data(personMapper.toPersonResponse(person))
+                .build();
     }
 }

@@ -13,7 +13,6 @@ import main.service.util.NetworkPageRequest;
 import org.mapstruct.Named;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -31,14 +30,14 @@ public class CommentsService {
     private final CommentMapper commentMapper;
 
     public CommonResponse<CommentResponse> createComment(Post post, CommentRequest commentRequest) {
-        Person person = personsService.getPersonByEmail((SecurityContextHolder.getContext().getAuthentication().getName()));
+        Person person = personsService.getPersonByContext();
         Comment parentComment = getCommentById(commentRequest.getParentId());
         post = parentComment == null ? post : null;
         Comment comment = commentMapper.commentRequestToNewComment(commentRequest, post, person, parentComment, LocalDateTime.now());
         return CommonResponse.<CommentResponse>builder()
                 .error("success")
                 .timestamp(System.currentTimeMillis())
-                .data(commentMapper.commentToResponse(commentRepository.save(comment)))
+                .data(getCommentResponse(commentRepository.save(comment)))
                 .build();
     }
 
@@ -51,32 +50,44 @@ public class CommentsService {
                 .offset(offset)
                 .itemPerPage(commentPage.getSize())
                 .total(commentPage.getTotalElements())
-                .data(commentPage.getContent().stream().map(commentMapper::commentToResponse).collect(Collectors.toList()))
+                .data(commentPage.getContent().stream().map(this::getCommentResponse).collect(Collectors.toList()))
                 .errorDescription("")
                 .build();
     }
 
     public CommonResponse<CommentResponse> editComment(long commentId, CommentRequest commentRequest) {
         Comment comment = getCommentById(commentId);
-        comment.setCommentText(commentRequest.getCommentText());
-        comment.setTime(LocalDateTime.now());
+        if (personsService.validatePerson(comment.getPerson())) {
+            comment.setCommentText(commentRequest.getCommentText());
+            comment.setTime(LocalDateTime.now());
+            comment = commentRepository.save(comment);
+        }
         return CommonResponse.<CommentResponse>builder()
                 .error("success")
                 .timestamp(System.currentTimeMillis())
-                .data(commentMapper.commentToResponse(commentRepository.save(comment)))
+                .data(getCommentResponse(comment))
                 .errorDescription("")
                 .build();
     }
 
     public CommonResponse<CommentResponse> changeCommentDeleteStatus(long commentId, boolean status) {
         Comment comment = getCommentById(commentId);
-        comment.setIsDeleted(status);
+        if (personsService.validatePerson(comment.getPerson())) {
+            comment.setIsDeleted(status);
+            comment = commentRepository.save(comment);
+        }
         return CommonResponse.<CommentResponse>builder()
                 .error("success")
                 .timestamp(System.currentTimeMillis())
-                .data(commentMapper.commentToResponse(commentRepository.save(comment)))
+                .data(getCommentResponse(comment))
                 .errorDescription("")
                 .build();
+    }
+
+    private CommentResponse getCommentResponse(Comment comment) {
+        CommentResponse response = commentMapper.commentToResponse(commentRepository.save(comment));
+        response.setEmbeddedComments(embeddedCommentsToResponse(comment.getEmbeddedComments()));
+        return response;
     }
 
     @Named("getCommentById")
@@ -85,7 +96,7 @@ public class CommentsService {
     }
 
     @Named("commentsToResponse")
-    public List<CommentResponse> commentsToResponse(List<Comment> comments) {
+    public List<CommentResponse> embeddedCommentsToResponse(List<Comment> comments) {
         if (comments == null) {
             return new ArrayList<>();
         }
@@ -95,7 +106,7 @@ public class CommentsService {
             commentResponse.setEmbeddedComments(
                     comment.getEmbeddedComments().isEmpty() ?
                             new ArrayList<>() :
-                            commentsToResponse(comment.getEmbeddedComments()));
+                            embeddedCommentsToResponse(comment.getEmbeddedComments()));
             return commentResponse;
         }).collect(Collectors.toList());
     }

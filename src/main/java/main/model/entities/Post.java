@@ -2,11 +2,11 @@ package main.model.entities;
 
 import lombok.Data;
 import main.model.enums.LikeTypes;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.ManyToAny;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Entity
@@ -41,25 +41,31 @@ public class Post implements Liked{
     private LocalDateTime timeDelete;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 
     @ManyToMany(mappedBy = "posts", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Tag> tags;
+    private List<Tag> tags = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    private List<PostFile> postFiles;
-
-//    @OneToMany(mappedBy = "entity", cascade = CascadeType.ALL)
-//    private List<Like> likes;
-
-//    @ManyToAny(metaDef = "likesMetaDef", metaColumn = @Column(name = "meta_column"))
-//    @Cascade(org.hibernate.annotations.CascadeType.ALL)
-//    @JoinTable(name = "post_likes", joinColumns = @JoinColumn(name = "entity_id"), inverseJoinColumns = @JoinColumn(name = "ent_id"))
-//    private List<Like> likes;
-
+    private List<PostFile> postFiles = new ArrayList<>();
 
     @Override
     public LikeTypes getType() {
         return LikeTypes.POST;
+    }
+
+    @Override
+    public String toString() {
+        return "Post{" +
+                "id=" + id +
+                ", time=" + time +
+                ", authorId=" + author.getId() +
+                ", title='" + title +
+                "', isBlocked=" + isBlocked +
+                ", isDeleted=" + isDeleted +
+                ", commentsCount=" + comments.size() +
+                ", tags=" + Arrays.toString(tags.stream().map(Tag::getTagName).toArray()) +
+                ", postFilesCount=" + postFiles.size() +
+                '}';
     }
 }

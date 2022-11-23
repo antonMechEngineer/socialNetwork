@@ -10,6 +10,6 @@ public class CommentRequest {
     private long parentId;
     @JsonProperty("comment_text")
     private String commentText;
-    @JsonProperty("get_deleted")
-    private boolean getDeleted;
+//    @JsonProperty("get_deleted")
+//    private boolean getDeleted;
 }
