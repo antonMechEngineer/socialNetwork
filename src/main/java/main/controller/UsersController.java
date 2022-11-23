@@ -30,10 +30,10 @@ public class UsersController {
     private final PersonsService personsService;
     private final UsersService usersService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<PersonResponse> getUserById(@PathVariable long id) {
-        return ResponseEntity.ok(personsService.getPersonResponse(personsService.getPersonById(id)));
-    }
+//    @GetMapping("/{id}")
+//    public ResponseEntity<PersonResponse> getUserById(@PathVariable long id) {
+//        return ResponseEntity.ok(personsService.getPersonResponse(personsService.getPersonById(id)));
+//    }
 
 //    @GetMapping("/{id}/wall")
 //    public CommonResponse<List<PostResponse>> getUsersPosts(
