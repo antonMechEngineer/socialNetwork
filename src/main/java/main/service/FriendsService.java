@@ -52,12 +52,10 @@ public class FriendsService {
             String descriptionError = "Person with ID" + idDeletableFriend + " isn't your friend";
             return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), new ComplexRs(descriptionError));
         }
-//        modifyFriendShipStatus(srcPerson, dstPerson, FriendshipStatusTypes.REQUEST);
-//        modifyFriendShipStatus(dstPerson, srcPerson, FriendshipStatusTypes.SUBSCRIBED);  //TODO: 22.11.2022 просто вырезать друга из базы
         Friendship srcFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(srcPerson, optionalDstPerson.get());
         Friendship dstFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(optionalDstPerson.get(), srcPerson);
-        deleteFriendshipObjects(srcFriendship);
-        deleteFriendshipObjects(dstFriendship);
+        friendshipsRepository.delete(srcFriendship);
+        friendshipsRepository.delete(dstFriendship);
         return new FriendshipRs("ok", LocalDateTime.now().toString(), new ComplexRs("ok"));
     }
 
@@ -70,7 +68,7 @@ public class FriendsService {
         Person srcPerson = getPersonByToken(token);
         Optional<Person> dstPersonOptional = personsRepository.findPersonById(potentialFriendId);
         Person dstPerson = dstPersonOptional.get();
-        createFriendshipObjects(srcPerson, dstPerson, FriendshipStatusTypes.SUBSCRIBED);
+        createFriendshipObjects(srcPerson, dstPerson, FriendshipStatusTypes.REQUEST);
         createFriendshipObjects(srcPerson, dstPerson, FriendshipStatusTypes.REQUEST);
         return new FriendshipRs("ok", LocalDateTime.now().toString(), new ComplexRs("ok"));
     }
@@ -81,8 +79,8 @@ public class FriendsService {
         Person dstPerson = dstPersonOptional.get();
         Friendship srcFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(srcPerson, dstPerson);
         Friendship dstFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(dstPerson, srcPerson);
-        deleteFriendshipObjects(srcFriendship);
-        deleteFriendshipObjects(dstFriendship);
+        friendshipsRepository.delete(srcFriendship);
+        friendshipsRepository.delete(dstFriendship);
         return new FriendshipRs("ok", LocalDateTime.now().toString(), new ComplexRs("ok"));
     }
 
@@ -93,12 +91,6 @@ public class FriendsService {
         friendshipsRepository.save(friendship);
     }
 
-    private void deleteFriendshipObjects(Friendship friendship){      // TODO: 23.11.2022 здесь удаляется каскадом статусы зацепленные за friendship
-        FriendshipStatus friendshipStatus = friendshipStatusesRepository.
-                findFriendshipStatusesById(friendship.getFriendshipStatus().getId());
-        friendshipsRepository.delete(friendship);
-        friendshipStatusesRepository.delete(friendshipStatus);
-    }
 
     public CommonResponse<List<PersonResponse>> getRequestedPersons(String token) {
         List<PersonResponse> requestedPersons = getPersons(token, FriendshipStatusTypes.REQUEST);
@@ -113,7 +105,7 @@ public class FriendsService {
             return new ArrayList<>();
         } else {
             List<Person> persons = srcPersonFriendships.stream().map(Friendship::getDstPerson).collect(Collectors.toList());
-            List<PersonResponse> responsePersons = personsToPersonResponses(persons);
+            List<PersonResponse> responsePersons = personsToPersonResponses(persons, srcPerson);
             return responsePersons;
         }
     }
@@ -147,12 +139,13 @@ public class FriendsService {
                 .build();
     }
 
-    private List<PersonResponse> personsToPersonResponses(List<Person> persons) {
+    private List<PersonResponse> personsToPersonResponses(List<Person> persons, Person srcPerson) {
         List<PersonResponse> personResponses = new ArrayList<>();
         for (Person person : persons) {
             personResponses.add(personMapper.toPersonResponse(person));
         }
         return personResponses;
+
     }
 
 }

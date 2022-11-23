@@ -16,7 +16,7 @@ public class Friendship {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(name = "sent_time", nullable = false)
+    @Column(name = "sent_time", nullable = false)
     private LocalDateTime sentTime;
 
     @ManyToOne
@@ -27,7 +27,7 @@ public class Friendship {
     @JoinColumn(name = "dst_person_id", nullable = false)
     private Person dstPerson;
 
-    @OneToOne
+    @OneToOne (cascade = CascadeType.ALL)
     @JoinColumn(name = "status_id", nullable = false)
     private FriendshipStatus friendshipStatus;
 
