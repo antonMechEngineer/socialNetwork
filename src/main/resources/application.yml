@@ -34,7 +34,5 @@ auth:
 
 logging:
   file:
-    name: log/logs.txt
-  pattern:
-    rolling-file-name: "${LOG_FILE}.%d{yyyy-MM-dd}-%i.txt"
-    file: "%-5level %d{yyyy-MM-dd HH:mm:ss} [%thread] %logger{36} - %msg%n"
+    max-history: 1
+    path: log
