@@ -6,6 +6,7 @@ import main.api.request.UserRq;
 import main.api.response.CommonResponse;
 import main.api.response.PersonResponse;
 import main.api.response.UserRs;
+import main.errors.BadAuthorizationException;
 import main.errors.PersonNotFoundException;
 import main.service.PersonsService;
 import main.service.PostsService;
@@ -31,27 +32,11 @@ public class UsersController {
 
     @GetMapping("/{id}")
     public CommonResponse<PersonResponse> getUserById(@PathVariable long id) {
-        return usersService.getPersonDataById(id);
+        return personsService.getPersonDataById(id);
     }
 
 
-    @PostMapping("/{id}/wall")
-    public CommonResponse<PostResponse> createPost(
-            @PathVariable(name = "id") Long personId,
-            @RequestParam(name = "publish_date", required = false) Long publishingDate,
-            @RequestBody PostRequest postRequest) throws PersonNotFoundException {
 
-        return postsService.createPost(postRequest, personId, publishingDate);
-    }
-
-    @GetMapping("/me")
-    public CommonResponse<PersonResponse> getMyData() {
-        return usersService.getMyData();
-    public CommonResponse<PersonResponse> getAuthorized(
-            @RequestHeader(name = "Authorization") String token) throws BadAuthorizationException {
-
-        return personsService.getAuthorized(token);
-    }
 
     @PutMapping("/me")
     ResponseEntity<UserRs> updateMyData(@RequestBody UserRq userRq) {
