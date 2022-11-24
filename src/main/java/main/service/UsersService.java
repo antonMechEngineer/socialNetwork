@@ -1,6 +1,5 @@
 package main.service;
 
-import liquibase.util.file.FilenameUtils;
 import lombok.AllArgsConstructor;
 
 import main.api.request.UserRq;
@@ -20,8 +19,8 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.security.Principal;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 
 @Service
@@ -52,7 +51,7 @@ public class UsersService {
             response.setError("Размер файла превышает допустимый размер");
         }
 
-        if (response.getError().isEmpty()) {
+      //  if (response.getError().isEmpty()) {
 
         response.setTimestamp(0);
         dataRs.setBytes(0);
@@ -77,7 +76,7 @@ public class UsersService {
         dataRs.setFileType(extention);
 
         response.setData(dataRs);
-    }
+    //}
         return response;
     }
 
@@ -89,8 +88,8 @@ public class UsersService {
             person.setAbout(userRq.getAbout());
         }
         if (userRq.getBirth_date() != null) {
-            person.setBirthDate(LocalDateTime.parse(userRq.getBirth_date()));
-            personResponse.setBirthDate(LocalDateTime.parse(userRq.getBirth_date()));
+            person.setBirthDate(LocalDateTime.from(OffsetDateTime.parse(userRq.getBirth_date())));
+            personResponse.setBirthDate(LocalDateTime.from(OffsetDateTime.parse(userRq.getBirth_date())));
         }
         if (userRq.getCity() != null) {
        //     person.setCity(userRq.getCity());
