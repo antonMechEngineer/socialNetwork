@@ -5,7 +5,7 @@ import main.api.response.CommonResponse;
 import main.api.response.ComplexRs;
 import main.api.response.FriendshipRs;
 import main.api.response.PersonResponse;
-import main.mappers.PersonMapper;
+import main.mappers.FriendMapper;
 import main.model.entities.Friendship;
 import main.model.entities.FriendshipStatus;
 import main.model.entities.Person;
@@ -30,7 +30,7 @@ public class FriendsService {
     private final FriendshipStatusesRepository friendshipStatusesRepository;
     private final PersonsRepository personsRepository;
     private final JWTUtil jwtUtil;
-    private final PersonMapper personMapper;
+    private final FriendMapper friendMapper;
 
     public FriendshipRs addFriend(String token, Long futureFriendId) {
         Person srcPerson = getPersonByToken(token);
@@ -142,7 +142,8 @@ public class FriendsService {
     private List<PersonResponse> personsToPersonResponses(List<Person> persons, Person srcPerson) {
         List<PersonResponse> personResponses = new ArrayList<>();
         for (Person person : persons) {
-            personResponses.add(personMapper.toPersonResponse(person));
+            Friendship srcFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(srcPerson, person);
+            personResponses.add(friendMapper.toFriendResponse(person, srcFriendship.getFriendshipStatus().getCode()));
         }
         return personResponses;
 
