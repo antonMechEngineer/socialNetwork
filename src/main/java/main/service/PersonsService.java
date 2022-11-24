@@ -25,6 +25,7 @@ public class PersonsService {
     public CommonResponse<PersonResponse> getPersonDataById(Long id) {
         return getCommonPersonResponse(getPersonById(id));
     }
+
     public CommonResponse<PersonResponse> getMyData() {
         return getCommonPersonResponse(getPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()));
     }
@@ -33,7 +34,7 @@ public class PersonsService {
                             String city, String country, String first_name, String last_name,
                             String birth_date, String message_permission) throws IOException {
         Person person = personsRepository.findPersonByEmail(principal.getName()).get();
-        UserRs response =new UserRs();
+        UserRs response = new UserRs();
 
         return response;
     }
