@@ -59,9 +59,9 @@ public class Comment implements Liked {
         return "Comment{" +
                 "id=" + id +
                 ", postId=" + (post == null ? "no post" : post.getId()) +
-                ", parentComment=" + (parentComment == null ? "no parent comment" : parentComment.getId()) +
+                ", parentCommentId=" + (parentComment == null ? "no parent comment" : parentComment.getId()) +
                 ", embeddedCommentsCount=" + embeddedComments.size() +
-                ", personId=" + person.getId() +
+                ", authorId=" + person.getId() +
                 ", isBlocked=" + isBlocked +
                 ", isDeleted=" + isDeleted +
                 '}';

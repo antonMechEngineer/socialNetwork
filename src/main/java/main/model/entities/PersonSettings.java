@@ -1,8 +1,9 @@
 package main.model.entities;
+
 import lombok.Data;
-import lombok.ToString;
 
 import javax.persistence.*;
+
 @Entity
 @Data
 @Table(name = "person_settings")
@@ -35,6 +36,20 @@ public class PersonSettings {
 
     @OneToOne
     @JoinColumn(name = "person_id", referencedColumnName = "id", nullable = false)
-    @ToString.Exclude
     private Person person;
+
+    @Override
+    public String toString() {
+        return "PersonSettings{" +
+                "id=" + id +
+                ", postCommentNotification=" + postCommentNotification +
+                ", commentCommentNotification=" + commentCommentNotification +
+                ", friendRequestNotification=" + friendRequestNotification +
+                ", messageNotification=" + messageNotification +
+                ", friendBirthdayNotification=" + friendBirthdayNotification +
+                ", likeNotification=" + likeNotification +
+                ", postNotification=" + postNotification +
+                ", personId=" + person.getId() +
+                '}';
+    }
 }

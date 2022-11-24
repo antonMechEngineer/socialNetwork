@@ -43,9 +43,9 @@ public class CommentResponse {
     @Override
     public String toString() {
         return "CommentResponse{" +
-                "id=" + id +
+                "commentId=" + id +
                 ", postId=" + postId +
-                ", parentId=" + parentId +
+                ", parentCommentId=" + parentId +
                 ", authorId=" + author.getId() +
                 ", isBlocked=" + isBlocked +
                 ", isDeleted=" + isDeleted +

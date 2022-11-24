@@ -27,12 +27,12 @@ public class LikesService {
     private final LikesRepository likesRepository;
     private final PostsRepository postsRepository;
     private final CommentsRepository commentsRepository;
-    private final PersonsRepository personsRepository;
+    private final PersonsService personsService;
 
     public CommonResponse<LikeResponse> putLike(LikeRequest likeRequest) {
-        Person person = getPerson();
+        Person person = personsService.getPersonByContext();
         Liked liked = getLikedEntity(likeRequest.getItemId(), likeRequest.getType());
-        if (validateLikeFromCurrentPerson(person, liked)) {
+        if (liked != null && personsService.validatePerson(liked.getAuthor())) {
             Like like = new Like();
             like.setEntity(liked);
             like.setPerson(person);
@@ -56,16 +56,13 @@ public class LikesService {
                 .build();
     }
 
-    public boolean validateLikeFromCurrentPerson(Person person, Liked liked) {
-        Like like = likesRepository.findLikeByPersonAndEntity(liked.getType(), liked, person).orElse(null);
-        return like == null || !person.getId().equals(like.getPerson().getId());
-    }
-
     public CommonResponse<LikeResponse> deleteLike(long entityId, String type) {
-        Person person = getPerson();
+        Person person = personsService.getPersonByContext();
         Liked liked = getLikedEntity(entityId, type);
-        likesRepository.delete(
-                likesRepository.findLikeByPersonAndEntity(LikeTypes.getType(type), liked, person).get());
+        if (liked != null && personsService.validatePerson(liked.getAuthor())) {
+            likesRepository.delete(
+                    likesRepository.findLikeByPersonAndEntity(LikeTypes.getType(type), liked, person).get());
+        }
         return getLikesByType(entityId, type);
     }
 
@@ -85,11 +82,6 @@ public class LikesService {
         return liked;
     }
 
-    private Person getPerson() {
-        return personsRepository.findPersonByEmail((SecurityContextHolder.getContext().getAuthentication().getName()))
-                .orElse(null);
-    }
-
     @Named("getLikesCount")
     public Integer getLikesCount(Liked liked) {
         return likesRepository.findLikesByEntity(liked.getType(), liked).size();
@@ -97,7 +89,7 @@ public class LikesService {
 
     @Named("getMyLike")
     public Boolean getMyLike(Liked liked) {
-        Person person = getPerson();
+        Person person = personsService.getPersonByContext();
         Like like = likesRepository.findLikeByPersonAndEntity(liked.getType(), liked, person).orElse(null);
         return like != null && person.getId().equals(like.getPerson().getId());
     }

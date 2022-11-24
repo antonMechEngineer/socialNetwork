@@ -20,7 +20,7 @@ public class ServiceLoggingAspect {
     @Before("allServices()")
     private void beforeMethod(JoinPoint joinPoint) {
         logContext = new LogContext(joinPoint);
-        log.debug("Start {}.{}(" + logContext.getArgs(joinPoint) + ")", logContext.getClassName(), logContext.getMethodName());
+        log.debug("START {}.{}(" + logContext.getArgs(joinPoint) + ")", logContext.getClassName(), logContext.getMethodName());
     }
 
     @AfterReturning(value = "allServices()", returning = "response")
@@ -35,7 +35,7 @@ public class ServiceLoggingAspect {
     @AfterThrowing(value = "allServices()", throwing = "ex")
     private void afterError(JoinPoint joinPoint, Throwable ex) {
         logContext = new LogContext(joinPoint);
-        log.warn("Error {}.{}(" + logContext.getArgs(joinPoint) + ") - {}:{}",
+        log.warn("ERROR {}.{}(" + logContext.getArgs(joinPoint) + ") - {}:{}",
                 logContext.getClassName(),
                 logContext.getMethodName(),
                 ex.getClass().getSimpleName(),

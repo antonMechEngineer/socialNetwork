@@ -12,7 +12,7 @@ import java.util.List;
 @Entity
 @Data
 @Table(name = "posts", indexes = @Index(name = "post_name_index", columnList = "title"))
-public class Post implements Liked{
+public class Post implements Liked {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,13 +31,13 @@ public class Post implements Liked{
     @Column(name = "post_text", nullable = false, columnDefinition = "TEXT")
     private String postText;
 
-    @Column (name = "is_blocked", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Column(name = "is_blocked", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isBlocked;
 
-    @Column (name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isDeleted;
 
-    @Column (name = "time_delete")
+    @Column(name = "time_delete")
     private LocalDateTime timeDelete;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
@@ -60,8 +60,8 @@ public class Post implements Liked{
                 "id=" + id +
                 ", time=" + time +
                 ", authorId=" + author.getId() +
-                ", title='" + title + '\'' +
-                ", isBlocked=" + isBlocked +
+                ", title='" + title +
+                "', isBlocked=" + isBlocked +
                 ", isDeleted=" + isDeleted +
                 ", commentsCount=" + comments.size() +
                 ", tags=" + Arrays.toString(tags.stream().map(Tag::getTagName).toArray()) +
