@@ -10,8 +10,6 @@ spring:
     url: jdbc:postgresql://195.133.48.174:5432/social
     username: admin
     password: secret
-    initialization-mode: never
-    data: classpath:/db/changelog/data.sql
   liquibase:
     change-log: classpath:db/changelog/changelog-master.yaml
     enabled: true

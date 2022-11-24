@@ -9,6 +9,7 @@ import main.model.entities.Person;
 import main.model.enums.MessagePermissionTypes;
 import main.repository.CaptchaRepository;
 import main.repository.PersonsRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class AccountService {
     private final PersonsRepository personsRepository;
     private final CaptchaRepository captchaRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public RegisterRs getRegResponse(RegisterRq regRequest){
         RegisterRs registerRs = new RegisterRs();
@@ -50,7 +52,7 @@ public class AccountService {
             Person person = new Person();
             person.setFirstName(regRequest.getFirstName());
             person.setLastName(regRequest.getLastName());
-            person.setPassword(regRequest.getPasswd1());
+            person.setPassword(passwordEncoder.encode(regRequest.getPasswd1()));
             person.setRegDate(LocalDateTime.now());
             person.setEmail(regRequest.getEmail());
             person.setPhoto("https://res.cloudinary.com/dre3qhjvh/image/upload/v1669013824/default-1_wzqelg.png");
