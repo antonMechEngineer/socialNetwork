@@ -39,7 +39,7 @@ public class CloudaryService {
         Dotenv dotenv = Dotenv.load();
         Cloudinary cloudinary = new Cloudinary(dotenv.get("CLOUDINARY_URL"));
         cloudinary.config.secure = true;
-        System.out.println(
+        System.out.println("работает getImage "+
                 cloudinary.config.cloudName);
 
         try {
@@ -48,7 +48,7 @@ public class CloudaryService {
                     "quality_analysis", true
             );
             path = String.valueOf(cloudinary.api().resource(fileName, params2));
-
+            System.out.println(cloudinary.api().resource(fileName, params2));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
