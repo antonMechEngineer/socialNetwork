@@ -83,13 +83,6 @@ public class Person {
     @JoinTable(name = "friendships", joinColumns = @JoinColumn(name = "dst_person_id"), inverseJoinColumns = @JoinColumn(name = "src_person_id"))
     private List<Person> dstFriendships = new ArrayList<>();
 
-
-
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "friendships", joinColumns = @JoinColumn(name = "id"))
-    private List<Friendship> srcPersonsFriendships = new ArrayList<>();
-    
-
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
     private List<BlockHistory> blockHistoryList = new ArrayList<>();
 

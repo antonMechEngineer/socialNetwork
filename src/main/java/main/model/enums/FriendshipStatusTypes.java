@@ -1,5 +1,5 @@
 package main.model.enums;
 
 public enum FriendshipStatusTypes {
-    REQUEST, FRIEND, BLOCKED, DECLINED, SUBSCRIBED;
+    REQUEST, FRIEND, BLOCKED, DECLINED, SUBSCRIBED, UNKNOWN;
 }

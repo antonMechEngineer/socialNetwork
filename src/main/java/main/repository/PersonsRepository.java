@@ -17,8 +17,6 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
 
     Optional<Person>findPersonById(Long id);
 
-    List<Person> findPersonByDstFriendshipsIn(List<Friendship> friendships);
-
     boolean existsPersonByEmail(String email);
 
     Optional<Person> findPersonByEmail(String email);

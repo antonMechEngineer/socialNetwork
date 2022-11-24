@@ -22,6 +22,7 @@ public interface FriendMapper {
     @Mapping(target = "token", ignore = true)
     PersonResponse toFriendResponse(Person person, FriendshipStatusTypes friendshipStatusTypes);
 
+
     default WeatherRs getMapWeather(Person person) {
         return WeatherRs.builder()
                 .clouds("clouds")
@@ -36,6 +37,10 @@ public interface FriendMapper {
                 .euro("62")
                 .build();
     }
+    default FriendshipStatusTypes getFriendStatus(FriendshipStatusTypes friendshipStatusTypes) {
+        return friendshipStatusTypes;
+    }
+
 
 }
 
