@@ -39,6 +39,8 @@ public class FriendsController {
     @ResponseBody
     public CommonResponse<List<PersonResponse>> getFriends(
             @RequestHeader("Authorization") String token)
+    //@RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
+    //@RequestParam(name = "perPage", required = false, defaultValue = "${socialNetwork.default.size}") int size)
     {
         return friendsService.getFriends(token);
     }
@@ -52,7 +54,10 @@ public class FriendsController {
     @GetMapping("/request")
     @ResponseBody
     public CommonResponse<List<PersonResponse>> getPotentialFriends(
-            @RequestHeader("Authorization") String token){
+            @RequestHeader("Authorization") String token)
+    //@RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset, // TODO: 25.11.2022 эти параметры отдать в пагинацию
+    //@RequestParam(name = "perPage", required = false, defaultValue = "${socialNetwork.default.size}") int size)
+    {
         return friendsService.getRequestedPersons(token);
     }
 
