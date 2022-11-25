@@ -31,3 +31,7 @@ server:
 
 auth:
   secret: someSecretCode
+
+logging:
+  file:
+    uploadLogs: false
