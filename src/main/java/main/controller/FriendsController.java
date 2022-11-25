@@ -27,7 +27,7 @@ public class FriendsController {
 
     @PostMapping("/{id}")
     public FriendshipRs addFriend(@RequestHeader("Authorization") String token, @PathVariable Long id) {
-        return friendsService.addFriend(token, id);
+        return friendsService.sendFriendshipRequest(token, id);
     }
 
     @DeleteMapping("/{id}")
@@ -39,8 +39,7 @@ public class FriendsController {
     @ResponseBody
     public CommonResponse<List<PersonResponse>> getFriends(
             @RequestHeader("Authorization") String token)
-    //@RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
-    //@RequestParam(name = "perPage", required = false, defaultValue = "${socialNetwork.default.size}") int size)
+
     {
         return friendsService.getFriends(token);
     }
@@ -48,15 +47,13 @@ public class FriendsController {
     @PostMapping("/request/{id}")
     public FriendshipRs sendFriendshipRequest(@RequestHeader("Authorization") String token,
                                               @PathVariable Long id) {
-        return friendsService.sendFriendshipRequest(token, id);
+        return friendsService.addFriend(token, id);
     }
 
     @GetMapping("/request")
     @ResponseBody
     public CommonResponse<List<PersonResponse>> getPotentialFriends(
             @RequestHeader("Authorization") String token)
-    //@RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset, // TODO: 25.11.2022 эти параметры отдать в пагинацию
-    //@RequestParam(name = "perPage", required = false, defaultValue = "${socialNetwork.default.size}") int size)
     {
         return friendsService.getRequestedPersons(token);
     }

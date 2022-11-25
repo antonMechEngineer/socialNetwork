@@ -32,7 +32,7 @@ public class PersonsService {
     private final FriendshipsRepository friendshipsRepository;
 
     public CommonResponse<PersonResponse> getPersonDataById(Long id, String token) {
-        Person srcPerson = friendsService.getPersonByToken(token);
+        Person srcPerson = friendsService.getSrcPersonByToken(token);
         return getCommonPersonResponse(getPersonById(id), srcPerson);
     }
 
@@ -68,16 +68,10 @@ public class PersonsService {
 
 
     private CommonResponse<PersonResponse> getCommonPersonResponse(Person person, Person srcPerson) {
-        Optional <Friendship> optionalSrcFriendship = friendshipsRepository.findFriendshipBySrcPerson(srcPerson).
-                stream().filter(fs-> fs.getDstPerson() == person).collect(Collectors.toList()).stream().findFirst();
-        FriendshipStatusTypes srcFriendshipStatusType = FriendshipStatusTypes.UNKNOWN;
-        if (optionalSrcFriendship.isPresent()){
-            srcFriendshipStatusType = optionalSrcFriendship.get().getFriendshipStatus().getCode();
-        }
         return CommonResponse.<PersonResponse>builder()
                 .error("success")
                 .timestamp(System.currentTimeMillis())
-                .data(friendMapper.toFriendResponse(person, srcFriendshipStatusType))
+                .data(friendMapper.toFriendResponse(person, friendsService.getStatusTwoPersons(person, srcPerson)))
                 .build();
     }
 

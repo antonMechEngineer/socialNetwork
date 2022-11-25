@@ -26,8 +26,9 @@ public class FriendshipStatus {
     @Enumerated(EnumType.STRING)
     private FriendshipStatusTypes code;
 
-    public FriendshipStatus(LocalDateTime time, FriendshipStatusTypes code) {
+    public FriendshipStatus(LocalDateTime time, FriendshipStatusTypes code, String name) {
         this.time = time;
         this.code = code;
+        this.name = name;
     }
 }
