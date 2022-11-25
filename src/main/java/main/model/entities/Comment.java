@@ -33,7 +33,7 @@ public class Comment implements Liked {
 
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
-    private Person person;
+    private Person author;
 
     @Column(name = "comment_text", nullable = false, columnDefinition = "TEXT")
     private String commentText;
@@ -43,11 +43,6 @@ public class Comment implements Liked {
 
     @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isDeleted;
-
-    @Override
-    public Person getAuthor() {
-        return person;
-    }
 
     @Override
     public LikeTypes getType() {
@@ -61,7 +56,7 @@ public class Comment implements Liked {
                 ", postId=" + (post == null ? "no post" : post.getId()) +
                 ", parentCommentId=" + (parentComment == null ? "no parent comment" : parentComment.getId()) +
                 ", embeddedCommentsCount=" + embeddedComments.size() +
-                ", authorId=" + person.getId() +
+                ", authorId=" + author.getId() +
                 ", isBlocked=" + isBlocked +
                 ", isDeleted=" + isDeleted +
                 '}';

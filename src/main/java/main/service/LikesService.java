@@ -7,13 +7,10 @@ import main.api.response.LikeResponse;
 import main.model.entities.Like;
 import main.model.entities.Liked;
 import main.model.entities.Person;
-import main.model.enums.LikeTypes;
 import main.repository.CommentsRepository;
 import main.repository.LikesRepository;
-import main.repository.PersonsRepository;
 import main.repository.PostsRepository;
 import org.mapstruct.Named;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -32,18 +29,18 @@ public class LikesService {
     public CommonResponse<LikeResponse> putLike(LikeRequest likeRequest) {
         Person person = personsService.getPersonByContext();
         Liked liked = getLikedEntity(likeRequest.getItemId(), likeRequest.getType());
-        if (liked != null && personsService.validatePerson(liked.getAuthor())) {
+        if (getLikeFromCurrentPerson(person, liked) == null) {
             Like like = new Like();
             like.setEntity(liked);
             like.setPerson(person);
             like.setTime(LocalDateTime.now());
             likesRepository.save(like);
         }
-        return getLikesByType(liked.getId(), likeRequest.getType());
+        return getLikesResponse(liked);
     }
 
-    public CommonResponse<LikeResponse> getLikesByType(long entityId, String type) {
-        List<Like> likes = likesRepository.findLikesByEntity(LikeTypes.getType(type), getLikedEntity(entityId, type));
+    private CommonResponse<LikeResponse> getLikesResponse(Liked liked) {
+        List<Like> likes = likesRepository.findLikesByEntity(liked.getType(), liked);
         List<Long> users = likes.stream().map(like -> like.getPerson().getId()).collect(Collectors.toList());
         LikeResponse likeResponse = LikeResponse.builder()
                 .likes(likes.size())
@@ -56,14 +53,22 @@ public class LikesService {
                 .build();
     }
 
+    public CommonResponse<LikeResponse> getLikesResponse(long entityId, String type) {
+        return getLikesResponse(getLikedEntity(entityId, type));
+    }
+
     public CommonResponse<LikeResponse> deleteLike(long entityId, String type) {
         Person person = personsService.getPersonByContext();
         Liked liked = getLikedEntity(entityId, type);
-        if (liked != null && personsService.validatePerson(liked.getAuthor())) {
-            likesRepository.delete(
-                    likesRepository.findLikeByPersonAndEntity(LikeTypes.getType(type), liked, person).get());
+        Like like = getLikeFromCurrentPerson(person, liked);
+        if (like != null) {
+            likesRepository.delete(like);
         }
-        return getLikesByType(entityId, type);
+        return getLikesResponse(liked);
+    }
+
+    private Like getLikeFromCurrentPerson(Person person, Liked liked) {
+        return likesRepository.findLikeByPersonAndEntity(liked.getType(), liked, person).orElse(null);
     }
 
     private Liked getLikedEntity(long entityId, String type) {
