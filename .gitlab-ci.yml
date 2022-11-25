@@ -17,8 +17,8 @@ test-job:
 deploy-job:
   stage: deploy
   script:
-    - docker stop social
-    - docker rm social
+    - sudo docker stop social
+    - sudo docker rm social
     - cd javaproTeams30Backend/
-    - docker build -t java-backend:1.0 .
-    - docker run --name=social -d -p 8086:8086 -t java-backend:1.0
+    - sudo docker build -t java-backend:1.0 .
+    - sudo docker run --name=social -d -p 8086:8086 -t java-backend:1.0
