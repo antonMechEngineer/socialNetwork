@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    initialization-mode: never
+  jpa:
+    show-sql: false
+  liquibase:
+    change-log: classpath:db/changelog/changelog-master.yaml
+    enabled: true
+auth:
+  secret: someSecretCode
+  time-to-live: 3600000000
+
+#applicationParams
+socialNetwork:
+  default:
+    page: 0
+    size: 20
+
+
+
+
