@@ -6,8 +6,8 @@ stages:
 build-job:
   stage: build
   script:
-    - mvn clean
-    - mvn package spring-boot:repackage
+    - sudo mvn clean
+    - sudo mvn package spring-boot:repackage
 
 test-job:
   stage: test
@@ -17,6 +17,6 @@ test-job:
 deploy-job:
   stage: deploy
   script:
-    - docker stop vigilant_babbage
-    - docker build -t java-backend:1.0 .
-    - docker run -d -p 8086:8086 -t java-backend:1.0
+    - sudo docker stop vigilant_babbage
+    - sudo docker build -t java-backend:1.0 .
+    - sudo docker run -d -p 8086:8086 -t java-backend:1.0
