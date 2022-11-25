@@ -5,8 +5,11 @@ import com.cloudinary.utils.ObjectUtils;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.InputStream;
 import java.util.Map;
 
 
@@ -29,6 +32,7 @@ public class CloudaryService {
                     "overwrite", true
             );
                     cloudinary.uploader().upload(file, params1);
+       //     cloudinary.uploader().rename(file.toString(), newFileName, params1);
         } catch (Exception e) {
             e.getMessage();
         }
@@ -39,18 +43,15 @@ public class CloudaryService {
         Dotenv dotenv = Dotenv.load();
         Cloudinary cloudinary = new Cloudinary(dotenv.get("CLOUDINARY_URL"));
         cloudinary.config.secure = true;
-        System.out.println("работает getImage "+
-                cloudinary.config.cloudName);
 
         try {
             // Get the asset details
             Map params2 = ObjectUtils.asMap(
                     "quality_analysis", true
             );
-            path = String.valueOf(cloudinary.api().resource(fileName, params2));
-            System.out.println(cloudinary.api().resource(fileName, params2));
+            path = (String) cloudinary.api().resource(fileName, params2).get("url");
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.getMessage();
         }
         return path;
     }
@@ -65,15 +66,12 @@ public class CloudaryService {
 
         try {
             // Create the image tag with the transformed image and log it to the console
-            System.out.println(
                     cloudinary.url().transformation(new Transformation()
                                     .crop("pad")
                                     .width(300)
                                     .height(400)
                                     .background("auto:predominant"))
-                            .imageTag("coffee_cup"));
-            // The code above generates an HTML image tag similar to the following:
-            //  <img src='https://res.cloudinary.com/demo/image/upload/b_auto:predominant,c_pad,h_400,w_300/coffee_cup' height='400' width='300'/>
+                            .imageTag("coffee_cup");
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -85,8 +83,6 @@ public class CloudaryService {
         Dotenv dotenv = Dotenv.load();
         Cloudinary cloudinary = new Cloudinary(dotenv.get("CLOUDINARY_URL"));
         cloudinary.config.secure = true;
-        System.out.println(
-                cloudinary.config.cloudName);
 
         try {
             cloudinary.uploader()
