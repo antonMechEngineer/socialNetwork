@@ -1,6 +1,5 @@
 package main.service;
 
-import liquibase.util.file.FilenameUtils;
 import lombok.AllArgsConstructor;
 
 import main.api.request.UserRq;
@@ -20,8 +19,8 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.security.Principal;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 
 @Service
@@ -39,11 +38,11 @@ public class UsersService {
         long personId = person.getId();
         StorageRs response = new StorageRs();
         StorageDataRs dataRs = new StorageDataRs();
-        PersonResponse personResponse = personMapper.toPersonResponse(person);
 
         String originFileName = photo.getOriginalFilename();
         String extention = originFileName.substring(originFileName.lastIndexOf(".") + 1);
         String newFileName = "image" + personId + "." + extention;
+        String newFileNameShort = "image" + personId;
         if (!extention.equals("jpg") && !extention.equals("png")) {
             response.setError("Отправлен файл не формата изображение jpg, png");
         }
@@ -52,8 +51,7 @@ public class UsersService {
             response.setError("Размер файла превышает допустимый размер");
         }
 
-        if (response.getError().isEmpty()) {
-
+        if (response.getError()== null) {
         response.setTimestamp(0);
         dataRs.setBytes(0);
         dataRs.setCreatedAt(0);
@@ -62,21 +60,19 @@ public class UsersService {
         File outputfile = new File(newFileName);
         ImageIO.write(bufferedImage, extention, outputfile);
 
-        String cloudinaryPath = person.getPhoto();
-        if (!cloudinaryPath.equals("https://res.cloudinary.com/dre3qhjvh/image/upload/v1669013824/default-1_wzqelg.png")) {
-            cloudaryService.deleteImage("image" + personId);
-        }
         cloudaryService.uploadImage(outputfile);
-        String relativePath = cloudaryService.getImage(newFileName);
-
+        outputfile.delete();
+        String relativePath = cloudaryService.getImage(newFileNameShort);
         dataRs.setId(String.valueOf(personId));
         dataRs.setOwnerId(personId);
         dataRs.setFileName(newFileName);
         dataRs.setRelativeFilePath(relativePath);
         dataRs.setFileFormat(photo.getContentType());
         dataRs.setFileType(extention);
-
         response.setData(dataRs);
+
+        person.setPhoto(relativePath);
+        personsRepository.save(person);
     }
         return response;
     }
@@ -89,8 +85,8 @@ public class UsersService {
             person.setAbout(userRq.getAbout());
         }
         if (userRq.getBirth_date() != null) {
-            person.setBirthDate(LocalDateTime.parse(userRq.getBirth_date()));
-            personResponse.setBirthDate(LocalDateTime.parse(userRq.getBirth_date()));
+            person.setBirthDate(LocalDateTime.from(OffsetDateTime.parse(userRq.getBirth_date())));
+            personResponse.setBirthDate(LocalDateTime.from(OffsetDateTime.parse(userRq.getBirth_date())));
         }
         if (userRq.getCity() != null) {
        //     person.setCity(userRq.getCity());
