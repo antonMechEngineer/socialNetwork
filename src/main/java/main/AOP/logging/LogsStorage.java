@@ -2,10 +2,10 @@ package main.AOP.logging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import main.AOP.logging.dto.LoadPathDto;
-import main.errors.FileAlreadyUploadException;
 import main.errors.UnauthorizedException;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.fluent.Request;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -18,11 +18,17 @@ import java.nio.file.Path;
 public class LogsStorage {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final String clientId = "12ea62f27076416cba3d89f7bbf5046e";
-    private final String token = "y0_AgAAAABmXrQEAAixEgAAAADUt4an1A5J737iQj-h8tddar39fPxBIgQ";
+    @Value("${yandex.OAuth}")
+    private String token;
+
+    @Value("${logging.file.uploadLogs}")
+    private boolean uploadLogs;
 
     @Scheduled(cron = "0 0 4 * * *")
-    private void copyDir() throws IOException, FileAlreadyUploadException, UnauthorizedException {
+    private void copyDir() throws IOException, UnauthorizedException {
+        if (!uploadLogs) {
+            return;
+        }
 
         File logs = new File("log");
         File[] logFiles = logs.listFiles();
@@ -34,13 +40,13 @@ public class LogsStorage {
                 byte[] bytesFile = Files.readAllBytes(Path.of("log/" + file.getName()));
                 uploadFile(urlForUpload, bytesFile);
             } catch (HttpResponseException ex) {
-                exceptionHandler(ex, file);
+                exceptionHandler(ex);
             }
         }
     }
 
     private String getUrlForUpload(File file) throws IOException {
-        String getUrl = "https://cloud-api.yandex.net/v1/disk/resources/upload?path=disk:/" + file.getName() + "/";
+        String getUrl = "https://cloud-api.yandex.net/v1/disk/resources/upload?path=disk:/" + file.getName() + "/&overwrite=true";
         Object url = Request.Get(getUrl)
                 .setHeader("Authorization", token)
                 .execute()
@@ -57,11 +63,9 @@ public class LogsStorage {
                 .returnContent();
     }
 
-    private void exceptionHandler(HttpResponseException ex, File file) throws UnauthorizedException, FileAlreadyUploadException {
-        if (ex.getStatusCode() == 409) {
-            throw new FileAlreadyUploadException("Log file: '" + file.getName() + "' already upload to Yandex.Disk");
-        } else if (ex.getStatusCode() == 401) {
-            throw new UnauthorizedException("Upload log file fail with token: " + token);
+    private void exceptionHandler(HttpResponseException ex) throws UnauthorizedException {
+        if (ex.getStatusCode() == 401) {
+            throw new UnauthorizedException("Fail upload log file fail with token: " + token);
         } else {
             ex.printStackTrace();
         }
