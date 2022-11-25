@@ -17,6 +17,8 @@ test-job:
 deploy-job:
   stage: deploy
   script:
-    - docker stop vigilant_babbage
+    - docker stop social
+    - docker rm social
+    - cd javaproTeams30Backend/
     - docker build -t java-backend:1.0 .
-    - docker run -d -p 8086:8086 -t java-backend:1.0
+    - docker run --name=social -d -p 8086:8086 -t java-backend:1.0
