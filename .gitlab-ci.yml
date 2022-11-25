@@ -6,8 +6,8 @@ stages:
 build-job:
   stage: build
   script:
-    - sudo mvn clean
-    - sudo mvn package spring-boot:repackage
+    - mvn clean
+    - mvn package spring-boot:repackage
 
 test-job:
   stage: test
