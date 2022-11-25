@@ -28,6 +28,12 @@ server:
   servlet:
     context-path: "/"
 
-
 auth:
   secret: someSecretCode
+  time-to-live: 3600000000
+
+logging:
+  file:
+    max-history: 1
+    path: log
+    uploadLogs: false

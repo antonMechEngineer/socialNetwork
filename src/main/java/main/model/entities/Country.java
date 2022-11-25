@@ -1,8 +1,9 @@
 package main.model.entities;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
+
 @Entity
 @Data
 @Table(name = "countries")

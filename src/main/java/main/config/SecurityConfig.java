@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
@@ -24,13 +25,13 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JWTRequestFilter filter;
 
     @Bean
     PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder(12);
     }
 
     @Bean
@@ -43,13 +44,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.applyPermitDefaultValues();
-        configuration.setAllowedOrigins(List.of("http://localhost:8080/", "http://195.133.48.174:8080/",
-                "http://localhost:8086/", "http://localhost:8081/", "http://195.133.48.174:80/",
-                "http://localhost:8080"));
+        configuration.setAllowedOrigins(List.of("http://localhost:8080", "http://195.133.48.174:8080"));
         configuration.setAllowedMethods(List.of("OPTIONS", "DELETE", "POST", "GET", "PATCH", "PUT"));
         configuration.setExposedHeaders(List.of("Content-Type", "X-Requested-With", "accept", "Origin",
                 "Access-Control-Request-Method", "Access-Control-Request-Headers", "Access-Control-Allow-Origin",
-                "Access-Control-Allow-Credentials", "Clear-Site-Data"));
+                "Access-Control-Allow-Credentials"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -67,11 +66,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-//                .antMatchers("/api/v1/auth/login", "/api/v1/auth/captcha", "/api/v1/account/register", "/api/v1/account/password/recovery", "/api/v1/account/email/recovery")
-//                .permitAll()
-                .anyRequest()
+                .antMatchers("/api/v1/auth/login", "/api/v1/auth/captcha", "/api/v1/account/register", "/api/v1/account/password/recovery", "/api/v1/account/email/recovery")
                 .permitAll()
-//                .authenticated()
+                .anyRequest()
+                .authenticated()
                 .and()
                 .exceptionHandling()
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))

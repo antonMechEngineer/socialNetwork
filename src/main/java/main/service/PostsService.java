@@ -121,7 +121,7 @@ public class PostsService {
             List<Tag> oldTags = post.getTags();
             oldTags.removeAll(tags);
             oldTags.forEach(tag -> tagsService.dropPostFromTag(tag, post));
-            }
+        }
         tags.forEach(tag -> tagsService.addPostToTag(tag, post));
         post.setTags(tags);
         return post;

@@ -1,18 +1,15 @@
 spring:
   jpa:
-    hibernate:ddl-auto: validate
-    database: postgresql
+    hibernate:
+      ddl-auto: validate
     open-in-view: true
-    database-platform=org:hibernate:dialect: PostgreSQLDialect
-    properties:hibernate:jdbc:lob:non_contextual_creation: true
+    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
     show-sql: false
-
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5434/postgres?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&serverTimezone=UTC&useUnicode=true&characterEncoding=utf8
-    username: postgres
-    password: test
-    initialization-mode: always
+    url: jdbc:postgresql://195.133.48.174:5432/social
+    username: admin
+    password: secret
   liquibase:
     change-log: classpath:db/changelog/changelog-master.yaml
     enabled: true
@@ -25,10 +22,16 @@ socialNetwork:
 
 server:
   port: 8086
-  servlet:
-    context-path: "/"
-
 
 auth:
   secret: someSecretCode
   time-to-live: 3600000000
+
+logging:
+  file:
+    max-history: 1
+    path: log
+    uploadLogs: true
+
+yandex:
+  OAuth: y0_AgAAAABmXrQEAAixEgAAAADUt4an1A5J737iQj-h8tddar39fPxBIgQ

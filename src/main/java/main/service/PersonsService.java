@@ -35,14 +35,16 @@ public class PersonsService {
         Person srcPerson = friendsService.getPersonByToken(token);
         return getCommonPersonResponse(getPersonById(id), srcPerson);
     }
+
     public CommonResponse<PersonResponse> getMyData() {
         return getCommonPersonResponse(getPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()));
     }
+
     public UserRs editImage(Principal principal, MultipartFile photo, String phone, String about,
                             String city, String country, String first_name, String last_name,
                             String birth_date, String message_permission) throws IOException {
         Person person = personsRepository.findPersonByEmail(principal.getName()).get();
-        UserRs response =new UserRs();
+        UserRs response = new UserRs();
 
         return response;
     }

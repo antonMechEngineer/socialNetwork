@@ -3,3 +3,5 @@ target/
 log/
 *.iml
 *.iws
+Dockerfile
+/.jpb/
