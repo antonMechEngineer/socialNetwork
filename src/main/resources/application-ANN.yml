@@ -17,6 +17,10 @@ socialNetwork:
     page: 0
     size: 20
 
+logging:
+  file:
+    uploadLogs: false
+
 
 
 

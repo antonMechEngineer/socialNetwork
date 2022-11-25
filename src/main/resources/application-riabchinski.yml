@@ -36,3 +36,4 @@ logging:
   file:
     max-history: 1
     path: log
+    uploadLogs: false
