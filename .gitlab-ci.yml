@@ -17,6 +17,6 @@ test-job:
 deploy-job:
   stage: deploy
   script:
-    - sudo docker stop vigilant_babbage
-    - sudo docker build -t java-backend:1.0 .
-    - sudo docker run -d -p 8086:8086 -t java-backend:1.0
+    - docker stop vigilant_babbage
+    - docker build -t java-backend:1.0 .
+    - docker run -d -p 8086:8086 -t java-backend:1.0
