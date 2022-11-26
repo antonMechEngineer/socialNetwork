@@ -3,11 +3,15 @@ stages:
   - test
   - deploy
 
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+
 build-job:
   stage: build
   script:
-    - mvn clean
-    - mvn package spring-boot:repackage
+    - mvn -f /root/javaproTeams30Backend/ clean
+    - mvn -f /root/javaproTeams30Backend/ package spring-boot:repackage
 
 test-job:
   stage: test
@@ -17,7 +21,7 @@ test-job:
 deploy-job:
   stage: deploy
   script:
-    - docker stop social
-    - docker rm social
-    - docker build -t java-backend:1.0 .
+    - (docker ps -a --format {{.Names}} | grep social -w) && docker stop social && docker rm social || echo "Doesn't exist"
+    - pwd
+    - docker build -f /root/Dockerfile -t java-backend:1.0 .
     - docker run --name=social -d -p 8086:8086 -t java-backend:1.0

@@ -19,7 +19,7 @@ public class LikesController {
             @RequestParam(name = "item_id") long itemId,
             @RequestParam String type) {
 
-        return likesService.getLikesByType(itemId, type);
+        return likesService.getLikesResponse(itemId, type);
     }
 
     @PutMapping

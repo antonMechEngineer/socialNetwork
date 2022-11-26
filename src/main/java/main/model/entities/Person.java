@@ -89,7 +89,7 @@ public class Person {
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List<Post> posts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
 
     @OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
@@ -107,7 +107,7 @@ public class Person {
     @OneToMany(mappedBy = "author", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Message> messages = new ArrayList<>();
 
-    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "person", cascade = CascadeType.REMOVE)
     private List<Like> likes = new ArrayList<>();
 
     @Override
