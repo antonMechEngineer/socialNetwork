@@ -1,9 +1,11 @@
 package main.service;
 
 import lombok.RequiredArgsConstructor;
+import main.api.request.FindPostRq;
 import main.api.request.PostRequest;
 import main.api.response.CommonResponse;
 import main.api.response.PostResponse;
+import main.errors.EmptyFieldException;
 import main.errors.PersonNotFoundException;
 import main.mappers.PostMapper;
 import main.model.entities.Person;
@@ -11,12 +13,14 @@ import main.model.entities.Post;
 import main.model.entities.Tag;
 import main.repository.PersonsRepository;
 import main.repository.PostsRepository;
+import main.service.search.SearchPosts;
 import main.service.util.NetworkPageRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,6 +35,7 @@ public class PostsService {
     private final PersonsRepository personsRepository;
     private final TagsService tagsService;
     private final PostMapper postMapper;
+    private final SearchPosts searchPosts;
 
     public CommonResponse<PostResponse> createPost(PostRequest postRequest, long userId, Long timestamp) throws PersonNotFoundException {
         Person person = personsRepository.findById(userId).orElse(null);
@@ -121,7 +126,7 @@ public class PostsService {
             List<Tag> oldTags = post.getTags();
             oldTags.removeAll(tags);
             oldTags.forEach(tag -> tagsService.dropPostFromTag(tag, post));
-            }
+        }
         tags.forEach(tag -> tagsService.addPostToTag(tag, post));
         post.setTags(tags);
         return post;
@@ -134,5 +139,22 @@ public class PostsService {
     private boolean validatePerson(Person person) {
         return person != null && person.equals(personsRepository.findPersonByEmail(
                 (SecurityContextHolder.getContext().getAuthentication().getName())).orElse(null));
+    }
+
+    public CommonResponse<List<PostResponse>> findPosts(FindPostRq postRq, int offset, int perPage) throws SQLException, EmptyFieldException {
+        if (postRq.getText() == null) {
+            throw new EmptyFieldException("Field 'text' is required but empty");
+        }
+        return buildCommonResponse(offset, perPage, searchPosts.findPosts(postRq, offset, perPage), searchPosts.getTotal());
+    }
+
+    private CommonResponse<List<PostResponse>> buildCommonResponse(int offset, int perPage, List<Post> posts, Long total) {
+        return CommonResponse.<List<PostResponse>>builder()
+                .timestamp(System.currentTimeMillis())
+                .offset(offset)
+                .perPage(perPage)
+                .total(total)
+                .data(postsToResponse(posts))
+                .build();
     }
 }

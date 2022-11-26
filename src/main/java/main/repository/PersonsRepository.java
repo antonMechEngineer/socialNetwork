@@ -22,4 +22,6 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
     @Query("FROM Person AS p " +
             "ORDER BY p.regDate DESC")
     Page<Person> findPageOrderByRegDate(Pageable page);
+
+    Person findPersonByFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(String firstName, String lastName);
 }
