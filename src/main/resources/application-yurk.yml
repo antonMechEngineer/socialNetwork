@@ -1,7 +1,5 @@
 server:
   port: 8086
-#  servlet:
-#    context-path: /api/v1
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/network
@@ -27,6 +25,10 @@ socialNetwork:
   default:
     page: 0
     size: 20
+
+logging:
+  file:
+    uploadLogs: false
 
 
 

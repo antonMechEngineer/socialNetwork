@@ -1,6 +1,7 @@
 package main.service;
 
-import com.cloudinary.*;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.AllArgsConstructor;

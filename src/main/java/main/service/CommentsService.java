@@ -33,7 +33,7 @@ public class CommentsService {
         Person person = personsService.getPersonByContext();
         Comment parentComment = getCommentById(commentRequest.getParentId());
         post = parentComment == null ? post : null;
-        Comment comment = commentMapper.commentRequestToNewComment(commentRequest, post, person, parentComment, LocalDateTime.now());
+        Comment comment = commentMapper.commentRequestToNewComment(commentRequest, post, person, parentComment);
         return CommonResponse.<CommentResponse>builder()
                 .error("success")
                 .timestamp(System.currentTimeMillis())
@@ -57,35 +57,33 @@ public class CommentsService {
 
     public CommonResponse<CommentResponse> editComment(long commentId, CommentRequest commentRequest) {
         Comment comment = getCommentById(commentId);
-        if (personsService.validatePerson(comment.getPerson())) {
+        if (personsService.validatePerson(comment.getAuthor())) {
             comment.setCommentText(commentRequest.getCommentText());
             comment.setTime(LocalDateTime.now());
-            comment = commentRepository.save(comment);
         }
         return CommonResponse.<CommentResponse>builder()
                 .error("success")
                 .timestamp(System.currentTimeMillis())
-                .data(getCommentResponse(comment))
+                .data(getCommentResponse(commentRepository.save(comment)))
                 .errorDescription("")
                 .build();
     }
 
     public CommonResponse<CommentResponse> changeCommentDeleteStatus(long commentId, boolean status) {
         Comment comment = getCommentById(commentId);
-        if (personsService.validatePerson(comment.getPerson())) {
+        if (personsService.validatePerson(comment.getAuthor())) {
             comment.setIsDeleted(status);
-            comment = commentRepository.save(comment);
         }
         return CommonResponse.<CommentResponse>builder()
                 .error("success")
                 .timestamp(System.currentTimeMillis())
-                .data(getCommentResponse(comment))
+                .data(getCommentResponse(commentRepository.save(comment)))
                 .errorDescription("")
                 .build();
     }
 
     private CommentResponse getCommentResponse(Comment comment) {
-        CommentResponse response = commentMapper.commentToResponse(commentRepository.save(comment));
+        CommentResponse response = commentMapper.commentToResponse(comment);
         response.setEmbeddedComments(embeddedCommentsToResponse(comment.getEmbeddedComments()));
         return response;
     }

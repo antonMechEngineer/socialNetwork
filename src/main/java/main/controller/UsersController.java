@@ -27,8 +27,9 @@ public class UsersController {
     private final UsersService usersService;
 
     @GetMapping("/{id}")
-    public CommonResponse<PersonResponse> getUserById(@PathVariable long id) {
-        return personsService.getPersonDataById(id);
+    public CommonResponse<PersonResponse> getUserById(@PathVariable long id,
+                                                      @RequestHeader("Authorization") String token) {
+        return personsService.getPersonDataById(id, token);
     }
 
     @GetMapping("/{id}/wall")
