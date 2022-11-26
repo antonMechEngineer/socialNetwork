@@ -3,13 +3,14 @@ package main.service;
 import lombok.AllArgsConstructor;
 
 import main.api.request.UserRq;
-import main.api.response.PersonResponse;
-import main.api.response.StorageDataRs;
-import main.api.response.StorageRs;
-import main.api.response.UserRs;
+import main.api.response.*;
 import main.mappers.PersonMapper;
+import main.model.entities.City;
+import main.model.entities.Country;
 import main.model.entities.Person;
 import main.repository.CaptchaRepository;
+import main.repository.CitiesRepository;
+import main.repository.CountriesRepository;
 import main.repository.PersonsRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,8 @@ import java.time.OffsetDateTime;
 public class UsersService {
     private final static int MAX_IMAGE_LENTH = 512000;
     private final PersonsRepository personsRepository;
+    private final CitiesRepository citiesRepository;
+    private final CountriesRepository countriesRepository;
     private final CaptchaRepository captchaRepository;
     private final CloudaryService cloudaryService;
     private final PersonMapper personMapper;
@@ -80,6 +83,12 @@ public class UsersService {
     public UserRs editProfile(UserRq userRq){
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
         UserRs response =new UserRs();
+//        CityRs cityRs = new CityRs();
+//        CountryRs countryRs = new CountryRs();
+//        cityRs.setId(0);
+//        cityRs.setTitle(userRq.getCity());
+//        countryRs.setId(0);
+//        countryRs.setTitle(userRq.getCountry());
         PersonResponse personResponse = personMapper.toPersonResponse(person);
         if (userRq.getAbout() != null) {
             person.setAbout(userRq.getAbout());
@@ -89,10 +98,22 @@ public class UsersService {
             personResponse.setBirthDate(LocalDateTime.from(OffsetDateTime.parse(userRq.getBirth_date())));
         }
         if (userRq.getCity() != null) {
-       //     person.setCity(userRq.getCity());
+            person.setCity(userRq.getCity());
+            personResponse.setCity(userRq.getCity());
+            if (!citiesRepository.existsCityByTitle(userRq.getCity())) {
+                City city = new City();
+                city.setTitle(userRq.getCity());
+                citiesRepository.save(city);
+            }
         }
         if (userRq.getCountry() != null) {
-       //     person.setCountry(userRq.getCountry());
+            person.setCountry(userRq.getCountry());
+            personResponse.setCountry(userRq.getCountry());
+            if (!countriesRepository.existsCountryByTitle(userRq.getCountry())){
+                Country country = new Country();
+                country.setTitle(userRq.getCountry());
+                countriesRepository.save(country);
+            }
         }
         if (userRq.getFirst_name() != null) {
             person.setFirstName(userRq.getFirst_name());

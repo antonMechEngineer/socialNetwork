@@ -17,7 +17,7 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
 
     Optional<Person> findPersonByEmail(String email);
 
-    Page<Person> findAllByCity(City city, Pageable page);
+    Page<Person> findAllByCity(String city, Pageable page);
 
     @Query("FROM Person AS p " +
             "ORDER BY p.regDate DESC")

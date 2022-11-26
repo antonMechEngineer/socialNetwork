@@ -24,6 +24,7 @@ public class FriendsRecommendationService {
     public CommonResponse<List<PersonResponse>> getFriendsRecommendation() {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
         Pageable page = PageRequest.of(0, 8);
+//        List<PersonResponse> personResponses = personsToPersonResponses(personsRepository.findAllByCity(person.getCity(), page).getContent());
         List<PersonResponse> personResponses = personsToPersonResponses(personsRepository.findAllByCity(person.getCity(), page).getContent());
         if (person.getCity() == null || personResponses.size() == 0) {
             personResponses = personsToPersonResponses(personsRepository.findPageOrderByRegDate(page).getContent());
