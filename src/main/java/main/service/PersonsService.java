@@ -4,8 +4,12 @@ import lombok.RequiredArgsConstructor;
 import main.api.response.CommonResponse;
 import main.api.response.PersonResponse;
 import main.api.response.UserRs;
+import main.mappers.FriendMapper;
 import main.mappers.PersonMapper;
+import main.model.entities.Friendship;
 import main.model.entities.Person;
+import main.model.enums.FriendshipStatusTypes;
+import main.repository.FriendshipsRepository;
 import main.repository.PersonsRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -13,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,9 +27,13 @@ public class PersonsService {
     private final PersonsRepository personsRepository;
     private final CurrencyService currencyService;
     private final PersonMapper personMapper;
+    private final FriendMapper friendMapper;
+    private final FriendsService friendsService;
+    private final FriendshipsRepository friendshipsRepository;
 
-    public CommonResponse<PersonResponse> getPersonDataById(Long id) {
-        return getCommonPersonResponse(getPersonById(id));
+    public CommonResponse<PersonResponse> getPersonDataById(Long id, String token) {
+        Person srcPerson = friendsService.getSrcPersonByToken(token);
+        return getCommonPersonResponse(getPersonById(id), srcPerson);
     }
 
     public CommonResponse<PersonResponse> getMyData() {
@@ -56,6 +66,15 @@ public class PersonsService {
         return person != null && person.equals(getPersonByContext());
     }
 
+
+    private CommonResponse<PersonResponse> getCommonPersonResponse(Person person, Person srcPerson) {
+        return CommonResponse.<PersonResponse>builder()
+                .error("success")
+                .timestamp(System.currentTimeMillis())
+                .data(friendMapper.toFriendResponse(person, friendsService.getStatusTwoPersons(person, srcPerson)))
+                .build();
+    }
+
     private CommonResponse<PersonResponse> getCommonPersonResponse(Person person) {
         return CommonResponse.<PersonResponse>builder()
                 .error("success")
@@ -63,4 +82,6 @@ public class PersonsService {
                 .data(personMapper.toPersonResponse(person))
                 .build();
     }
+
+
 }
