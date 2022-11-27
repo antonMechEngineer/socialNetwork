@@ -58,9 +58,10 @@ public class PostsController {
     }
 
     @GetMapping("/post")
-    public CommonResponse<List<PostResponse>> findPost(FindPostRq postRq,
-                                                       @RequestParam(required = false, defaultValue = "${socialNetwork.default.page}") int offset,
-                                                       @RequestParam(required = false, defaultValue = "${socialNetwork.default.size}") int perPage) throws SQLException, EmptyFieldException {
+    public CommonResponse<List<PostResponse>> findPost(
+            FindPostRq postRq,
+            @RequestParam(required = false, defaultValue = "${socialNetwork.default.page}") int offset,
+            @RequestParam(required = false, defaultValue = "${socialNetwork.default.size}") int perPage) throws SQLException, EmptyFieldException {
 
         return postsService.findPosts(postRq, offset, perPage);
     }

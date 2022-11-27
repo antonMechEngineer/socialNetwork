@@ -39,7 +39,7 @@ public class FriendsService {
     public FriendshipRs addFriend(String token, Long futureFriendId) {
         Person srcPerson = getSrcPersonByToken(token);
         Optional<Person> dstPersonOptional = personsRepository.findPersonById(futureFriendId);
-        if (!dstPersonOptional.isPresent()) {
+        if (dstPersonOptional.isEmpty()) {
            String descriptionError = "Person with ID" + futureFriendId + " doesn't exist";
             return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), new ComplexRs(descriptionError));
         }
@@ -51,7 +51,7 @@ public class FriendsService {
 
     public FriendshipRs sendFriendshipRequest(String token, Long potentialFriendId) {
         Optional<Person> dstPersonOptional = personsRepository.findPersonById(potentialFriendId);
-        if (!dstPersonOptional.isPresent()) {
+        if (dstPersonOptional.isEmpty()) {
            String descriptionError = "Person with ID" + potentialFriendId + " doesn't exist";
             return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), new ComplexRs(descriptionError));
         }
@@ -62,7 +62,7 @@ public class FriendsService {
 
     public FriendshipRs deleteFriend(String token, Long idDeletableFriend) {
         Optional<Person> optionalDstPerson = personsRepository.findPersonById(idDeletableFriend);
-        if (!optionalDstPerson.isPresent()) {
+        if (optionalDstPerson.isEmpty()) {
            String descriptionError = "Person with ID" + idDeletableFriend + " isn't your friend";
             return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), new ComplexRs(descriptionError));
         }
@@ -73,7 +73,7 @@ public class FriendsService {
 
     public FriendshipRs deleteSentFriendshipRequest(String token, Long idRequestedPerson) {
         Optional<Person> dstPersonOptional = personsRepository.findPersonById(idRequestedPerson);
-        if (!dstPersonOptional.isPresent()) {
+        if (dstPersonOptional.isEmpty()) {
             String descriptionError = "Person with ID" + idRequestedPerson + " isn't requested";
             return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), new ComplexRs(descriptionError));
         }
@@ -82,21 +82,19 @@ public class FriendsService {
         return new FriendshipRs(defaultError, LocalDateTime.now().toString(), new ComplexRs(defaultError));
     }
 
-    public CommonResponse<List<PersonResponse>> getFriends(String token) {
+    public CommonResponse<List<PersonResponse>> getFriends(int offset, int perPage,String token) {
         List<PersonResponse> requestedPersons = getPersons(token, FriendshipStatusTypes.FRIEND);
-        CommonResponse<List<PersonResponse>> commonResponse = buildCommonResponse(requestedPersons);
-        return commonResponse;
+        return buildCommonResponse(offset, perPage, requestedPersons);
     }
 
-    public CommonResponse<List<PersonResponse>> getRequestedPersons(String token) {
+    public CommonResponse<List<PersonResponse>> getRequestedPersons(int offset, int perPage, String token) {
         List<PersonResponse> personsSentResponse = getPersons(token, FriendshipStatusTypes.RECEIVED_REQUEST);
-        return buildCommonResponse(personsSentResponse);
+        return buildCommonResponse(offset, perPage, personsSentResponse);
     }
 
     public Person getSrcPersonByToken(String token) {
         String personEmail = jwtUtil.extractUserName(token);
-        Person person = personsRepository.findPersonByEmail(personEmail).orElseThrow();
-        return person;
+        return personsRepository.findPersonByEmail(personEmail).orElseThrow();
     }
 
     public FriendshipStatusTypes getStatusTwoPersons(Person dstPerson, Person srcPerson){
@@ -137,8 +135,7 @@ public class FriendsService {
             return new ArrayList<>();
         } else {
             List<Person> persons = srcPersonFriendships.stream().map(Friendship::getDstPerson).collect(Collectors.toList());
-            List<PersonResponse> responsePersons = personsToPersonResponses(persons, srcPerson);
-            return responsePersons;
+            return personsToPersonResponses(persons, srcPerson);
         }
     }
 
@@ -161,14 +158,14 @@ public class FriendsService {
                 collect(Collectors.toList());
     }
 
-    private CommonResponse<List<PersonResponse>> buildCommonResponse(List<PersonResponse> personResponses) {
-        Pageable pageable = PageRequest.of(0, 8);
+    private CommonResponse<List<PersonResponse>> buildCommonResponse(int offset, int perPage, List<PersonResponse> personResponses) {
+        Pageable pageable = PageRequest.of(offset, perPage);
         Page<PersonResponse> pagePersons = new PageImpl<>(personResponses, pageable, personResponses.size());
         return CommonResponse.<List<PersonResponse>>builder()
                 .timestamp(System.currentTimeMillis())
-                .offset(pagePersons.getSize())
-                .perPage(8)
-                .total((long) personResponses.size())
+                .offset(offset)
+                .perPage(perPage)
+                .total(pagePersons.getTotalElements())
                 .data(personResponses)
                 .build();
     }

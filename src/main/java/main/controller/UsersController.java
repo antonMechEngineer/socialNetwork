@@ -70,9 +70,10 @@ public class UsersController {
     }
 
     @GetMapping("/search")
-    public CommonResponse<List<PersonResponse>> findPersons(FindPersonRq personRq,
-                                                            @RequestParam(required = false, defaultValue = "${socialNetwork.default.page}") int offset,
-                                                            @RequestParam(required = false, defaultValue = "${socialNetwork.default.size}") int perPage) throws SQLException, EmptyFieldException {
+    public CommonResponse<List<PersonResponse>> findPersons(
+            FindPersonRq personRq,
+            @RequestParam(required = false, defaultValue = "${socialNetwork.default.page}") int offset,
+            @RequestParam(required = false, defaultValue = "${socialNetwork.default.size}") int perPage) throws SQLException, EmptyFieldException {
         return usersService.findPersons(personRq, offset, perPage);
     }
 }

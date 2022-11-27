@@ -44,47 +44,25 @@ public class PostsService {
         }
         LocalDateTime postPublishingTime = timestamp == null ? LocalDateTime.now() : new Timestamp(timestamp).toLocalDateTime();
         Post post = postMapper.postRequestToNewPost(postRequest, person, postPublishingTime);
-        return CommonResponse.<PostResponse>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .data(postMapper.postToResponse(
-                        postsRepository.save(
-                                updateTagsInPost(new ArrayList<>(post.getTags()), post))))
-                .build();
+        PostResponse postResponse = postMapper.postToResponse(postsRepository.save(updateTagsInPost(new ArrayList<>(post.getTags()), post)));
+        return buildCommonResponse(postResponse);
     }
 
     public CommonResponse<List<PostResponse>> getFeeds(int offset, int size) {
         Pageable pageable = NetworkPageRequest.of(offset, size);
         Page<Post> postPage = postsRepository.findPostsByTimeBeforeAndIsDeletedFalseOrderByTimeDesc(pageable, LocalDateTime.now());
-        return CommonResponse.<List<PostResponse>>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .total(postPage.getTotalElements())
-                .itemPerPage(postPage.getSize())
-                .offset(offset)
-                .data(new ArrayList<>(postsToResponse(postPage.getContent())))
-                .build();
+        return buildCommonResponse(offset, size, postPage.getContent(), postPage.getTotalElements());
     }
 
     public CommonResponse<List<PostResponse>> getAllPostsByAuthor(int offset, int size, Person postsAuthor) {
         Pageable pageable = NetworkPageRequest.of(offset, size);
         Page<Post> postPage = postsRepository.findPostsByAuthorOrderByTimeDesc(pageable, postsAuthor);
-        return CommonResponse.<List<PostResponse>>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .offset(offset)
-                .perPage(postPage.getSize())
-                .total(postPage.getTotalElements())
-                .data(new ArrayList<>(postsToResponse(postPage.getContent())))
-                .build();
+        return buildCommonResponse(offset, size, postPage.getContent(), postPage.getTotalElements());
     }
 
     public CommonResponse<PostResponse> getPostById(long postId) {
-        return CommonResponse.<PostResponse>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .data(postMapper.postToResponse(findPostById(postId)))
-                .build();
+        PostResponse postResponse = postMapper.postToResponse(findPostById(postId));
+        return buildCommonResponse(postResponse);
     }
 
     public CommonResponse<PostResponse> updatePost(long postId, PostRequest postRequest) throws PersonNotFoundException {
@@ -96,11 +74,8 @@ public class PostsService {
         post.setPostText(postRequest.getPostText());
         List<Tag> tags = tagsService.stringsToTagsMapper(postRequest.getTags());
         Post newPost = updateTagsInPost(tags, post);
-        return CommonResponse.<PostResponse>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .data(postMapper.postToResponse(postsRepository.save(newPost)))
-                .build();
+        PostResponse postResponse = postMapper.postToResponse(postsRepository.save(newPost));
+        return buildCommonResponse(postResponse);
     }
 
     public CommonResponse<PostResponse> changeDeleteStatusInPost(long postId, boolean deleteStatus) throws PersonNotFoundException {
@@ -110,11 +85,8 @@ public class PostsService {
         }
         post.setIsDeleted(deleteStatus);
         post.setTimeDelete(LocalDateTime.now());
-        return CommonResponse.<PostResponse>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .data(postMapper.postToResponse(postsRepository.save(post)))
-                .build();
+        PostResponse postResponse = postMapper.postToResponse(postsRepository.save(post));
+        return buildCommonResponse(postResponse);
     }
 
     public Post findPostById(long postId) {
@@ -155,6 +127,13 @@ public class PostsService {
                 .perPage(perPage)
                 .total(total)
                 .data(postsToResponse(posts))
+                .build();
+    }
+
+    private CommonResponse<PostResponse> buildCommonResponse(PostResponse postResponse) {
+        return CommonResponse.<PostResponse>builder()
+                .timestamp(System.currentTimeMillis())
+                .data(postResponse)
                 .build();
     }
 }
