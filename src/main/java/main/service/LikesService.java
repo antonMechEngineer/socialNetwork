@@ -46,11 +46,7 @@ public class LikesService {
                 .likes(likes.size())
                 .users(users)
                 .build();
-        return CommonResponse.<LikeResponse>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .data(likeResponse)
-                .build();
+        return buildCommonResponse(likeResponse);
     }
 
     public CommonResponse<LikeResponse> getLikesResponse(long entityId, String type) {
@@ -97,5 +93,12 @@ public class LikesService {
         Person person = personsService.getPersonByContext();
         Like like = likesRepository.findLikeByPersonAndEntity(liked.getType(), liked, person).orElse(null);
         return like != null && person.getId().equals(like.getPerson().getId());
+    }
+
+    private CommonResponse<LikeResponse> buildCommonResponse(LikeResponse likeResponse) {
+        return CommonResponse.<LikeResponse>builder()
+                .timestamp(System.currentTimeMillis())
+                .data(likeResponse)
+                .build();
     }
 }

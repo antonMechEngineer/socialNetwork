@@ -40,4 +40,13 @@ public class ExceptionHandlerController {
                 .errorDescription(e.getMessage())
                 .build());
     }
+
+    @ExceptionHandler(EmptyFieldException.class)
+    public ResponseEntity<CommonResponse> handleEmptyFieldException(Exception e) {
+        return ResponseEntity.status(400).body(CommonResponse.builder()
+                .error(EmptyFieldException.class.getSimpleName())
+                .timestamp(System.currentTimeMillis())
+                .errorDescription(e.getLocalizedMessage())
+                .build());
+    }
 }

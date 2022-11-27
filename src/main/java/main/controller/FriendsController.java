@@ -38,10 +38,10 @@ public class FriendsController {
     @GetMapping()
     @ResponseBody
     public CommonResponse<List<PersonResponse>> getFriends(
-            @RequestHeader("Authorization") String token)
-
-    {
-        return friendsService.getFriends(token);
+            @RequestParam(required = false, defaultValue = "${socialNetwork.default.page}") int offset,
+            @RequestParam(required = false, defaultValue = "${socialNetwork.default.size}") int perPage,
+            @RequestHeader("Authorization") String token) {
+        return friendsService.getFriends(offset, perPage, token);
     }
 
     @PostMapping("/request/{id}")
@@ -53,17 +53,17 @@ public class FriendsController {
     @GetMapping("/request")
     @ResponseBody
     public CommonResponse<List<PersonResponse>> getPotentialFriends(
-            @RequestHeader("Authorization") String token)
-    {
-        return friendsService.getRequestedPersons(token);
+            @RequestParam(required = false, defaultValue = "${socialNetwork.default.page}") int offset,
+            @RequestParam(required = false, defaultValue = "${socialNetwork.default.size}") int perPage,
+            @RequestHeader("Authorization") String token) {
+        return friendsService.getRequestedPersons(offset, perPage, token);
     }
 
     @DeleteMapping("request/{id}")
-    public FriendshipRs deleteSentFriendshipRequest (@RequestHeader("Authorization") String token,
-                                                     @PathVariable Long id) {
+    public FriendshipRs deleteSentFriendshipRequest(@RequestHeader("Authorization") String token,
+                                                    @PathVariable Long id) {
         return friendsService.deleteSentFriendshipRequest(token, id);
     }
-
 
 
 }
