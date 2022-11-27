@@ -39,7 +39,7 @@ public class FriendsService {
     public FriendshipRs addFriend(String token, Long futureFriendId) {
         Person srcPerson = getSrcPersonByToken(token);
         Optional<Person> dstPersonOptional = personsRepository.findPersonById(futureFriendId);
-        if (!dstPersonOptional.isPresent()) {
+        if (dstPersonOptional.isEmpty()) {
            String descriptionError = "Person with ID" + futureFriendId + " doesn't exist";
             return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), new ComplexRs(descriptionError));
         }
@@ -51,7 +51,7 @@ public class FriendsService {
 
     public FriendshipRs sendFriendshipRequest(String token, Long potentialFriendId) {
         Optional<Person> dstPersonOptional = personsRepository.findPersonById(potentialFriendId);
-        if (!dstPersonOptional.isPresent()) {
+        if (dstPersonOptional.isEmpty()) {
            String descriptionError = "Person with ID" + potentialFriendId + " doesn't exist";
             return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), new ComplexRs(descriptionError));
         }
@@ -62,7 +62,7 @@ public class FriendsService {
 
     public FriendshipRs deleteFriend(String token, Long idDeletableFriend) {
         Optional<Person> optionalDstPerson = personsRepository.findPersonById(idDeletableFriend);
-        if (!optionalDstPerson.isPresent()) {
+        if (optionalDstPerson.isEmpty()) {
            String descriptionError = "Person with ID" + idDeletableFriend + " isn't your friend";
             return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), new ComplexRs(descriptionError));
         }
@@ -73,7 +73,7 @@ public class FriendsService {
 
     public FriendshipRs deleteSentFriendshipRequest(String token, Long idRequestedPerson) {
         Optional<Person> dstPersonOptional = personsRepository.findPersonById(idRequestedPerson);
-        if (!dstPersonOptional.isPresent()) {
+        if (dstPersonOptional.isEmpty()) {
             String descriptionError = "Person with ID" + idRequestedPerson + " isn't requested";
             return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), new ComplexRs(descriptionError));
         }
@@ -143,7 +143,6 @@ public class FriendsService {
     }
 
     private void modifyFriendShipStatus(Person srcPerson, Person dstPerson) {
-
         List<Friendship> srcFriendships = friendshipsRepository.findFriendshipBySrcPerson(srcPerson);
         Optional<Friendship> optionalSrcFriendship = srcFriendships.stream().
                 filter(friendship -> friendship.getDstPerson().equals(dstPerson)).findFirst();
