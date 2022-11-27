@@ -34,25 +34,13 @@ public class CommentsService {
         Comment parentComment = getCommentById(commentRequest.getParentId());
         post = parentComment == null ? post : null;
         Comment comment = commentMapper.commentRequestToNewComment(commentRequest, post, person, parentComment);
-        return CommonResponse.<CommentResponse>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .data(getCommentResponse(commentRepository.save(comment)))
-                .build();
+        return buildCommonResponse(comment);
     }
 
     public CommonResponse<List<CommentResponse>> getPostComments(Post post, int offset, int size) {
         Pageable pageable = NetworkPageRequest.of(offset, size);
         Page<Comment> commentPage = commentRepository.findCommentsByPostOrderByTimeAsc(pageable, post);
-        return CommonResponse.<List<CommentResponse>>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .offset(offset)
-                .itemPerPage(commentPage.getSize())
-                .total(commentPage.getTotalElements())
-                .data(commentPage.getContent().stream().map(this::getCommentResponse).collect(Collectors.toList()))
-                .errorDescription("")
-                .build();
+        return buildCommonResponseList(offset, size, commentPage);
     }
 
     public CommonResponse<CommentResponse> editComment(long commentId, CommentRequest commentRequest) {
@@ -61,12 +49,7 @@ public class CommentsService {
             comment.setCommentText(commentRequest.getCommentText());
             comment.setTime(LocalDateTime.now());
         }
-        return CommonResponse.<CommentResponse>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .data(getCommentResponse(commentRepository.save(comment)))
-                .errorDescription("")
-                .build();
+        return buildCommonResponse(comment);
     }
 
     public CommonResponse<CommentResponse> changeCommentDeleteStatus(long commentId, boolean status) {
@@ -74,12 +57,7 @@ public class CommentsService {
         if (personsService.validatePerson(comment.getAuthor())) {
             comment.setIsDeleted(status);
         }
-        return CommonResponse.<CommentResponse>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .data(getCommentResponse(commentRepository.save(comment)))
-                .errorDescription("")
-                .build();
+        return buildCommonResponse(comment);
     }
 
     private CommentResponse getCommentResponse(Comment comment) {
@@ -107,5 +85,22 @@ public class CommentsService {
                             embeddedCommentsToResponse(comment.getEmbeddedComments()));
             return commentResponse;
         }).collect(Collectors.toList());
+    }
+
+    private CommonResponse<CommentResponse> buildCommonResponse(Comment comment) {
+        return CommonResponse.<CommentResponse>builder()
+                .timestamp(System.currentTimeMillis())
+                .data(getCommentResponse(commentRepository.save(comment)))
+                .build();
+    }
+
+    private CommonResponse<List<CommentResponse>> buildCommonResponseList(int offset, int perPage, Page<Comment> comments) {
+        return CommonResponse.<List<CommentResponse>>builder()
+                .timestamp(System.currentTimeMillis())
+                .offset(offset)
+                .itemPerPage(perPage)
+                .total(comments.getTotalElements())
+                .data(comments.getContent().stream().map(this::getCommentResponse).collect(Collectors.toList()))
+                .build();
     }
 }

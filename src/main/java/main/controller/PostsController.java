@@ -1,13 +1,16 @@
 package main.controller;
 
 import lombok.RequiredArgsConstructor;
+import main.api.request.FindPostRq;
 import main.api.request.PostRequest;
 import main.api.response.CommonResponse;
 import main.api.response.PostResponse;
+import main.errors.EmptyFieldException;
 import main.errors.PersonNotFoundException;
 import main.service.PostsService;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -52,5 +55,14 @@ public class PostsController {
             @PathVariable long id) throws PersonNotFoundException {
 
         return postsService.changeDeleteStatusInPost(id, false);
+    }
+
+    @GetMapping("/post")
+    public CommonResponse<List<PostResponse>> findPost(
+            FindPostRq postRq,
+            @RequestParam(required = false, defaultValue = "${socialNetwork.default.page}") int offset,
+            @RequestParam(required = false, defaultValue = "${socialNetwork.default.size}") int perPage) throws SQLException, EmptyFieldException {
+
+        return postsService.findPosts(postRq, offset, perPage);
     }
 }

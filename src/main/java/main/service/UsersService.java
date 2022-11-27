@@ -2,8 +2,11 @@ package main.service;
 
 import lombok.AllArgsConstructor;
 
+import main.api.request.FindPersonRq;
 import main.api.request.UserRq;
 import main.api.response.*;
+import main.api.response.*;
+import main.errors.EmptyFieldException;
 import main.mappers.PersonMapper;
 import main.model.entities.City;
 import main.model.entities.Country;
@@ -12,6 +15,7 @@ import main.repository.CaptchaRepository;
 import main.repository.CitiesRepository;
 import main.repository.CountriesRepository;
 import main.repository.PersonsRepository;
+import main.service.search.SearchPersons;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,8 +24,11 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -34,7 +41,7 @@ public class UsersService {
     private final CaptchaRepository captchaRepository;
     private final CloudaryService cloudaryService;
     private final PersonMapper personMapper;
-
+    private final SearchPersons searchPersons;
 
     public StorageRs storeImage(MultipartFile photo) throws IOException {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
@@ -54,35 +61,35 @@ public class UsersService {
             response.setError("Размер файла превышает допустимый размер");
         }
 
-        if (response.getError()== null) {
-        response.setTimestamp(0);
-        dataRs.setBytes(0);
-        dataRs.setCreatedAt(0);
+        if (response.getError() == null) {
+            response.setTimestamp(0);
+            dataRs.setBytes(0);
+            dataRs.setCreatedAt(0);
 
-        BufferedImage bufferedImage = ImageIO.read(photo.getInputStream());
-        File outputfile = new File(newFileName);
-        ImageIO.write(bufferedImage, extention, outputfile);
+            BufferedImage bufferedImage = ImageIO.read(photo.getInputStream());
+            File outputfile = new File(newFileName);
+            ImageIO.write(bufferedImage, extention, outputfile);
 
-        cloudaryService.uploadImage(outputfile);
-        outputfile.delete();
-        String relativePath = cloudaryService.getImage(newFileNameShort);
-        dataRs.setId(String.valueOf(personId));
-        dataRs.setOwnerId(personId);
-        dataRs.setFileName(newFileName);
-        dataRs.setRelativeFilePath(relativePath);
-        dataRs.setFileFormat(photo.getContentType());
-        dataRs.setFileType(extention);
-        response.setData(dataRs);
+            cloudaryService.uploadImage(outputfile);
+            outputfile.delete();
+            String relativePath = cloudaryService.getImage(newFileNameShort);
+            dataRs.setId(String.valueOf(personId));
+            dataRs.setOwnerId(personId);
+            dataRs.setFileName(newFileName);
+            dataRs.setRelativeFilePath(relativePath);
+            dataRs.setFileFormat(photo.getContentType());
+            dataRs.setFileType(extention);
+            response.setData(dataRs);
 
-        person.setPhoto(relativePath);
-        personsRepository.save(person);
-    }
+            person.setPhoto(relativePath);
+            personsRepository.save(person);
+        }
         return response;
     }
 
-    public UserRs editProfile(UserRq userRq){
+    public UserRs editProfile(UserRq userRq) {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
-        UserRs response =new UserRs();
+        UserRs response = new UserRs();
         PersonResponse personResponse = personMapper.toPersonResponse(person);
         if (userRq.getAbout() != null) {
             person.setAbout(userRq.getAbout());
@@ -129,5 +136,27 @@ public class UsersService {
         personsRepository.save(person);
         response.setData(personResponse);
         return response;
+    }
+
+    public CommonResponse<List<PersonResponse>> findPersons(FindPersonRq personRq, int offset, int perPage) throws SQLException, EmptyFieldException {
+        if (personRq.getFirst_name() == null && personRq.getLast_name() == null && personRq.getAge_from() == null
+                && personRq.getAge_to() == null && personRq.getCity() == null && personRq.getCountry() == null) {
+            throw new EmptyFieldException("All fields in query are empty");
+        }
+        return buildCommonResponse(offset, perPage, searchPersons.findPersons(personRq, offset, perPage), searchPersons.getTotal());
+    }
+
+    private CommonResponse<List<PersonResponse>> buildCommonResponse(int offset, int perPAge, List<Person> persons, long total) {
+        return CommonResponse.<List<PersonResponse>>builder()
+                .timestamp(System.currentTimeMillis())
+                .data(personsToResponse(persons))
+                .offset(offset)
+                .perPage(perPAge)
+                .total(total)
+                .build();
+    }
+
+    private List<PersonResponse> personsToResponse(List<Person> persons) {
+        return persons.stream().map(personMapper::toPersonResponse).collect(Collectors.toList());
     }
 }
