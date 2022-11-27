@@ -3,5 +3,3 @@ databaseChangeLog:
       file: db/changelog/liquibase-outputChangeLog_init.yaml
   - include:
       file: db/changelog/liquibase-outputChangeLog_1.yaml
-  - include:
-      file: db/changelog/data.sql

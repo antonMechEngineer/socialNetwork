@@ -83,12 +83,6 @@ public class UsersService {
     public UserRs editProfile(UserRq userRq){
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
         UserRs response =new UserRs();
-//        CityRs cityRs = new CityRs();
-//        CountryRs countryRs = new CountryRs();
-//        cityRs.setId(0);
-//        cityRs.setTitle(userRq.getCity());
-//        countryRs.setId(0);
-//        countryRs.setTitle(userRq.getCountry());
         PersonResponse personResponse = personMapper.toPersonResponse(person);
         if (userRq.getAbout() != null) {
             person.setAbout(userRq.getAbout());
