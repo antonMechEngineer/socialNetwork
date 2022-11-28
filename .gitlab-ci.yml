@@ -4,7 +4,7 @@ stages:
 
 workflow:
   rules:
-    - if: $CI_MERGE_REQUEST_APPROVED
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev" && $CI_MERGE_REQUEST_APPROVED
 
 test-job:
   stage: test
