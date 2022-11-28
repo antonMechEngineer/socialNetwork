@@ -1,5 +1,6 @@
 package main.repository;
 
+import main.model.entities.Captcha;
 import main.model.entities.City;
 import main.model.entities.Friendship;
 import main.model.entities.Person;
@@ -28,4 +29,7 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
     Page<Person> findPageOrderByRegDate(Pageable page);
 
     Person findPersonByFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(String firstName, String lastName);
+
+    @Query(value = "SELECT * FROM persons WHERE is_deleted = true AND deleted_time < (NOW() - INTERVAL '1' minute)", nativeQuery = true)
+    List<Person> findOldDeletes();
 }

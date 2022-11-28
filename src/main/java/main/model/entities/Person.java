@@ -44,10 +44,6 @@ public class Person {
 
     private String country;
 
-//    @ManyToOne
-//    @JoinColumn(name = "city_id")
-//    private City city;
-
     @Column(name = "confirmation_code")
     private Integer confirmationCode;
 

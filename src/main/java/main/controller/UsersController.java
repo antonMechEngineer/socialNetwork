@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import main.api.request.FindPersonRq;
 import main.api.request.PostRequest;
 import main.api.request.UserRq;
-import main.api.response.CommonResponse;
-import main.api.response.PersonResponse;
-import main.api.response.PostResponse;
-import main.api.response.UserRs;
+import main.api.response.*;
 import main.errors.EmptyFieldException;
 import main.errors.PersonNotFoundException;
 import main.service.PersonsService;
@@ -65,8 +62,14 @@ public class UsersController {
     }
 
     @DeleteMapping("/me")
-    ResponseEntity<UserRs> deleteMyData() {
-        return null;
+    ResponseEntity<ResponseRsComplexRs> deleteMyData() {
+        return ResponseEntity
+                .ok(usersService.deleteProfile());
+    }
+    @PostMapping("/me/recover")
+    ResponseEntity<ResponseRsComplexRs> recoverMyData() {
+        return ResponseEntity
+                .ok(usersService.recoverProfile());
     }
 
     @GetMapping("/search")

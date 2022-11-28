@@ -16,6 +16,8 @@ import main.repository.CitiesRepository;
 import main.repository.CountriesRepository;
 import main.repository.PersonsRepository;
 import main.service.search.SearchPersons;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,13 +29,16 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
 @Service
 @AllArgsConstructor
+@EnableScheduling
 public class UsersService {
+    public static final long HOUR_IN_MILLISECONDS = 60_000;
     private final static int MAX_IMAGE_LENTH = 512000;
     private final PersonsRepository personsRepository;
     private final CitiesRepository citiesRepository;
@@ -154,6 +159,53 @@ public class UsersService {
                 .perPage(perPAge)
                 .total(total)
                 .build();
+    }
+    public ResponseRsComplexRs deleteProfile(){
+        Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
+        ResponseRsComplexRs response = new ResponseRsComplexRs();
+        ComplexRs data = new ComplexRs();
+        data.setMessage("OK");
+        data.setId(0);
+        data.setCount(0);
+        data.setMessage_id(0);
+        response.setData(data);
+        response.setTimestamp(0);
+        response.setOffset(0);
+        response.setPerPage(0);
+        response.setError(null);
+        response.setError_description(null);
+
+        person.setIsDeleted(true);
+        person.setDeletedTime(LocalDateTime.now());
+        personsRepository.save(person);
+
+        return response;
+    }
+
+    public ResponseRsComplexRs recoverProfile(){
+        Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
+        ResponseRsComplexRs response = new ResponseRsComplexRs();
+        ComplexRs data = new ComplexRs();
+        data.setMessage("OK");
+        data.setId(0);
+        data.setCount(0);
+        data.setMessage_id(0);
+        response.setData(data);
+        response.setTimestamp(0);
+        response.setOffset(0);
+        response.setPerPage(0);
+        response.setError(null);
+        response.setError_description(null);
+
+        person.setIsDeleted(false);
+        person.setDeletedTime(null);
+        personsRepository.save(person);
+
+        return response;
+    }
+    @Scheduled(fixedRate = HOUR_IN_MILLISECONDS)
+    public void executeOldDeletes() {
+        personsRepository.deleteAll(personsRepository.findOldDeletes());
     }
 
     private List<PersonResponse> personsToResponse(List<Person> persons) {
