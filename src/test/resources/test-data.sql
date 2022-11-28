@@ -63,7 +63,7 @@ VALUES
     ('Gretchn','Contrras','2022-09-29 21:49:07','2000-06-08 10:54:06','rhoncu.nullam@yahoo.edu','+7 (978) 311-43-59','ZvJ57ekY5Tc',32,'senectus et netus et malesuada fames ac turpis egestas. Fusce aliquet magna a neque. Nullam ut'),
     ('Gretc','Contr','2022-09-29 21:49:07','2000-06-08 10:54:06','rhon.nullam@yahoo.edu','+7 (978) 311-43-59','ZvJ57ekY5Tc',32,'senectus et netus et malesuada fames ac turpis egestas. Fusce aliquet magna a neque. Nullam ut'),
     ('Gre','Con','2022-09-29 21:49:07','2000-06-08 10:54:06','rh.nullam@yahoo.edu','+7 (978) 311-43-59','ZvJ57ekY5Tc',32,'senectus et netus et malesuada fames ac turpis egestas. Fusce aliquet magna a neque. Nullam ut'),
-    ('Gr','Co','2022-09-29 21:49:07','2000-06-08 10:54:06','r.nullam@yahoo.edu','+7 (978) 311-43-59','ZvJ57ekY5Tc',32,'senectus et netus et malesuada fames ac turpis egestas. Fusce aliquet magna a neque. Nullam ut');
+    ('Gr','Co','2022-09-29 21:49:07','2000-06-08 10:54:06','r.nullam@yahoo.edu','+7 (978) 311-43-59','ZvJ57ekY5Tc',32,'senectus et netus et malesuada fames ac turpis egestas. Fusce aliquet magna a neque. Nullam ut'),
     ('G','C','2022-09-29 21:49:07','2000-06-08 10:54:06','re.nullam@yahoo.edu','+7 (978) 311-43-59','ZvJ57ekY5Tc',32,'senectus et netus et malesuada fames ac turpis egestas. Fusce aliquet magna a neque. Nullam ut');
 
 INSERT INTO friendship_statuses (time, name, code)
