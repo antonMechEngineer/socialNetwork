@@ -5,16 +5,12 @@ import lombok.AllArgsConstructor;
 import main.api.request.FindPersonRq;
 import main.api.request.UserRq;
 import main.api.response.*;
-import main.api.response.*;
 import main.errors.EmptyFieldException;
 import main.mappers.PersonMapper;
 import main.model.entities.City;
 import main.model.entities.Country;
 import main.model.entities.Person;
-import main.repository.CaptchaRepository;
-import main.repository.CitiesRepository;
-import main.repository.CountriesRepository;
-import main.repository.PersonsRepository;
+import main.repository.*;
 import main.service.search.SearchPersons;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -29,7 +25,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,7 +35,17 @@ import java.util.stream.Collectors;
 public class UsersService {
     public static final long HOUR_IN_MILLISECONDS = 60_000;
     private final static int MAX_IMAGE_LENTH = 512000;
+
+    private final BlockHistoriesRepository blockHistoriesRepository;
+    private final CommentsRepository commentsRepository;
+    private final DialogsRepository dialogsRepository;
+    private final FriendshipsRepository friendshipsRepository;
+    private final LikesRepository likesRepository;
+    private final MessagesRepository messagesRepository;
+    private final NotificationsRepository notificationsRepository;
+    private final PostsRepository postsRepository;
     private final PersonsRepository personsRepository;
+    private final PersonSettingsRepository personSettingsRepository;
     private final CitiesRepository citiesRepository;
     private final CountriesRepository countriesRepository;
     private final CaptchaRepository captchaRepository;
@@ -205,7 +210,23 @@ public class UsersService {
     }
     @Scheduled(fixedRate = HOUR_IN_MILLISECONDS)
     public void executeOldDeletes() {
-        personsRepository.deleteAll(personsRepository.findOldDeletes());
+        List<Long> idToDelete = personsRepository.findIdtoDelete();
+        for(long oldId: idToDelete){
+            blockHistoriesRepository.deleteAll(blockHistoriesRepository.findBHtoDelete(oldId));
+            friendshipsRepository.deleteAll(friendshipsRepository.findFriendsToDelete(oldId));
+            postsRepository.deleteAll(postsRepository.findPostsToDelete(oldId));
+            List<Long> commentsIdToDelete = commentsRepository.findCommentsIdToDelete(oldId);
+            commentsRepository.commentsDelete(oldId);
+            for (long oldCommentId: commentsIdToDelete){
+                commentsRepository.secondaryCommentsDelete(oldCommentId);
+            }
+            personSettingsRepository.persSetDelete(oldId);
+            dialogsRepository.dialogsDelete(oldId);
+            notificationsRepository.notificationDelete(oldId);
+            messagesRepository.messagesDelete(oldId);
+            likesRepository.likeDelete(oldId);
+            personsRepository.deleteAll(personsRepository.findOldDeletes());
+        }
     }
 
     private List<PersonResponse> personsToResponse(List<Person> persons) {

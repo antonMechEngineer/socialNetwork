@@ -30,6 +30,9 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
 
     Person findPersonByFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(String firstName, String lastName);
 
+    @Query(value = "SELECT id FROM persons WHERE is_deleted = true AND deleted_time < (NOW() - INTERVAL '1' minute)", nativeQuery = true)
+    List<Long> findIdtoDelete();
+
     @Query(value = "SELECT * FROM persons WHERE is_deleted = true AND deleted_time < (NOW() - INTERVAL '1' minute)", nativeQuery = true)
     List<Person> findOldDeletes();
 }
