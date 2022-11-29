@@ -3,6 +3,7 @@ package main.controller;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import main.api.request.CommentRequest;
 import main.api.request.PostRequest;
+import main.repository.PersonsRepository;
 import main.service.PersonsService;
 import org.aspectj.weaver.ast.ITestVisitor;
 import org.junit.jupiter.api.Test;
@@ -46,11 +47,13 @@ class FriendsControllerTest {
 
     @Test
     void addFriend() throws Exception {
-         mockMvc.perform(post("/api/v1/friends/2").
+         mockMvc.perform(post("/api/v1/friends/3").
                          contentType(MediaType.APPLICATION_JSON)
                         .headers(buildHeader()))
                  .andDo(print())
                  .andExpect(status().is2xxSuccessful());
+
+
     }
 
     @Test
