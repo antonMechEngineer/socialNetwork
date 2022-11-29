@@ -42,7 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.applyPermitDefaultValues();
-        configuration.setAllowedOrigins(List.of("http://localhost:8080", "http://195.133.48.174:8080", "http://195.133.48.174:8086"));
+        configuration.setAllowedOrigins(List.of("http://localhost:8080", "http://195.133.48.174:8080"));
         configuration.setAllowedMethods(List.of("OPTIONS", "DELETE", "POST", "GET", "PATCH", "PUT"));
         configuration.setExposedHeaders(List.of("Content-Type", "X-Requested-With", "accept", "Origin",
                 "Access-Control-Request-Method", "Access-Control-Request-Headers", "Access-Control-Allow-Origin",
@@ -71,7 +71,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticated()
                 .and()
                 .exceptionHandling()
-                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.FORBIDDEN))
                 .and()
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
     }
