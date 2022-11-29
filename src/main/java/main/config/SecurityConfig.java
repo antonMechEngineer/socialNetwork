@@ -11,14 +11,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
@@ -44,7 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.applyPermitDefaultValues();
-        configuration.setAllowedOrigins(List.of("http://localhost:8080", "http://195.133.48.174:8080"));
+        configuration.setAllowedOrigins(List.of("http://localhost:8080", "http://195.133.48.174:8080", "http://195.133.48.174:8086"));
         configuration.setAllowedMethods(List.of("OPTIONS", "DELETE", "POST", "GET", "PATCH", "PUT"));
         configuration.setExposedHeaders(List.of("Content-Type", "X-Requested-With", "accept", "Origin",
                 "Access-Control-Request-Method", "Access-Control-Request-Headers", "Access-Control-Allow-Origin",
@@ -66,7 +64,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/v1/auth/login", "/api/v1/auth/captcha", "/api/v1/account/register", "/api/v1/account/password/recovery", "/api/v1/account/email/recovery")
+                .antMatchers("/api/v1/auth/login", "/api/v1/auth/captcha", "/api/v1/account/register",
+                        "/api/v1/account/password/recovery", "/api/v1/account/email/recovery", "/api/v1/ws")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

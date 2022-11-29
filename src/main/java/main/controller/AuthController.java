@@ -8,6 +8,7 @@ import main.api.response.ComplexRs;
 import main.api.response.PersonResponse;
 import main.service.AuthService;
 import main.service.CaptchaService;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,8 +25,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public CommonResponse<PersonResponse> login(@RequestBody LoginRq loginRq) {
-        return authService.loginUser(loginRq);
+    public CommonResponse<PersonResponse> login(@RequestBody LoginRq loginRq) throws BadCredentialsException {
+            return authService.loginUser(loginRq);
     }
 
     @PostMapping("/logout")
