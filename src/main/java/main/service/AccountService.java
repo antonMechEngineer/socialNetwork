@@ -47,8 +47,8 @@ public class AccountService {
 
         registerRs.setEmail(regRequest.getEmail());
         registerRs.setData(data);
-
-  //      if (registerRs.getError().equals(null)) {
+System.out.println(registerRs.getError());
+//        if (registerRs.getError()==null) {
             Person person = new Person();
             person.setFirstName(regRequest.getFirstName());
             person.setLastName(regRequest.getLastName());
@@ -62,8 +62,7 @@ public class AccountService {
             person.setEmail(regRequest.getEmail());
             person.setMessagePermission(MessagePermissionTypes.ALL);
             personsRepository.save(person);
-   //     }
-
+//        }
         return registerRs;
     }
 }

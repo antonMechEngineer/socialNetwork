@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public interface FriendMapper {
 
-    @Mapping(target = "city", source = "person.city.title")
-    @Mapping(target = "country", source = "person.city.country.title")
+    @Mapping(target = "city", source = "person.city.")
+    @Mapping(target = "country", source = "person.country.")
     @Mapping(target = "weather", source = "person")
     @Mapping(target = "currency", source = "person")
     @Mapping(target = "friendStatus", source = "friendshipStatusTypes")
@@ -27,7 +27,7 @@ public interface FriendMapper {
         return WeatherRs.builder()
                 .clouds("clouds")
                 .temp("9")
-                .city(person.getCity() == null ? null : person.getCity().getTitle())
+                .city(person.getCity() == null ? null : person.getCity())
                 .build();
     }
 

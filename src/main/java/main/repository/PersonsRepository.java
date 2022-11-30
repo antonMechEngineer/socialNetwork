@@ -21,6 +21,7 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
 
     Optional<Person> findPersonByEmail(String email);
 
+    Page<Person> findAllByCity(String city, Pageable page);
     Page<Person> findPersonBySrcFriendshipsIn(List<Person> friendlyPersons, Pageable pageable);
 
     Page<Person> findAllByCity(City city, Pageable page);
@@ -28,4 +29,6 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
     @Query("FROM Person AS p " +
             "ORDER BY p.regDate DESC")
     Page<Person> findPageOrderByRegDate(Pageable page);
+
+    Person findPersonByFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(String firstName, String lastName);
 }

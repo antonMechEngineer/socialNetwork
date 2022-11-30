@@ -1,0 +1,36 @@
+databaseChangeLog:
+- changeSet:
+    id: sprint-2-1
+    author: rialex
+    changes:
+        - dropColumn:
+            - tableName: cities
+            - column:
+                name: country_id
+            - column:
+                name: clouds
+            - column:
+                name: temp
+
+- changeSet:
+    id: sprint-2-2
+    author: rialex
+    changes:
+        - dropColumn:
+            - tableName: persons
+            - column:
+                name: city_id
+
+- changeSet:
+    id: sprint-2-3
+    author: rialex
+    changes:
+        - addColumn:
+            - tableName: persons
+            - columns:
+                - column:
+                    name: city
+                    type: VARCHAR(255)
+                - column:
+                    name: country
+                    type: VARCHAR(255)
