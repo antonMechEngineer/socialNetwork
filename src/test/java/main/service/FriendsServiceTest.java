@@ -95,6 +95,7 @@ class FriendsServiceTest {
         buildReceivedRequestObjects();
         buildRequestReceivedObjects();
         buildMockRepos();
+        buildMockAnswers();
         // TODO: 29.11.2022 создать свои листы репозитории, которые связать с моковыми действиями в реальных репозиториях
     }
 
@@ -128,48 +129,49 @@ class FriendsServiceTest {
         fsPtntlFr = new Friendship(6L, TIME, potentialFriend, currentPerson, fsStatusFtrFr);
     }
 
-    @Test
-    void addFriend() {
+    void buildMockAnswers(){
+        when(personsRepository.findPersonByEmail(EMAIL_CURRENT_PERSON)).thenReturn(Optional.ofNullable(currentPerson));
         when(personsRepository.findPersonById(ID_CURRENT_PERSON)).thenReturn(Optional.ofNullable(currentPerson));
         when(personsRepository.findPersonById(ID_FUTURE_FRIEND)).thenReturn(Optional.ofNullable(futureFriend));
+        when(personsRepository.findPersonById(ID_FRIEND)).thenReturn(Optional.ofNullable(currFriend));
+        when(personsRepository.findPersonById(ID_POTENTIAL_FRIEND)).thenReturn(Optional.ofNullable(potentialFriend));
+        when(personsRepository.findPersonById(ID_UNKNOWN_PERSON)).thenReturn(Optional.ofNullable(unknownPerson));
+
         when(friendshipsRepository.findFriendshipBySrcPerson(currentPerson)).thenReturn(List.of(fsCurPsFtrFr));
         when(friendshipsRepository.findFriendshipBySrcPerson(futureFriend)).thenReturn(List.of(fsFtrFr));
+        when(friendshipsRepository.findFriendshipBySrcPerson(currFriend)).thenReturn(List.of(fsFr));
+        when(friendshipsRepository.findFriendshipBySrcPerson(potentialFriend)).thenReturn(List.of(fsPtntlFr));
 
+        when(friendshipsRepository.delete(fsFr)).thenAnswer(mockFriendshipRepo.remove(fsFr)); //не понятно как мокнуть без возврата см. др. тестовые классы, в дипломе я подобное делал
+    }
+
+    // TODO: 30.11.2022 проверить вызывается ли метод save, возможно ли объявлять метод when который будет вызываться одинаково в рамках всего класса
+    @Test
+    void addFriend() {
         friendsService.addFriend(TOKEN, ID_FUTURE_FRIEND);
-
-        assertEquals(currentPersonFs.getFriendshipStatus().getCode(), FriendshipStatusTypes.FRIEND);
-        assertEquals(friendPersonFs.getFriendshipStatus().getCode(), FriendshipStatusTypes.FRIEND);
+        assertEquals(FRIEND, fsCurPsFr.getFriendshipStatus().getCode());
+        assertEquals(FRIEND, fsCurPsFtrFr.getFriendshipStatus().getCode());
     }
 
     @Test
     void sendFriendshipRequest() {
         friendsService.sendFriendshipRequest(TOKEN, ID_POTENTIAL_FRIEND);
-        Person currentPerson = personsRepository.findPersonById(ID_CURRENT_PERSON).orElseThrow();
-        Person potentialFriend = personsRepository.findPersonById(ID_DELETABLE_FRIEND).orElseThrow();
-        Friendship currentPersonFs = friendshipsRepository.findFriendshipBySrcPerson(currentPerson).stream().
-                filter(fs -> fs.getDstPerson() == potentialFriend).collect(Collectors.toList()).get(0);
-        Friendship dstPersonFs = friendshipsRepository.findFriendshipBySrcPerson(potentialFriend).stream().
-                filter(fs -> fs.getDstPerson() == currentPerson).collect(Collectors.toList()).get(0);
-
-        // assertEquals(currentPersonFs.getFriendshipStatus().getCode(), FriendshipStatusTypes.REQUEST);
-        // assertEquals(dstPersonFs.getFriendshipStatus().getCode(), FriendshipStatusTypes.RECEIVED_REQUEST);
+        //mockFriendshipRepo.save д.б
+        // assertEquals(REQUEST, currentPersonFs.getFriendshipStatus().getCode());
+        // assertEquals(RECEIVED_REQUEST, dstPersonFs.getFriendshipStatus().getCode());
     }
 
     @Test
     void deleteFriend() {
-        friendsService.deleteFriend(TOKEN, ID_DELETABLE_FRIEND);
-        Person currentPerson = personsRepository.findPersonById(ID_CURRENT_PERSON).orElseThrow();
-        Person deletablePerson = personsRepository.findPersonById(ID_DELETABLE_FRIEND).orElseThrow();
-        Boolean isContainDeletablePerson = currentPerson.getDstFriendships().contains(deletablePerson);
+        friendsService.deleteFriend(TOKEN, ID_FRIEND);
+        //проверить вызываются ли методы delete
         //assertEquals(false, isContainDeletablePerson)
     }
 
     @Test
     void deleteSentFriendshipRequest() {
-        friendsService.deleteSentFriendshipRequest(TOKEN, ID_EX_POTENTIAL_FRIEND);
-        Person currentPerson = personsRepository.findPersonById(ID_CURRENT_PERSON).orElseThrow();
-        Person exPotentialFriend = personsRepository.findPersonById(ID_EX_POTENTIAL_FRIEND).orElseThrow();
-        Boolean isContainExPotentialPerson = currentPerson.getDstFriendships().contains(exPotentialFriend);
+        friendsService.deleteSentFriendshipRequest(TOKEN, ID_POTENTIAL_FRIEND);
+        //проверить вызываются ли методы delete
         //assertEquals(false, isContainExPotentialPerson)
     }
 
@@ -177,7 +179,6 @@ class FriendsServiceTest {
     void getFriends() {
         Person srcPerson = friendsService.getSrcPersonByToken(TOKEN);
         CommonResponse<List<PersonResponse>> resFriends = friendsService.getFriends(TOKEN);
-        List<PersonResponse> actualFriendsDto = resFriends.getData();
         List<Person> personsEntity = personsRepository.findAll();
         List<PersonResponse> expectedFriendsDto = new ArrayList<>();
         for (Person person : personsEntity) {
@@ -194,8 +195,6 @@ class FriendsServiceTest {
 
     @Test
     void getSrcPersonByToken() {
-        when(personsRepository.findPersonByEmail(EMAIL_CURRENT_PERSON)).thenReturn(Optional.of(currentPerson));
-        when(personsRepository.findPersonById(ID_CURRENT_PERSON)).thenReturn(Optional.of(currentPerson));
         Person srcPerson = friendsService.getSrcPersonByToken(TOKEN);
         Person expectedPerson = personsRepository.findPersonById(ID_CURRENT_PERSON).orElseThrow();
         assertEquals(expectedPerson, srcPerson);
@@ -203,15 +202,8 @@ class FriendsServiceTest {
 
     @Test
     void getStatusTwoPersons() {
-        when(personsRepository.findPersonById(ID_CURRENT_PERSON)).thenReturn(Optional.of(currentPerson));
-        when(personsRepository.findPersonById(ID_DELETABLE_FRIEND)).thenReturn(Optional.of(deletableFriend));
-
-        FriendshipStatus mockFriendshipStatus = new FriendshipStatus(
-                1L, LocalDateTime.now(), FriendshipStatusTypes.FRIEND.toString(), FriendshipStatusTypes.FRIEND);
-        Friendship mockFriendship = new Friendship(1L, LocalDateTime.now(),currentPerson, deletableFriend, mockFriendshipStatus);
-        when(friendshipsRepository.findFriendshipBySrcPerson(currentPerson)).thenReturn(List.of(mockFriendship));
-        FriendshipStatusTypes actualFriendshipStatusTypes = friendsService.getStatusTwoPersons(currentPerson, deletableFriend);
-        assertEquals(FriendshipStatusTypes.FRIEND, actualFriendshipStatusTypes);
+        FriendshipStatusTypes actualFriendshipStatusTypes = friendsService.getStatusTwoPersons(currentPerson, currFriend);
+        assertEquals(FRIEND, actualFriendshipStatusTypes);
 
     }
 }
