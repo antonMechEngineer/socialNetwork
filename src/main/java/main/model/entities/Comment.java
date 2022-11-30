@@ -2,6 +2,10 @@ package main.model.entities;
 
 import lombok.Data;
 import main.model.enums.LikeTypes;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -28,7 +32,7 @@ public class Comment implements Liked {
     @JoinColumn(name = "parent_id")
     private Comment parentComment;
 
-    @OneToMany(mappedBy = "parentComment")
+    @OneToMany(mappedBy = "parentComment",cascade = CascadeType.ALL)
     private List<Comment> embeddedComments = new ArrayList<>();
 
     @ManyToOne
