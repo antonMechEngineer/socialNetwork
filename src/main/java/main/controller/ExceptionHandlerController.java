@@ -7,6 +7,7 @@ import main.errors.*;
 import main.model.entities.Post;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -34,8 +35,8 @@ public class ExceptionHandlerController {
 
     @ExceptionHandler(BadAuthorizationException.class)
     public ResponseEntity<CommonResponse<PersonResponse>> handleBadAuthorizationException(Exception e) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(CommonResponse.<PersonResponse>builder()
-                .error(BadAuthorizationException.class.getName())
+        return ResponseEntity.status(401).body(CommonResponse.<PersonResponse>builder()
+                .error("error")
                 .timestamp(System.currentTimeMillis())
                 .errorDescription(e.getMessage())
                 .build());
@@ -47,6 +48,15 @@ public class ExceptionHandlerController {
                 .error(EmptyFieldException.class.getSimpleName())
                 .timestamp(System.currentTimeMillis())
                 .errorDescription(e.getLocalizedMessage())
+                .build());
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<CommonResponse> handleBadCredentialsException(Exception e) {
+        return ResponseEntity.status(400).body(CommonResponse.builder()
+                .error("error")
+                .timestamp((System.currentTimeMillis()))
+                .errorDescription(e.getMessage())
                 .build());
     }
 }

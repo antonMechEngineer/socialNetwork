@@ -5,10 +5,15 @@ import lombok.AllArgsConstructor;
 import main.api.request.FindPersonRq;
 import main.api.request.UserRq;
 import main.api.response.*;
+import main.api.response.*;
 import main.errors.EmptyFieldException;
 import main.mappers.PersonMapper;
+import main.model.entities.City;
+import main.model.entities.Country;
 import main.model.entities.Person;
 import main.repository.CaptchaRepository;
+import main.repository.CitiesRepository;
+import main.repository.CountriesRepository;
 import main.repository.PersonsRepository;
 import main.service.search.SearchPersons;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,6 +36,8 @@ import java.util.stream.Collectors;
 public class UsersService {
     private final static int MAX_IMAGE_LENTH = 512000;
     private final PersonsRepository personsRepository;
+    private final CitiesRepository citiesRepository;
+    private final CountriesRepository countriesRepository;
     private final CaptchaRepository captchaRepository;
     private final CloudaryService cloudaryService;
     private final PersonMapper personMapper;
@@ -92,10 +99,22 @@ public class UsersService {
             personResponse.setBirthDate(LocalDateTime.from(OffsetDateTime.parse(userRq.getBirth_date())));
         }
         if (userRq.getCity() != null) {
-            //     person.setCity(userRq.getCity());
+            person.setCity(userRq.getCity());
+            personResponse.setCity(userRq.getCity());
+            if (!citiesRepository.existsCityByTitle(userRq.getCity())) {
+                City city = new City();
+                city.setTitle(userRq.getCity());
+                citiesRepository.save(city);
+            }
         }
         if (userRq.getCountry() != null) {
-            //     person.setCountry(userRq.getCountry());
+            person.setCountry(userRq.getCountry());
+            personResponse.setCountry(userRq.getCountry());
+            if (!countriesRepository.existsCountryByTitle(userRq.getCountry())){
+                Country country = new Country();
+                country.setTitle(userRq.getCountry());
+                countriesRepository.save(country);
+            }
         }
         if (userRq.getFirst_name() != null) {
             person.setFirstName(userRq.getFirst_name());

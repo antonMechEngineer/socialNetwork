@@ -11,8 +11,8 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface PersonMapper {
 
-    @Mapping(target = "city", source = "city.title")
-    @Mapping(target = "country", source = "city.country.title")
+    @Mapping(target = "city", source = "person.city")
+    @Mapping(target = "country", source = "person.country")
     @Mapping(target = "weather", source = "person")
     @Mapping(target = "currency", source = "person")
     @Mapping(target = "friendStatus", source = "person")
@@ -24,7 +24,7 @@ public interface PersonMapper {
         return WeatherRs.builder()
                 .clouds("clouds")
                 .temp("9")
-                .city(person.getCity() == null ? null : person.getCity().getTitle())
+                .city(person.getCity() == null ? null : person.getCity())
                 .build();
     }
 
