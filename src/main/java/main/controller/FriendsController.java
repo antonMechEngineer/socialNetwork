@@ -35,27 +35,10 @@ public class FriendsController {
         return friendsService.deleteFriend(token, id);
     }
 
-    @GetMapping()
-    @ResponseBody
-    public CommonResponse<List<PersonResponse>> getFriends(
-            @RequestHeader("Authorization") String token)
-
-    {
-        return friendsService.getFriends(token);
-    }
-
     @PostMapping("/request/{id}")
     public FriendshipRs sendFriendshipRequest(@RequestHeader("Authorization") String token,
                                               @PathVariable Long id) {
         return friendsService.addFriend(token, id);
-    }
-
-    @GetMapping("/request")
-    @ResponseBody
-    public CommonResponse<List<PersonResponse>> getPotentialFriends(
-            @RequestHeader("Authorization") String token)
-    {
-        return friendsService.getRequestedPersons(token);
     }
 
     @DeleteMapping("request/{id}")
@@ -63,6 +46,29 @@ public class FriendsController {
                                                      @PathVariable Long id) {
         return friendsService.deleteSentFriendshipRequest(token, id);
     }
+
+    @GetMapping()
+    @ResponseBody
+    public CommonResponse<List<PersonResponse>> getFriends(
+            @RequestHeader("Authorization") String token,
+            @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
+            @RequestParam(name = "perPage", required = false, defaultValue = "${socialNetwork.default.size}") int size
+    )
+    {
+        return friendsService.getFriends(token, offset, size);
+    }
+
+    @GetMapping("/request")
+    @ResponseBody
+    public CommonResponse<List<PersonResponse>> getPotentialFriends(
+            @RequestHeader("Authorization") String token,
+            @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
+            @RequestParam(name = "perPage", required = false, defaultValue = "${socialNetwork.default.size}") int size
+    )
+    {
+        return friendsService.getRequestedPersons(token, offset, size);
+    }
+
 
 
 

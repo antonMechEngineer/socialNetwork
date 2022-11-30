@@ -142,7 +142,7 @@ class FriendsServiceTest {
         when(friendshipsRepository.findFriendshipBySrcPerson(currFriend)).thenReturn(List.of(fsFr));
         when(friendshipsRepository.findFriendshipBySrcPerson(potentialFriend)).thenReturn(List.of(fsPtntlFr));
 
-        when(friendshipsRepository.delete(fsFr)).thenAnswer(mockFriendshipRepo.remove(fsFr)); //не понятно как мокнуть без возврата см. др. тестовые классы, в дипломе я подобное делал
+        //when(friendshipsRepository.delete(fsFr)).thenAnswer(mockFriendshipRepo.remove(fsFr)); //не понятно как мокнуть без возврата см. др. тестовые классы, в дипломе я подобное делал
     }
 
     // TODO: 30.11.2022 проверить вызывается ли метод save, возможно ли объявлять метод when который будет вызываться одинаково в рамках всего класса

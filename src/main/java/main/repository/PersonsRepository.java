@@ -21,6 +21,8 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
 
     Optional<Person> findPersonByEmail(String email);
 
+    Page<Person> findPersonBySrcFriendshipsIn(List<Person> friendlyPersons, Pageable pageable);
+
     Page<Person> findAllByCity(City city, Pageable page);
 
     @Query("FROM Person AS p " +
