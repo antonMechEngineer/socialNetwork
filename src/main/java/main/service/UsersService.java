@@ -1,7 +1,7 @@
 package main.service;
 
-import lombok.AllArgsConstructor;
 
+import lombok.RequiredArgsConstructor;
 import main.api.request.FindPersonRq;
 import main.api.request.UserRq;
 import main.api.response.*;
@@ -12,6 +12,7 @@ import main.model.entities.Country;
 import main.model.entities.Person;
 import main.repository.*;
 import main.service.search.SearchPersons;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,11 +31,12 @@ import java.util.stream.Collectors;
 
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 @EnableScheduling
 public class UsersService {
-    public static final long HOUR_IN_MILLISECONDS = 60_000;
     private final static int MAX_IMAGE_LENTH = 512000;
+    @Value("${user.time-to-delete}")
+    long timeToDel;
 
     private final BlockHistoriesRepository blockHistoriesRepository;
     private final CommentsRepository commentsRepository;
@@ -208,9 +210,9 @@ public class UsersService {
 
         return response;
     }
-    @Scheduled(fixedRate = HOUR_IN_MILLISECONDS)
+    @Scheduled(fixedRateString = "${user.time-to-delete}")
     public void executeOldDeletes() {
-        List<Long> idToDelete = personsRepository.findIdtoDelete();
+        List<Long> idToDelete = personsRepository.findIdtoDelete(timeToDel);
         for(long oldId: idToDelete){
             blockHistoriesRepository.deleteAll(blockHistoriesRepository.findBHtoDelete(oldId));
             friendshipsRepository.deleteAll(friendshipsRepository.findFriendsToDelete(oldId));
@@ -225,7 +227,7 @@ public class UsersService {
             notificationsRepository.notificationDelete(oldId);
             messagesRepository.messagesDelete(oldId);
             likesRepository.likeDelete(oldId);
-            personsRepository.deleteAll(personsRepository.findOldDeletes());
+            personsRepository.deleteAll(personsRepository.findOldDeletes(timeToDel));
         }
     }
 

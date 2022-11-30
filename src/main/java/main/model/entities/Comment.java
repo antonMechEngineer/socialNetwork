@@ -33,8 +33,6 @@ public class Comment implements Liked {
     private Comment parentComment;
 
     @OneToMany(mappedBy = "parentComment",cascade = CascadeType.ALL)
-    @LazyCollection(LazyCollectionOption.FALSE)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Comment> embeddedComments = new ArrayList<>();
 
     @ManyToOne
