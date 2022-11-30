@@ -16,7 +16,7 @@ import java.util.StringJoiner;
 public class SearchPosts {
     private final PostsRepository postsRepository;
     private final CommonSearchMethods commonSearchMethods;
-    private Long total;
+    private long total;
 
     public List<Post> findPosts(FindPostRq postRq, int offset, int perPage) throws SQLException {
         Person person = null;
@@ -37,7 +37,7 @@ public class SearchPosts {
                 (postRq.getAuthor() != null ? " AND p.author_id = " + (person == null ? null : person.getId()) : "") +
                 (postRq.getTags() != null ? " AND t.tag IN (" + tags + ") GROUP BY p.id HAVING COUNT(p2t.tag_id) = " + postRq.getTags().size() : ""));
         List<Long> postsId = commonSearchMethods.getIdsFromResultSet(posts);
-        total = (long) postsId.size();
+        total = postsId.size();
         commonSearchMethods.closeStatementAndConnection();
         posts.close();
         return commonSearchMethods.getPageFromList(postsRepository.findAllById(postsId), offset, perPage);

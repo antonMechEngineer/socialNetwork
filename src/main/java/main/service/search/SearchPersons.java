@@ -17,7 +17,7 @@ public class SearchPersons {
 
     private final CommonSearchMethods commonSearchMethods;
     private final PersonsRepository personsRepository;
-    private Long total;
+    private long total;
 
     public List<Person> findPersons(FindPersonRq personRq, int offset, int perPage) throws SQLException {
         if (personRq.getFirst_name() != null && personRq.getLast_name() == null && personRq.getCity() == null &&
@@ -42,7 +42,7 @@ public class SearchPersons {
                         && personRq.getCountry() != null ? " AND" : "") +
                 (personRq.getCountry() != null ? " c2.title ~* '" + personRq.getCountry() + "'" : ""));
         List<Long> personsId = commonSearchMethods.getIdsFromResultSet(persons);
-        total = (long) personsId.size();
+        total = personsId.size();
         commonSearchMethods.closeStatementAndConnection();
         persons.close();
         return commonSearchMethods.getPageFromList(personsRepository.findAllById(personsId), offset, perPage);
