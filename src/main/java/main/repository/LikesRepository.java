@@ -1,9 +1,8 @@
 package main.repository;
 
 import main.model.entities.Like;
-import main.model.entities.Liked;
 import main.model.entities.Person;
-import main.model.entities.Post;
+import main.model.entities.interfaces.Liked;
 import main.model.enums.LikeTypes;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

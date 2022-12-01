@@ -11,6 +11,8 @@ import main.mappers.PostMapper;
 import main.model.entities.Person;
 import main.model.entities.Post;
 import main.model.entities.Tag;
+import main.model.enums.FriendshipStatusTypes;
+import main.repository.FriendshipsRepository;
 import main.repository.PersonsRepository;
 import main.repository.PostsRepository;
 import main.service.search.SearchPosts;
@@ -33,7 +35,9 @@ public class PostsService {
 
     private final PostsRepository postsRepository;
     private final PersonsRepository personsRepository;
+    private final FriendshipsRepository friendshipsRepository;
     private final TagsService tagsService;
+    private final NotificationsService notificationsService;
     private final PostMapper postMapper;
     private final SearchPosts searchPosts;
 
@@ -45,6 +49,7 @@ public class PostsService {
         LocalDateTime postPublishingTime = timestamp == null ? LocalDateTime.now() : new Timestamp(timestamp).toLocalDateTime();
         Post post = postMapper.postRequestToNewPost(postRequest, person, postPublishingTime);
         PostResponse postResponse = postMapper.postToResponse(postsRepository.save(updateTagsInPost(new ArrayList<>(post.getTags()), post)));
+        createNotifications(post, person);
         return buildCommonResponse(postResponse);
     }
 
@@ -135,5 +140,19 @@ public class PostsService {
                 .timestamp(System.currentTimeMillis())
                 .data(postResponse)
                 .build();
+    }
+
+    private void createNotifications(Post post, Person person) {
+        friendshipsRepository.findFriendshipsByDstPerson(person).forEach(friendship -> {
+            if (friendship.getFriendshipStatus().getCode().equals(FriendshipStatusTypes.FRIEND) ||
+                    friendship.getFriendshipStatus().getCode().equals(FriendshipStatusTypes.SUBSCRIBED)) {
+                notificationsService.createNotification(post, friendship.getSrcPerson());
+            }
+        });
+        friendshipsRepository.findFriendshipBySrcPerson(person).forEach(friendship -> {
+            if (friendship.getFriendshipStatus().getCode().equals(FriendshipStatusTypes.FRIEND)) {
+                notificationsService.createNotification(post, friendship.getDstPerson());
+            }
+        });
     }
 }

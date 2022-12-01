@@ -5,14 +5,13 @@ import main.api.request.LikeRequest;
 import main.api.response.CommonResponse;
 import main.api.response.LikeResponse;
 import main.model.entities.Like;
-import main.model.entities.Liked;
+import main.model.entities.interfaces.Liked;
 import main.model.entities.Person;
 import main.repository.CommentsRepository;
 import main.repository.LikesRepository;
 import main.repository.PostsRepository;
 import org.mapstruct.Named;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;

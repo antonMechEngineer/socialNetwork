@@ -1,11 +1,10 @@
 package main.model.entities;
 
 import lombok.Data;
+import main.model.entities.interfaces.Liked;
+import main.model.entities.interfaces.Notificationed;
 import main.model.enums.LikeTypes;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import main.model.enums.NotificationTypes;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -15,7 +14,7 @@ import java.util.List;
 @Entity
 @Data
 @Table(name = "post_comments")
-public class Comment implements Liked {
+public class Comment implements Liked, Notificationed {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,6 +50,11 @@ public class Comment implements Liked {
     @Override
     public LikeTypes getType() {
         return LikeTypes.COMMENT;
+    }
+
+    @Override
+    public NotificationTypes getNotificationType() {
+        return post == null ? NotificationTypes.COMMENT_COMMENT : NotificationTypes.POST_COMMENT;
     }
 
     @Override
