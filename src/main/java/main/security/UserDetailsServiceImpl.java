@@ -3,6 +3,7 @@ package main.security;
 import lombok.RequiredArgsConstructor;
 import main.model.entities.Person;
 import main.repository.PersonsRepository;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,6 +17,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Person person = personsRepository.findPersonByEmail(email).orElseThrow();
-        return new UserDetailsImpl(person);
+//        return new UserDetailsImpl(person);
+        return User.builder()
+                .username(person.getEmail())
+                .password(person.getPassword())
+                .roles("BUTLER")
+                .build();
     }
 }

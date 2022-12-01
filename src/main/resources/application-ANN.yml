@@ -23,7 +23,7 @@ auth:
 socialNetwork:
   default:
     page: 0
-    size: 20
+    size: 5
 
 logging:
   file:

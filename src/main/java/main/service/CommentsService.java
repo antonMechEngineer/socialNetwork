@@ -27,6 +27,7 @@ public class CommentsService {
 
     private final CommentsRepository commentRepository;
     private final PersonsService personsService;
+    private final NotificationsService notificationsService;
     private final CommentMapper commentMapper;
 
     public CommonResponse<CommentResponse> createComment(Post post, CommentRequest commentRequest) {
@@ -34,6 +35,8 @@ public class CommentsService {
         Comment parentComment = getCommentById(commentRequest.getParentId());
         post = parentComment == null ? post : null;
         Comment comment = commentMapper.commentRequestToNewComment(commentRequest, post, person, parentComment);
+        notificationsService.createNotification(commentRepository.save(comment),
+                post != null ? post.getAuthor() : parentComment.getAuthor());
         return buildCommonResponse(comment);
     }
 
@@ -49,7 +52,7 @@ public class CommentsService {
             comment.setCommentText(commentRequest.getCommentText());
             comment.setTime(LocalDateTime.now());
         }
-        return buildCommonResponse(comment);
+        return buildCommonResponse(commentRepository.save(comment));
     }
 
     public CommonResponse<CommentResponse> changeCommentDeleteStatus(long commentId, boolean status) {
@@ -57,7 +60,7 @@ public class CommentsService {
         if (personsService.validatePerson(comment.getAuthor())) {
             comment.setIsDeleted(status);
         }
-        return buildCommonResponse(comment);
+        return buildCommonResponse(commentRepository.save(comment));
     }
 
     private CommentResponse getCommentResponse(Comment comment) {
@@ -90,7 +93,7 @@ public class CommentsService {
     private CommonResponse<CommentResponse> buildCommonResponse(Comment comment) {
         return CommonResponse.<CommentResponse>builder()
                 .timestamp(System.currentTimeMillis())
-                .data(getCommentResponse(commentRepository.save(comment)))
+                .data(getCommentResponse(comment))
                 .build();
     }
 
