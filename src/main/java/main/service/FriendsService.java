@@ -137,7 +137,6 @@ public class FriendsService {
         List<Person> friendlyPersons = srcPersonFriendships.stream().map(Friendship::getDstPerson).collect(Collectors.toList());
         Page<Person> persons = personsRepository.findPersonBySrcFriendshipsIn(friendlyPersons, pageable);
         return persons;
-
     }
 
     private void modifyFriendShipStatus(Person srcPerson, Person dstPerson) {
