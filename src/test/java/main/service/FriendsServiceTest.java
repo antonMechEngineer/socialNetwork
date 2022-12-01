@@ -10,19 +10,22 @@ import main.model.entities.Person;
 import main.model.enums.FriendshipStatusTypes;
 import main.repository.FriendshipsRepository;
 import main.repository.PersonsRepository;
+import org.hibernate.engine.jdbc.Size;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -75,6 +78,9 @@ class FriendsServiceTest {
     private ArrayList<Friendship> mockFriendshipRepo;
     private ArrayList<FriendshipStatus> mockFriendshipStatusRepo;
 
+    private List<Person> friendlyPersons;
+    private Page<Person> pageFriendlyPerson;
+
     private final static String TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyaG9uY3VzLm51bGxhbUB5YWhvby5lZHUiLCJpYXQiOjE2Njg4NDk3MTAsImV4cCI6MTY3OTY0OTcxMH0.vZ3y_zEilhMJYyGjlezHeh_olbdiWuIRU5-VTq8V974";
     private final static String EMAIL_CURRENT_PERSON = "rhoncus.nullam@yahoo.edu";
     private final static Long ID_CURRENT_PERSON = Long.valueOf(1);
@@ -83,6 +89,11 @@ class FriendsServiceTest {
     private final static Long ID_POTENTIAL_FRIEND = Long.valueOf(4);
     private final static Long ID_UNKNOWN_PERSON = Long.valueOf(5);
     private static final LocalDateTime TIME = LocalDateTime.now();
+    private static final Integer OFFSET = 0;
+    private static final Integer SIZE = 5;
+    private static final Integer NUMBER_FRIENDS = 1;
+    private static final Integer NUMBER_REQUESTED_PERSON = 1;
+    private static final Pageable PAGEABLE = PageRequest.of(OFFSET, SIZE);
 
     @BeforeEach
     void setUp() {
@@ -91,6 +102,8 @@ class FriendsServiceTest {
         futureFriend = new Person(ID_FUTURE_FRIEND);
         potentialFriend = new Person(ID_POTENTIAL_FRIEND);
         unknownPerson = new Person(ID_UNKNOWN_PERSON);
+        friendlyPersons.add(currFriend);
+        pageFriendlyPerson = new PageImpl<>(friendlyPersons, PAGEABLE, friendlyPersons.size());
         buildFriendObjects();
         buildReceivedRequestObjects();
         buildRequestReceivedObjects();
@@ -136,12 +149,14 @@ class FriendsServiceTest {
         when(personsRepository.findPersonById(ID_FRIEND)).thenReturn(Optional.ofNullable(currFriend));
         when(personsRepository.findPersonById(ID_POTENTIAL_FRIEND)).thenReturn(Optional.ofNullable(potentialFriend));
         when(personsRepository.findPersonById(ID_UNKNOWN_PERSON)).thenReturn(Optional.ofNullable(unknownPerson));
+        when(personsRepository.findPersonBySrcFriendshipsIn(friendlyPersons, PAGEABLE)).thenReturn(pageFriendlyPerson);
 
         when(friendshipsRepository.findFriendshipBySrcPerson(currentPerson)).thenReturn(List.of(fsCurPsFtrFr));
         when(friendshipsRepository.findFriendshipBySrcPerson(futureFriend)).thenReturn(List.of(fsFtrFr));
         when(friendshipsRepository.findFriendshipBySrcPerson(currFriend)).thenReturn(List.of(fsFr));
         when(friendshipsRepository.findFriendshipBySrcPerson(potentialFriend)).thenReturn(List.of(fsPtntlFr));
 
+        when(friendMapper)
         //when(friendshipsRepository.delete(fsFr)).thenAnswer(mockFriendshipRepo.remove(fsFr)); //не понятно как мокнуть без возврата см. др. тестовые классы, в дипломе я подобное делал
     }
 
@@ -177,20 +192,14 @@ class FriendsServiceTest {
 
     @Test
     void getFriends() {
-        Person srcPerson = friendsService.getSrcPersonByToken(TOKEN);
-        CommonResponse<List<PersonResponse>> resFriends = friendsService.getFriends(TOKEN);
-        List<Person> personsEntity = personsRepository.findAll();
-        List<PersonResponse> expectedFriendsDto = new ArrayList<>();
-        for (Person person : personsEntity) {
-            expectedFriendsDto.add(friendMapper.toFriendResponse(person, friendsService.getStatusTwoPersons(person, srcPerson)));
-        }
-        //assertEquals(expectedFriendsDto, actualFriendsDto)
+        CommonResponse<List<PersonResponse>> resFriends = friendsService.getFriends(TOKEN, OFFSET, SIZE);
+        assertEquals(NUMBER_FRIENDS, resFriends.getData().size());
     }
 
     @Test
     void getRequestedPersons() {
-        CommonResponse<List<PersonResponse>> resRequestedPersons = friendsService.getFriends(TOKEN);
-        //схема такая же как и в getFriends
+        CommonResponse<List<PersonResponse>> resRequestedPersons = friendsService.getRequestedPersons(TOKEN, OFFSET, SIZE);
+        assertEquals(NUMBER_REQUESTED_PERSON, resRequestedPersons.getData().size());
     }
 
     @Test

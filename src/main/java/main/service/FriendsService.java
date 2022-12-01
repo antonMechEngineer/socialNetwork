@@ -15,12 +15,9 @@ import main.repository.FriendshipsRepository;
 import main.repository.PersonsRepository;
 import main.security.jwt.JWTUtil;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import javax.persistence.criteria.CriteriaBuilder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,8 +84,7 @@ public class FriendsService {
     public CommonResponse<List<PersonResponse>> getFriends(String token, Integer offset, Integer size) {
         Person srcPerson = getSrcPersonByToken(token);
         Page<Person> requestedPersons = getPersons(srcPerson, offset, size, FriendshipStatusTypes.FRIEND);
-        CommonResponse<List<PersonResponse>> commonResponse = buildCommonResponse(requestedPersons, srcPerson, offset);
-        return commonResponse;
+        return buildCommonResponse(requestedPersons, srcPerson, offset);
     }
 
     public CommonResponse<List<PersonResponse>> getRequestedPersons(String token, Integer offset, Integer size) {
