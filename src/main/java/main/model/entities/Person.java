@@ -3,6 +3,11 @@ package main.model.entities;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import main.model.enums.MessagePermissionTypes;
+import main.model.enums.ReadStatusTypes;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -46,10 +51,6 @@ public class Person {
 
     private String country;
 
-//    @ManyToOne
-//    @JoinColumn(name = "city_id")
-//    private City city;
-
     @Column(name = "confirmation_code")
     private Integer confirmationCode;
 
@@ -83,37 +84,53 @@ public class Person {
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "friendships", joinColumns = @JoinColumn(name = "src_person_id"), inverseJoinColumns = @JoinColumn(name = "dst_person_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Person> srcFriendships = new ArrayList<>();
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "friendships", joinColumns = @JoinColumn(name = "dst_person_id"), inverseJoinColumns = @JoinColumn(name = "src_person_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Person> dstFriendships = new ArrayList<>();
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<BlockHistory> blockHistoryList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Post> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Comment> comments = new ArrayList<>();
 
     @OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private PersonSettings personSettings;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Notification> notifications = new ArrayList<>();
 
     @OneToMany(mappedBy = "firstPerson", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Dialog> firstPersonDialogs = new ArrayList<>();
 
     @OneToMany(mappedBy = "secondPerson", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Dialog> secondPersonDialogs = new ArrayList<>();
 
     @OneToMany(mappedBy = "author", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+//    @CollectionTable(name = "messages")
+//    @ElementCollection(targetClass = ReadStatusTypes.class, fetch = FetchType.EAGER)
     private List<Message> messages = new ArrayList<>();
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.REMOVE)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Like> likes = new ArrayList<>();
 
     @Override
