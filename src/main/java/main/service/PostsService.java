@@ -1,9 +1,11 @@
 package main.service;
 
 import lombok.RequiredArgsConstructor;
+import main.api.request.FindPostRq;
 import main.api.request.PostRequest;
 import main.api.response.CommonResponse;
 import main.api.response.PostResponse;
+import main.errors.EmptyFieldException;
 import main.errors.PersonNotFoundException;
 import main.mappers.PostMapper;
 import main.model.entities.Person;
@@ -11,12 +13,14 @@ import main.model.entities.Post;
 import main.model.entities.Tag;
 import main.repository.PersonsRepository;
 import main.repository.PostsRepository;
+import main.service.search.SearchPosts;
 import main.service.util.NetworkPageRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,6 +35,7 @@ public class PostsService {
     private final PersonsRepository personsRepository;
     private final TagsService tagsService;
     private final PostMapper postMapper;
+    private final SearchPosts searchPosts;
 
     public CommonResponse<PostResponse> createPost(PostRequest postRequest, long userId, Long timestamp) throws PersonNotFoundException {
         Person person = personsRepository.findById(userId).orElse(null);
@@ -39,47 +44,25 @@ public class PostsService {
         }
         LocalDateTime postPublishingTime = timestamp == null ? LocalDateTime.now() : new Timestamp(timestamp).toLocalDateTime();
         Post post = postMapper.postRequestToNewPost(postRequest, person, postPublishingTime);
-        return CommonResponse.<PostResponse>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .data(postMapper.postToResponse(
-                        postsRepository.save(
-                                updateTagsInPost(new ArrayList<>(post.getTags()), post))))
-                .build();
+        PostResponse postResponse = postMapper.postToResponse(postsRepository.save(updateTagsInPost(new ArrayList<>(post.getTags()), post)));
+        return buildCommonResponse(postResponse);
     }
 
     public CommonResponse<List<PostResponse>> getFeeds(int offset, int size) {
         Pageable pageable = NetworkPageRequest.of(offset, size);
         Page<Post> postPage = postsRepository.findPostsByTimeBeforeAndIsDeletedFalseOrderByTimeDesc(pageable, LocalDateTime.now());
-        return CommonResponse.<List<PostResponse>>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .total(postPage.getTotalElements())
-                .itemPerPage(postPage.getSize())
-                .offset(offset)
-                .data(new ArrayList<>(postsToResponse(postPage.getContent())))
-                .build();
+        return buildCommonResponse(offset, size, postPage.getContent(), postPage.getTotalElements());
     }
 
     public CommonResponse<List<PostResponse>> getAllPostsByAuthor(int offset, int size, Person postsAuthor) {
         Pageable pageable = NetworkPageRequest.of(offset, size);
         Page<Post> postPage = postsRepository.findPostsByAuthorOrderByTimeDesc(pageable, postsAuthor);
-        return CommonResponse.<List<PostResponse>>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .offset(offset)
-                .perPage(postPage.getSize())
-                .total(postPage.getTotalElements())
-                .data(new ArrayList<>(postsToResponse(postPage.getContent())))
-                .build();
+        return buildCommonResponse(offset, size, postPage.getContent(), postPage.getTotalElements());
     }
 
     public CommonResponse<PostResponse> getPostById(long postId) {
-        return CommonResponse.<PostResponse>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .data(postMapper.postToResponse(findPostById(postId)))
-                .build();
+        PostResponse postResponse = postMapper.postToResponse(findPostById(postId));
+        return buildCommonResponse(postResponse);
     }
 
     public CommonResponse<PostResponse> updatePost(long postId, PostRequest postRequest) throws PersonNotFoundException {
@@ -91,11 +74,8 @@ public class PostsService {
         post.setPostText(postRequest.getPostText());
         List<Tag> tags = tagsService.stringsToTagsMapper(postRequest.getTags());
         Post newPost = updateTagsInPost(tags, post);
-        return CommonResponse.<PostResponse>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .data(postMapper.postToResponse(postsRepository.save(newPost)))
-                .build();
+        PostResponse postResponse = postMapper.postToResponse(postsRepository.save(newPost));
+        return buildCommonResponse(postResponse);
     }
 
     public CommonResponse<PostResponse> changeDeleteStatusInPost(long postId, boolean deleteStatus) throws PersonNotFoundException {
@@ -105,11 +85,8 @@ public class PostsService {
         }
         post.setIsDeleted(deleteStatus);
         post.setTimeDelete(LocalDateTime.now());
-        return CommonResponse.<PostResponse>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .data(postMapper.postToResponse(postsRepository.save(post)))
-                .build();
+        PostResponse postResponse = postMapper.postToResponse(postsRepository.save(post));
+        return buildCommonResponse(postResponse);
     }
 
     public Post findPostById(long postId) {
@@ -134,5 +111,29 @@ public class PostsService {
     private boolean validatePerson(Person person) {
         return person != null && person.equals(personsRepository.findPersonByEmail(
                 (SecurityContextHolder.getContext().getAuthentication().getName())).orElse(null));
+    }
+
+    public CommonResponse<List<PostResponse>> findPosts(FindPostRq postRq, int offset, int perPage) throws SQLException, EmptyFieldException {
+        if (postRq.getText() == null) {
+            throw new EmptyFieldException("Field 'text' is required but empty");
+        }
+        return buildCommonResponse(offset, perPage, searchPosts.findPosts(postRq, offset, perPage), searchPosts.getTotal());
+    }
+
+    private CommonResponse<List<PostResponse>> buildCommonResponse(int offset, int perPage, List<Post> posts, Long total) {
+        return CommonResponse.<List<PostResponse>>builder()
+                .timestamp(System.currentTimeMillis())
+                .offset(offset)
+                .perPage(perPage)
+                .total(total)
+                .data(postsToResponse(posts))
+                .build();
+    }
+
+    private CommonResponse<PostResponse> buildCommonResponse(PostResponse postResponse) {
+        return CommonResponse.<PostResponse>builder()
+                .timestamp(System.currentTimeMillis())
+                .data(postResponse)
+                .build();
     }
 }

@@ -5,3 +5,4 @@ log/
 *.iws
 Dockerfile
 /.jpb/
+.gitlab-ci.yml

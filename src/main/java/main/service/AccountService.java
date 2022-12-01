@@ -40,15 +40,11 @@ public class AccountService {
                 registerRs.setError("Каптча");
                 registerRs.setError_description("Код с картинки введён неверно");
             }
-        } else {
-            registerRs.setError("Каптча");
-            registerRs.setError_description("код устарел");
         }
 
         registerRs.setEmail(regRequest.getEmail());
         registerRs.setData(data);
-
-  //      if (registerRs.getError().equals(null)) {
+        if (registerRs.getError()==null) {
             Person person = new Person();
             person.setFirstName(regRequest.getFirstName());
             person.setLastName(regRequest.getLastName());
@@ -62,8 +58,7 @@ public class AccountService {
             person.setEmail(regRequest.getEmail());
             person.setMessagePermission(MessagePermissionTypes.ALL);
             personsRepository.save(person);
-   //     }
-
+        }
         return registerRs;
     }
 }

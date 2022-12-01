@@ -1,12 +1,11 @@
 package main.controller;
 
 import lombok.RequiredArgsConstructor;
+import main.api.request.FindPersonRq;
 import main.api.request.PostRequest;
 import main.api.request.UserRq;
-import main.api.response.CommonResponse;
-import main.api.response.PersonResponse;
-import main.api.response.PostResponse;
-import main.api.response.UserRs;
+import main.api.response.*;
+import main.errors.EmptyFieldException;
 import main.errors.PersonNotFoundException;
 import main.service.PersonsService;
 import main.service.PostsService;
@@ -14,7 +13,7 @@ import main.service.UsersService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
+import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -56,7 +55,6 @@ public class UsersController {
     }
 
 
-
     @PutMapping("/me")
     ResponseEntity<UserRs> updateMyData(@RequestBody UserRq userRq) {
         return ResponseEntity
@@ -64,7 +62,21 @@ public class UsersController {
     }
 
     @DeleteMapping("/me")
-    ResponseEntity<UserRs> deleteMyData() {
-        return null;
+    ResponseEntity<ResponseRsComplexRs> deleteMyData() {
+        return ResponseEntity
+                .ok(usersService.deleteProfile());
+    }
+    @PostMapping("/me/recover")
+    ResponseEntity<ResponseRsComplexRs> recoverMyData() {
+        return ResponseEntity
+                .ok(usersService.recoverProfile());
+    }
+
+    @GetMapping("/search")
+    public CommonResponse<List<PersonResponse>> findPersons(
+            FindPersonRq personRq,
+            @RequestParam(required = false, defaultValue = "${socialNetwork.default.page}") int offset,
+            @RequestParam(required = false, defaultValue = "${socialNetwork.default.size}") int perPage) throws SQLException, EmptyFieldException {
+        return usersService.findPersons(personRq, offset, perPage);
     }
 }
