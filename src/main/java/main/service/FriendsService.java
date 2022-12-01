@@ -173,6 +173,7 @@ public class FriendsService {
                 .build();
     }
 
+
     private List<PersonResponse> personsToPersonResponses(List<Person> persons, Person srcPerson) {
         List<PersonResponse> personResponses = new ArrayList<>();
         for (Person person : persons) {
