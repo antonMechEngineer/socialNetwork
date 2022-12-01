@@ -33,6 +33,7 @@ public class FriendsService {
     private final PersonsRepository personsRepository;
     private final JWTUtil jwtUtil;
     private final FriendMapper friendMapper;
+    private final NotificationsService notificationsService;
     private final String defaultError = "ok";
 
     public FriendshipRs addFriend(String token, Long futureFriendId) {
@@ -120,6 +121,8 @@ public class FriendsService {
         Friendship dstFriendship = new Friendship(LocalDateTime.now(), dstPerson, srcPerson, dstFriendshipStatus);
         friendshipsRepository.save(srcFriendship);
         friendshipsRepository.save(dstFriendship);
+        notificationsService.createNotification(srcFriendship, dstPerson);
+        notificationsService.createNotification(dstFriendship, srcPerson);
     }
 
     private void deleteFriendships(Person srcPerson, Person dstPerson) {
@@ -150,6 +153,7 @@ public class FriendsService {
             srcFriendshipStatus.setName(FriendshipStatusTypes.FRIEND.toString());
             srcFriendshipStatus.setTime(LocalDateTime.now());
             friendshipStatusesRepository.save(srcFriendshipStatus);
+            notificationsService.createNotification(optionalSrcFriendship.get(), dstPerson);
         }
     }
 

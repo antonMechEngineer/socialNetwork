@@ -22,4 +22,5 @@ public interface FriendshipsRepository extends JpaRepository<Friendship, Long> {
             nativeQuery = true)
     List<Friendship> findFriendsToDelete(@Param("id") long id);
 
+    List<Friendship> findFriendshipsByDstPerson(Person dstPerson);
 }

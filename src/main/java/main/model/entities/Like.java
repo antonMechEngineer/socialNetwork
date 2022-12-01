@@ -1,6 +1,7 @@
 package main.model.entities;
 
 import lombok.Data;
+import main.model.entities.interfaces.Liked;
 import main.model.enums.LikeTypes;
 import org.hibernate.annotations.*;
 

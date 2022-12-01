@@ -1,7 +1,9 @@
 package main.repository;
 
 import main.model.entities.Notification;
-import main.model.entities.Post;
+import main.model.entities.Person;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,4 +19,8 @@ public interface NotificationsRepository extends JpaRepository<Notification, Lon
     @Transactional
     @Query(value = "DELETE FROM notifications WHERE person_id = :id", nativeQuery = true)
     void notificationDelete(@Param("id") long id);
+
+    Page<Notification> findAllByPersonAndIsReadIsFalse(Person person, Pageable pageable);
+
+    List<Notification> findAllByPersonAndIsReadIsFalse(Person person);
 }
