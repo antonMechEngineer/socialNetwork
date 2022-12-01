@@ -1,5 +1,6 @@
 package main.model.entities;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import main.model.enums.FriendshipStatusTypes;
@@ -7,6 +8,7 @@ import main.model.enums.FriendshipStatusTypes;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Data

@@ -1,5 +1,7 @@
 package main.repository;
 
+import main.model.entities.City;
+import main.model.entities.Friendship;
 import main.model.entities.Person;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +23,9 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
     Optional<Person> findPersonByEmail(String email);
 
     Page<Person> findAllByCity(String city, Pageable page);
+    Page<Person> findPersonBySrcFriendshipsIn(List<Person> friendlyPersons, Pageable pageable);
+
+    Page<Person> findAllByCity(City city, Pageable page);
 
     @Query("FROM Person AS p " +
             "ORDER BY p.regDate DESC")

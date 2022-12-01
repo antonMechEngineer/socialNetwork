@@ -3,6 +3,8 @@ package main.repository;
 import main.model.entities.BlockHistory;
 import main.model.entities.Friendship;
 import main.model.entities.Person;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
