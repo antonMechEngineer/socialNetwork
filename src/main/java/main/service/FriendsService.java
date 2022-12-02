@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import static main.model.enums.FriendshipStatusTypes.*;
+
 
 @RequiredArgsConstructor
 @Service
@@ -35,48 +37,28 @@ public class FriendsService {
     private final FriendMapper friendMapper;
     private final String defaultError = "ok";
 
-    public FriendshipRs addFriend(String token, Long futureFriendId) {
+    public FriendshipRs addFriend(String token, Long receivedFriendId) {
         Person srcPerson = getSrcPersonByToken(token);
-        Optional<Person> dstPersonOptional = personsRepository.findPersonById(futureFriendId);
-        if (dstPersonOptional.isEmpty()) {
-            String descriptionError = "Person with ID" + futureFriendId + " doesn't exist";
-            return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), new ComplexRs(descriptionError));
-        }
-        Person dstPerson = dstPersonOptional.get();
+        Person dstPerson = personsRepository.findPersonById(receivedFriendId).orElseThrow();
         modifyFriendShipStatus(srcPerson, dstPerson);
         modifyFriendShipStatus(dstPerson, srcPerson);
         return new FriendshipRs(defaultError, LocalDateTime.now().toString(), new ComplexRs(defaultError));
     }
 
-    public FriendshipRs sendFriendshipRequest(String token, Long potentialFriendId) {
-        Optional<Person> dstPersonOptional = personsRepository.findPersonById(potentialFriendId);
-        if (dstPersonOptional.isEmpty()) {
-            String descriptionError = "Person with ID" + potentialFriendId + " doesn't exist";
-            return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), new ComplexRs(descriptionError));
-        }
-        Person dstPerson = dstPersonOptional.get();
+    public FriendshipRs sendFriendshipRequest(String token, Long requestedFriendId) {
+        Person dstPerson = personsRepository.findPersonById(requestedFriendId).orElseThrow();
         createFriendshipObjects(getSrcPersonByToken(token), dstPerson);
         return new FriendshipRs(defaultError, LocalDateTime.now().toString(), new ComplexRs(defaultError));
     }
 
     public FriendshipRs deleteFriend(String token, Long idDeletableFriend) {
-        Optional<Person> optionalDstPerson = personsRepository.findPersonById(idDeletableFriend);
-        if (optionalDstPerson.isEmpty()) {
-            String descriptionError = "Person with ID" + idDeletableFriend + " isn't your friend";
-            return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), new ComplexRs(descriptionError));
-        }
-        Person dstPerson = optionalDstPerson.get();
+        Person dstPerson = personsRepository.findPersonById(idDeletableFriend).orElseThrow();
         deleteFriendships(getSrcPersonByToken(token), dstPerson);
         return new FriendshipRs(defaultError, LocalDateTime.now().toString(), new ComplexRs(defaultError));
     }
 
-    public FriendshipRs deleteSentFriendshipRequest(String token, Long idRequestedPerson) {
-        Optional<Person> dstPersonOptional = personsRepository.findPersonById(idRequestedPerson);
-        if (dstPersonOptional.isEmpty()) {
-            String descriptionError = "Person with ID" + idRequestedPerson + " isn't requested";
-            return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), new ComplexRs(descriptionError));
-        }
-        Person dstPerson = dstPersonOptional.get();
+    public FriendshipRs deleteSentFriendshipRequest(String token, Long idRequestedFriend) {
+        Person dstPerson = personsRepository.findPersonById(idRequestedFriend).orElseThrow();
         deleteFriendships(getSrcPersonByToken(token), dstPerson);
         return new FriendshipRs(defaultError, LocalDateTime.now().toString(), new ComplexRs(defaultError));
     }
@@ -102,7 +84,7 @@ public class FriendsService {
     public FriendshipStatusTypes getStatusTwoPersons(Person dstPerson, Person srcPerson) {
         Optional<Friendship> optionalSrcFriendship = friendshipsRepository.findFriendshipBySrcPerson(srcPerson).
                 stream().filter(fs -> fs.getDstPerson() == dstPerson).collect(Collectors.toList()).stream().findFirst();
-        FriendshipStatusTypes srcFriendshipStatusType = FriendshipStatusTypes.UNKNOWN;
+        FriendshipStatusTypes srcFriendshipStatusType = UNKNOWN;
         if (optionalSrcFriendship.isPresent()) {
             srcFriendshipStatusType = optionalSrcFriendship.get().getFriendshipStatus().getCode();
         }
@@ -110,10 +92,8 @@ public class FriendsService {
     }
 
     private void createFriendshipObjects(Person srcPerson, Person dstPerson) {
-        FriendshipStatus srcFriendshipStatus = new FriendshipStatus(LocalDateTime.now(),
-                FriendshipStatusTypes.REQUEST, FriendshipStatusTypes.REQUEST.toString());
-        FriendshipStatus dstFriendshipStatus = new FriendshipStatus(LocalDateTime.now(),
-                FriendshipStatusTypes.RECEIVED_REQUEST, FriendshipStatusTypes.RECEIVED_REQUEST.toString());
+        FriendshipStatus srcFriendshipStatus = new FriendshipStatus(LocalDateTime.now(), REQUEST, REQUEST.toString());
+        FriendshipStatus dstFriendshipStatus = new FriendshipStatus(LocalDateTime.now(), RECEIVED_REQUEST, RECEIVED_REQUEST.toString());
         friendshipStatusesRepository.save(srcFriendshipStatus);
         friendshipStatusesRepository.save(dstFriendshipStatus);
         Friendship srcFriendship = new Friendship(LocalDateTime.now(), srcPerson, dstPerson, srcFriendshipStatus);
@@ -145,8 +125,8 @@ public class FriendsService {
                 filter(friendship -> friendship.getDstPerson().equals(dstPerson)).findFirst();
         if (optionalSrcFriendship.isPresent()) {
             FriendshipStatus srcFriendshipStatus = optionalSrcFriendship.get().getFriendshipStatus();
-            srcFriendshipStatus.setCode(FriendshipStatusTypes.FRIEND);
-            srcFriendshipStatus.setName(FriendshipStatusTypes.FRIEND.toString());
+            srcFriendshipStatus.setCode(FRIEND);
+            srcFriendshipStatus.setName(FRIEND.toString());
             srcFriendshipStatus.setTime(LocalDateTime.now());
             friendshipStatusesRepository.save(srcFriendshipStatus);
         }

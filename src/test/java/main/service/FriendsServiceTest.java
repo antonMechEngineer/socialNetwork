@@ -8,6 +8,7 @@ import main.model.entities.Friendship;
 import main.model.entities.FriendshipStatus;
 import main.model.entities.Person;
 import main.model.enums.FriendshipStatusTypes;
+import main.repository.FriendshipStatusesRepository;
 import main.repository.FriendshipsRepository;
 import main.repository.PersonsRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static main.model.enums.FriendshipStatusTypes.*;
 
@@ -41,36 +43,31 @@ class FriendsServiceTest {
     @MockBean
     private PersonsRepository personsRepository;
 
-    @Autowired
+    @MockBean
+    private FriendshipStatusesRepository friendshipStatusesRepository;
+
+    @MockBean
     private FriendMapper friendMapper;
 
-
-    private FriendshipStatus fsStatusCurPsFtrFr;
-    private FriendshipStatus fsStatusFtrFr;
-    private Friendship fsCurPsFtrFr;
-    private Friendship fsFtrFr;
+    private FriendshipStatus fsStatusCurPsRcFr;
+    private FriendshipStatus fsStatusRcFr;
+    private Friendship fsCurPsRcFr;
+    private Friendship fsRcFr;
 
     private FriendshipStatus fsStatusCurPsFr;
     private FriendshipStatus fsStatusFr;
     private Friendship fsCurPsFr;
     private Friendship fsFr;
 
-    private FriendshipStatus fsStatusCurPsPtntlFr;
-    private FriendshipStatus fsStatusPtntlFr;
-    private Friendship fsCurPsPtntlFr;
-    private Friendship fsPtntlFr;
+    private FriendshipStatus fsStatusCurPsRqFr;
+    private FriendshipStatus fsStatusRqFr;
+    private Friendship fsCurPsRqFr;
+    private Friendship fsRqFr;
 
     private FriendshipStatus fsStatusCurPsUnknown;
     private FriendshipStatus fsStatusPsUnknown;
     private Friendship fsCurPsUnknown;
     private Friendship fsPsUnknown;
-
-    private ArrayList<Person> mockPersonRepo = new ArrayList<>();
-    private ArrayList<Friendship> mockFriendshipRepo =  new ArrayList<>();
-    private ArrayList<FriendshipStatus> mockFriendshipStatusRepo = new ArrayList<>();
-
-    private PersonResponse frPersonResponse;
-    private PersonResponse ptntlFrPersonResponse;
 
 
     private final static String TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyaG9uY3VzLm51bGxhbUB5YWhvby5lZHUiLCJpYXQiOjE2Njg4NDk3MTAsImV4cCI6MTY3OTY0OTcxMH0.vZ3y_zEilhMJYyGjlezHeh_olbdiWuIRU5-VTq8V974";
@@ -78,13 +75,13 @@ class FriendsServiceTest {
     private final static String CURRENT_PERSON_MAIL = "rhoncus.nullam@yahoo.edu";
     private final static String C_FRIEND_MAIL = "molestie@yahoo.edu";
     private final static String RECEIVED_FRIEND_MAIL = "nostra.per.inceptos@hotmail.com";
-    private final static String RESPONSE_FRIEND_MAIL = "urna.suscipit@outlook.com";
+    private final static String REQUESTED_FRIEND_MAIL = "urna.suscipit@outlook.com";
     private final static String UNKNOWN_PERSON_MAIL = "blandit.congue@hotmail.couk";
 
     private final static Person CURRENT_PERSON = new Person(1L,  CURRENT_PERSON_MAIL);
     private final static Person C_FRIEND = new Person(2L,  C_FRIEND_MAIL);
     private final static Person RECEIVED_FRIEND = new Person(3L,  RECEIVED_FRIEND_MAIL);
-    private final static Person RESPONSE_FRIEND = new Person(4L,  RESPONSE_FRIEND_MAIL);
+    private final static Person REQUESTED_FRIEND = new Person(4L, REQUESTED_FRIEND_MAIL);
     private final static Person UNKNOWN_PERSON = new Person(5L,  UNKNOWN_PERSON_MAIL);
 
     private static final Integer OFFSET = 0;
@@ -102,75 +99,66 @@ class FriendsServiceTest {
         buildFriendObjects();
         buildReceivedRequestObjects();
         buildRequestReceivedObjects();
-        buildMockRepos();
         mockPersonsRepository();
         mockFriendshipsRepository();
-        // TODO: 29.11.2022 создать свои листы репозитории, которые связать с моковыми действиями в реальных репозиториях
     }
 
-    void buildMockRepos(){
-        mockPersonRepo.clear();
-        mockFriendshipRepo.clear();
-        mockFriendshipStatusRepo.clear();
-        mockPersonRepo.addAll(Arrays.asList(CURRENT_PERSON, C_FRIEND, RECEIVED_FRIEND, RESPONSE_FRIEND, UNKNOWN_PERSON));
-        mockFriendshipRepo.addAll(Arrays.asList(fsCurPsFr, fsFr, fsCurPsFtrFr, fsFtrFr, fsCurPsPtntlFr, fsPtntlFr));
-        mockFriendshipStatusRepo.addAll(Arrays.asList(fsStatusCurPsFr, fsStatusFr, fsStatusCurPsFtrFr,
-                                                        fsStatusFtrFr, fsStatusCurPsPtntlFr, fsStatusPtntlFr));
-    }
-
-    void buildFriendObjects(){  //testDeleteFriend  // getFriends
+    private void buildFriendObjects(){  //testDeleteFriend  // getFriends
         fsStatusCurPsFr = new FriendshipStatus(1L, TIME, C_FRIEND.toString(), FRIEND);
         fsStatusFr = new FriendshipStatus(2L, TIME, C_FRIEND.toString(), FRIEND);
         fsCurPsFr = new Friendship(1L, TIME,CURRENT_PERSON, C_FRIEND, fsStatusCurPsFr);
         fsFr = new Friendship(2L, TIME, C_FRIEND, CURRENT_PERSON, fsStatusFr);
     }
 
-    void buildReceivedRequestObjects(){ //testAddFriend   //getRequests
-        fsStatusCurPsFtrFr = new FriendshipStatus(3L, TIME, RECEIVED_REQUEST.toString(), RECEIVED_REQUEST);
-        fsStatusFtrFr = new FriendshipStatus(4L, TIME, REQUEST.toString(), REQUEST);
-        fsCurPsFtrFr = new Friendship(3L, TIME, CURRENT_PERSON, RECEIVED_FRIEND, fsStatusCurPsFtrFr);
-        fsFtrFr = new Friendship(4L, TIME, RECEIVED_FRIEND, CURRENT_PERSON, fsStatusFtrFr);
+   private void buildReceivedRequestObjects(){ //testAddFriend   //getRequests
+        fsStatusCurPsRcFr = new FriendshipStatus(3L, TIME, RECEIVED_REQUEST.toString(), RECEIVED_REQUEST);
+        fsStatusRcFr = new FriendshipStatus(4L, TIME, REQUEST.toString(), REQUEST);
+        fsCurPsRcFr = new Friendship(3L, TIME, CURRENT_PERSON, RECEIVED_FRIEND, fsStatusCurPsRcFr);
+        fsRcFr = new Friendship(4L, TIME, RECEIVED_FRIEND, CURRENT_PERSON, fsStatusRcFr);
     }
 
-    void buildRequestReceivedObjects(){ //testDeleteSentRequest
-        fsStatusCurPsPtntlFr = new FriendshipStatus(5L, TIME, REQUEST.toString(), REQUEST);
-        fsStatusPtntlFr = new FriendshipStatus(6L, TIME, RECEIVED_REQUEST.toString(), RECEIVED_REQUEST);
-        fsCurPsPtntlFr = new Friendship(5L, TIME, CURRENT_PERSON, RESPONSE_FRIEND, fsStatusCurPsFtrFr);
-        fsPtntlFr = new Friendship(6L, TIME, RESPONSE_FRIEND, CURRENT_PERSON, fsStatusFtrFr);
+    private void buildRequestReceivedObjects(){ //testDeleteSentRequest
+        fsStatusCurPsRqFr = new FriendshipStatus(5L, TIME, REQUEST.toString(), REQUEST);
+        fsStatusRqFr = new FriendshipStatus(6L, TIME, RECEIVED_REQUEST.toString(), RECEIVED_REQUEST);
+        fsCurPsRqFr = new Friendship(5L, TIME, CURRENT_PERSON, REQUESTED_FRIEND, fsStatusCurPsRqFr);
+        fsRqFr = new Friendship(6L, TIME, REQUESTED_FRIEND, CURRENT_PERSON, fsStatusRqFr);
     }
 
-    void mockPersonsRepository() {
+    private void mockPersonsRepository() {
         when(personsRepository.findPersonByEmail(CURRENT_PERSON_MAIL)).thenReturn(Optional.of(CURRENT_PERSON));
         when(personsRepository.findPersonById(CURRENT_PERSON.getId())).thenReturn(Optional.of(CURRENT_PERSON));
         when(personsRepository.findPersonById(RECEIVED_FRIEND.getId())).thenReturn(Optional.of(RECEIVED_FRIEND));
         when(personsRepository.findPersonById(C_FRIEND.getId())).thenReturn(Optional.of(C_FRIEND));
-        when(personsRepository.findPersonById(RESPONSE_FRIEND.getId())).thenReturn(Optional.of(RESPONSE_FRIEND));
+        when(personsRepository.findPersonById(REQUESTED_FRIEND.getId())).thenReturn(Optional.of(REQUESTED_FRIEND));
         when(personsRepository.findPersonById(UNKNOWN_PERSON.getId())).thenReturn(Optional.of(UNKNOWN_PERSON));
         when(personsRepository.findPersonBySrcFriendshipsIn(FRIENDS, PAGEABLE)).thenReturn(PAGE_FRIENDS);
         when(personsRepository.findPersonBySrcFriendshipsIn(RECEIVED_FRIENDS, PAGEABLE)).thenReturn(PAGE_RECEIVED_FRIENDS);
     }
-    void mockFriendshipsRepository(){
-        when(friendshipsRepository.findFriendshipBySrcPerson(CURRENT_PERSON)).thenReturn(List.of(fsCurPsFr, fsCurPsFtrFr));
-        when(friendshipsRepository.findFriendshipBySrcPerson(RECEIVED_FRIEND)).thenReturn(List.of(fsFtrFr));
+    private void mockFriendshipsRepository(){
+        when(friendshipsRepository.findFriendshipBySrcPerson(CURRENT_PERSON)).thenReturn(List.of(fsCurPsFr, fsCurPsRcFr, fsRqFr));
+        when(friendshipsRepository.findFriendshipBySrcPerson(RECEIVED_FRIEND)).thenReturn(List.of(fsRcFr));
         when(friendshipsRepository.findFriendshipBySrcPerson(C_FRIEND)).thenReturn(List.of(fsFr));
-        when(friendshipsRepository.findFriendshipBySrcPerson(RESPONSE_FRIEND)).thenReturn(List.of(fsPtntlFr));
-
-//        when(friendMapper.toFriendResponse(currentPerson, FRIEND)).thenReturn();
-//        when(friendMapper.toFriendResponse(currentPerson, RECEIVED_REQUEST)).thenReturn();
-        //when(friendshipsRepository.delete(fsFr)).thenAnswer(mockFriendshipRepo.remove(fsFr)); //не понятно как мокнуть без возврата см. др. тестовые классы, в дипломе я подобное делал
+        when(friendshipsRepository.findFriendshipBySrcPerson(REQUESTED_FRIEND)).thenReturn(List.of(fsRqFr));
     }
 
-    // TODO: 30.11.2022 проверить вызывается ли метод save, возможно ли объявлять метод when который будет вызываться одинаково в рамках всего класса
+   private void mockFriendshipStatusesRepository(){
+       when(friendshipStatusesRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+   }
+
+   private void mockFriendMapper(){}
+
+
+
     @Test
     void addFriend() {
         friendsService.addFriend(TOKEN, RECEIVED_FRIEND.getId());
         assertEquals(C_FRIEND, fsCurPsFr.getFriendshipStatus().getCode());
-        assertEquals(C_FRIEND, fsCurPsFtrFr.getFriendshipStatus().getCode());
+        assertEquals(C_FRIEND, fsCurPsRcFr.getFriendshipStatus().getCode());
     }
 
     @Test
     void sendFriendshipRequest() {
-        friendsService.sendFriendshipRequest(TOKEN, RESPONSE_FRIEND.getId());
+        friendsService.sendFriendshipRequest(TOKEN, REQUESTED_FRIEND.getId());
         //mockFriendshipRepo.save д.б
         // assertEquals(REQUEST, currentPersonFs.getFriendshipStatus().getCode());
         // assertEquals(RECEIVED_REQUEST, dstPersonFs.getFriendshipStatus().getCode());
@@ -185,7 +173,7 @@ class FriendsServiceTest {
 
     @Test
     void deleteSentFriendshipRequest() {
-        friendsService.deleteSentFriendshipRequest(TOKEN, RESPONSE_FRIEND.getId());
+        friendsService.deleteSentFriendshipRequest(TOKEN, REQUESTED_FRIEND.getId());
         //проверить вызываются ли методы delete
         //assertEquals(false, isContainExPotentialPerson)
     }
