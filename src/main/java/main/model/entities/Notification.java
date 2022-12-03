@@ -1,6 +1,7 @@
 package main.model.entities;
 
 import lombok.Data;
+import main.model.entities.interfaces.Notificationed;
 import main.model.enums.NotificationTypes;
 import org.hibernate.annotations.Any;
 import org.hibernate.annotations.AnyMetaDef;
@@ -33,7 +34,7 @@ public class Notification {
             @MetaValue(targetEntity = Message.class, value = "MESSAGE"),
     })
     @JoinColumn(name = "entity_id")
-    private Object entity;
+    private Notificationed entity;
 
     private String contact;
 

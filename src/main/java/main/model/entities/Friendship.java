@@ -3,6 +3,8 @@ package main.model.entities;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import main.model.entities.interfaces.Notificationed;
+import main.model.enums.NotificationTypes;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -12,7 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @Data
 @Table(name = "friendships")
-public class Friendship {
+public class Friendship implements Notificationed {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,6 +34,11 @@ public class Friendship {
     @OneToOne (cascade = CascadeType.ALL)
     @JoinColumn(name = "status_id", nullable = false)
     private FriendshipStatus friendshipStatus;
+
+    @Override
+    public NotificationTypes getNotificationType() {
+        return NotificationTypes.FRIEND_REQUEST;
+    }
 
     public Friendship(LocalDateTime sentTime, Person srcPerson, Person dstPerson, FriendshipStatus friendshipStatus) {
         this.sentTime = sentTime;
