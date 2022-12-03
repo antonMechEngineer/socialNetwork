@@ -20,14 +20,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
+
 import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static main.model.enums.FriendshipStatusTypes.*;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -53,24 +55,15 @@ class FriendsServiceTest {
     private FriendshipStatus fsStatusRcFr;
     private Friendship fsCurPsRcFr;
     private Friendship fsRcFr;
-
     private FriendshipStatus fsStatusCurPsFr;
     private FriendshipStatus fsStatusFr;
     private Friendship fsCurPsFr;
     private Friendship fsFr;
-
     private FriendshipStatus fsStatusCurPsRqFr;
     private FriendshipStatus fsStatusRqFr;
     private Friendship fsCurPsRqFr;
     private Friendship fsRqFr;
 
-    private FriendshipStatus fsStatusCurPsUnknown;
-    private FriendshipStatus fsStatusPsUnknown;
-    private Friendship fsCurPsUnknown;
-    private Friendship fsPsUnknown;
-
-
-    private final static String TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyaG9uY3VzLm51bGxhbUB5YWhvby5lZHUiLCJpYXQiOjE2Njg4NDk3MTAsImV4cCI6MTY3OTY0OTcxMH0.vZ3y_zEilhMJYyGjlezHeh_olbdiWuIRU5-VTq8V974";
 
     private final static String CURRENT_PERSON_MAIL = "rhoncus.nullam@yahoo.edu";
     private final static String C_FRIEND_MAIL = "molestie@yahoo.edu";
@@ -78,12 +71,16 @@ class FriendsServiceTest {
     private final static String REQUESTED_FRIEND_MAIL = "urna.suscipit@outlook.com";
     private final static String UNKNOWN_PERSON_MAIL = "blandit.congue@hotmail.couk";
 
-    private final static Person CURRENT_PERSON = new Person(1L,  CURRENT_PERSON_MAIL);
-    private final static Person C_FRIEND = new Person(2L,  C_FRIEND_MAIL);
-    private final static Person RECEIVED_FRIEND = new Person(3L,  RECEIVED_FRIEND_MAIL);
+    private final static Person CURRENT_PERSON = new Person(1L, CURRENT_PERSON_MAIL);
+    private final static Person C_FRIEND = new Person(2L, C_FRIEND_MAIL);
+    private final static Person RECEIVED_FRIEND = new Person(3L, RECEIVED_FRIEND_MAIL);
     private final static Person REQUESTED_FRIEND = new Person(4L, REQUESTED_FRIEND_MAIL);
-    private final static Person UNKNOWN_PERSON = new Person(5L,  UNKNOWN_PERSON_MAIL);
+    private final static Person UNKNOWN_PERSON = new Person(5L, UNKNOWN_PERSON_MAIL);
 
+    private final static PersonResponse C_FRIEND_DTO = PersonResponse.builder().id(2L).email(C_FRIEND_MAIL).build();
+    private final static PersonResponse RECEIVED_FRIEND_DTO = PersonResponse.builder().id(3L).email(RECEIVED_FRIEND_MAIL).build();
+
+    private static final LocalDateTime TIME = LocalDateTime.now();
     private static final Integer OFFSET = 0;
     private static final Integer SIZE = 5;
     private static final Pageable PAGEABLE = PageRequest.of(OFFSET, SIZE);
@@ -92,32 +89,32 @@ class FriendsServiceTest {
     private static final ArrayList<Person> RECEIVED_FRIENDS = new ArrayList<>(Arrays.asList(RECEIVED_FRIEND));
     private static final Page<Person> PAGE_RECEIVED_FRIENDS = new PageImpl<>(RECEIVED_FRIENDS, PAGEABLE, RECEIVED_FRIENDS.size());
 
-    private static final LocalDateTime TIME = LocalDateTime.now();
-
     @BeforeEach
     void setUp() {
+        //when(SecurityContextHolder.getContext().getAuthentication().getName()).thenReturn(CURRENT_PERSON_MAIL);
         buildFriendObjects();
         buildReceivedRequestObjects();
         buildRequestReceivedObjects();
         mockPersonsRepository();
         mockFriendshipsRepository();
+        mockFriendMapper();
     }
 
-    private void buildFriendObjects(){  //testDeleteFriend  // getFriends
+    private void buildFriendObjects() {  //testDeleteFriend  // getFriends
         fsStatusCurPsFr = new FriendshipStatus(1L, TIME, C_FRIEND.toString(), FRIEND);
         fsStatusFr = new FriendshipStatus(2L, TIME, C_FRIEND.toString(), FRIEND);
-        fsCurPsFr = new Friendship(1L, TIME,CURRENT_PERSON, C_FRIEND, fsStatusCurPsFr);
+        fsCurPsFr = new Friendship(1L, TIME, CURRENT_PERSON, C_FRIEND, fsStatusCurPsFr);
         fsFr = new Friendship(2L, TIME, C_FRIEND, CURRENT_PERSON, fsStatusFr);
     }
 
-   private void buildReceivedRequestObjects(){ //testAddFriend   //getRequests
+    private void buildReceivedRequestObjects() { //testAddFriend   //getRequests
         fsStatusCurPsRcFr = new FriendshipStatus(3L, TIME, RECEIVED_REQUEST.toString(), RECEIVED_REQUEST);
         fsStatusRcFr = new FriendshipStatus(4L, TIME, REQUEST.toString(), REQUEST);
         fsCurPsRcFr = new Friendship(3L, TIME, CURRENT_PERSON, RECEIVED_FRIEND, fsStatusCurPsRcFr);
         fsRcFr = new Friendship(4L, TIME, RECEIVED_FRIEND, CURRENT_PERSON, fsStatusRcFr);
     }
 
-    private void buildRequestReceivedObjects(){ //testDeleteSentRequest
+    private void buildRequestReceivedObjects() { //testDeleteSentRequest
         fsStatusCurPsRqFr = new FriendshipStatus(5L, TIME, REQUEST.toString(), REQUEST);
         fsStatusRqFr = new FriendshipStatus(6L, TIME, RECEIVED_REQUEST.toString(), RECEIVED_REQUEST);
         fsCurPsRqFr = new Friendship(5L, TIME, CURRENT_PERSON, REQUESTED_FRIEND, fsStatusCurPsRqFr);
@@ -134,54 +131,52 @@ class FriendsServiceTest {
         when(personsRepository.findPersonBySrcFriendshipsIn(FRIENDS, PAGEABLE)).thenReturn(PAGE_FRIENDS);
         when(personsRepository.findPersonBySrcFriendshipsIn(RECEIVED_FRIENDS, PAGEABLE)).thenReturn(PAGE_RECEIVED_FRIENDS);
     }
-    private void mockFriendshipsRepository(){
-        when(friendshipsRepository.findFriendshipBySrcPerson(CURRENT_PERSON)).thenReturn(List.of(fsCurPsFr, fsCurPsRcFr, fsRqFr));
+
+    private void mockFriendshipsRepository() {
+        when(friendshipsRepository.findFriendshipBySrcPerson(CURRENT_PERSON)).thenReturn(List.of(fsCurPsFr, fsCurPsRcFr, fsCurPsRqFr));
         when(friendshipsRepository.findFriendshipBySrcPerson(RECEIVED_FRIEND)).thenReturn(List.of(fsRcFr));
         when(friendshipsRepository.findFriendshipBySrcPerson(C_FRIEND)).thenReturn(List.of(fsFr));
         when(friendshipsRepository.findFriendshipBySrcPerson(REQUESTED_FRIEND)).thenReturn(List.of(fsRqFr));
     }
 
-   private void mockFriendshipStatusesRepository(){
-       when(friendshipStatusesRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-   }
-
-   private void mockFriendMapper(){}
-
-
+    private void mockFriendMapper() {
+        when(friendMapper.toFriendResponse(C_FRIEND, FRIEND)).thenReturn(C_FRIEND_DTO);
+        when(friendMapper.toFriendResponse(RECEIVED_FRIEND, RECEIVED_REQUEST)).thenReturn(RECEIVED_FRIEND_DTO);
+    }
 
     @Test
     void addFriend() {
-        friendsService.addFriend(TOKEN, RECEIVED_FRIEND.getId());
-        assertEquals(C_FRIEND, fsCurPsFr.getFriendshipStatus().getCode());
-        assertEquals(C_FRIEND, fsCurPsRcFr.getFriendshipStatus().getCode());
+        friendsService.addFriend(RECEIVED_FRIEND.getId());
+        assertEquals(FRIEND, fsCurPsFr.getFriendshipStatus().getCode());
+        assertEquals(FRIEND, fsCurPsRcFr.getFriendshipStatus().getCode());
+        verify(friendshipStatusesRepository, times(2)).save(any());
     }
 
     @Test
     void sendFriendshipRequest() {
-        friendsService.sendFriendshipRequest(TOKEN, REQUESTED_FRIEND.getId());
-        //mockFriendshipRepo.save д.б
-        // assertEquals(REQUEST, currentPersonFs.getFriendshipStatus().getCode());
-        // assertEquals(RECEIVED_REQUEST, dstPersonFs.getFriendshipStatus().getCode());
+        friendsService.sendFriendshipRequest(REQUESTED_FRIEND.getId());
+        verify(friendshipsRepository, times(2)).save(any());
+        verify(friendshipStatusesRepository, times(2)).save(any());
     }
 
     @Test
     void deleteFriend() {
-        friendsService.deleteFriend(TOKEN, C_FRIEND.getId());
-        //проверить вызываются ли методы delete
-        //assertEquals(false, isContainDeletablePerson)
+        friendsService.deleteFriend(C_FRIEND.getId());
+        verify(friendshipsRepository, times(1)).delete(fsCurPsFr);
+        verify(friendshipsRepository, times(1)).delete(fsFr);
     }
 
     @Test
     void deleteSentFriendshipRequest() {
-        friendsService.deleteSentFriendshipRequest(TOKEN, REQUESTED_FRIEND.getId());
-        //проверить вызываются ли методы delete
-        //assertEquals(false, isContainExPotentialPerson)
+        friendsService.deleteSentFriendshipRequest(REQUESTED_FRIEND.getId());
+        verify(friendshipsRepository, times(1)).delete(fsCurPsRqFr);
+        verify(friendshipsRepository, times(1)).delete(fsRqFr);
     }
 
     @Test
     void getFriends() {
-        CommonResponse<List<PersonResponse>> resFriends = friendsService.getFriends(TOKEN, OFFSET, SIZE);
-        PersonResponse resDto =  resFriends.getData().get(0);
+        CommonResponse<List<PersonResponse>> resFriends = friendsService.getFriends(OFFSET, SIZE);
+        PersonResponse resDto = resFriends.getData().get(0);
         assertEquals(FRIENDS.size(), resFriends.getData().size());
         assertEquals(C_FRIEND.getId(), resDto.getId());
         assertEquals(C_FRIEND.getEmail(), resDto.getEmail());
@@ -189,18 +184,11 @@ class FriendsServiceTest {
 
     @Test
     void getRequestedPersons() {
-        CommonResponse<List<PersonResponse>> resReceivedFriends = friendsService.getRequestedPersons(TOKEN, OFFSET, SIZE);
-        PersonResponse resDto =  resReceivedFriends.getData().get(0);
+        CommonResponse<List<PersonResponse>> resReceivedFriends = friendsService.getRequestedPersons(OFFSET, SIZE);
+        PersonResponse resDto = resReceivedFriends.getData().get(0);
         assertEquals(RECEIVED_FRIENDS.size(), resReceivedFriends.getData().size());
         assertEquals(RECEIVED_FRIEND.getId(), resDto.getId());
         assertEquals(RECEIVED_FRIEND.getEmail(), resDto.getEmail());
-    }
-
-    @Test
-    void getSrcPersonByToken() {
-        Person srcPerson = friendsService.getSrcPersonByToken(TOKEN);
-        Person expectedPerson = personsRepository.findPersonById(CURRENT_PERSON.getId()).orElseThrow();
-        assertEquals(expectedPerson, srcPerson);
     }
 
     @Test

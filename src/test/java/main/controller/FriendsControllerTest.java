@@ -48,28 +48,25 @@ class FriendsControllerTest {
     @Test
     void addFriend() throws Exception {
          mockMvc.perform(post("/api/v1/friends/3").
-                         contentType(MediaType.APPLICATION_JSON)
-                        .headers(buildHeader()))
+                         contentType(MediaType.APPLICATION_JSON))
                  .andDo(print())
                  .andExpect(status().is2xxSuccessful());
-
-
     }
 
+    //TODO: 02.12.2022 ввести сюда request param в запрос
     @Test
     void sendFriendshipRequest() throws Exception {
         mockMvc.perform(post("/api/v1/friends/request/2")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .headers(buildHeader()))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful());
     }
 
+    // TODO: 02.12.2022 ввести сюда request param в запрос
     @Test
     void getPotentialFriends() throws Exception {
         mockMvc.perform(get("/api/v1/friends/request")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .headers(buildHeader()))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful());
     }
@@ -77,8 +74,7 @@ class FriendsControllerTest {
     @Test
     void getFriends() throws Exception {
         mockMvc.perform(get("/api/v1/friends")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .headers(buildHeader()))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.data").isArray());
@@ -86,28 +82,15 @@ class FriendsControllerTest {
 
     @Test
     void deleteFriend() throws Exception {
-        mockMvc.perform(delete("/api/v1/friends/3")
-                        .headers(buildHeader()))
+        mockMvc.perform(delete("/api/v1/friends/3"))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful());
     }
 
     @Test
     void deleteSentRequest() throws Exception {
-        mockMvc.perform(delete("/api/v1/friends/5")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .headers(buildHeader()))
+        mockMvc.perform(delete("/api/v1/friends/5"))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful());
     }
-
-
-    private HttpHeaders buildHeader(){
-        String nameHeader = "Authorization";
-        String token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyaG9uY3VzLm51bGxhbUB5YWhvby5lZHUiLCJpYXQiOjE2Njg4NDk3MTAsImV4cCI6MTY3OTY0OTcxMH0.vZ3y_zEilhMJYyGjlezHeh_olbdiWuIRU5-VTq8V974";
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.set(nameHeader, token);
-        return httpHeaders;
-    }
-
 }

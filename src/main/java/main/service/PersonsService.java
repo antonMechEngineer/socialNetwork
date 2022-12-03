@@ -32,7 +32,7 @@ public class PersonsService {
     private final FriendshipsRepository friendshipsRepository;
 
     public CommonResponse<PersonResponse> getPersonDataById(Long id, String token) {
-        Person srcPerson = friendsService.getSrcPersonByToken(token);
+        Person srcPerson = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow();
         return getCommonPersonResponse(getPersonById(id), srcPerson);
     }
 

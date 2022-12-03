@@ -15,7 +15,6 @@ import java.util.List;
 @Repository
 public interface FriendshipsRepository extends JpaRepository<Friendship, Long> {
 
-    Friendship findFriendshipBySrcPersonAndDstPerson(Person srcPerson, Person dstPerson);
     List<Friendship> findFriendshipBySrcPerson(Person srcPerson);
 
     @Query(value = "SELECT * FROM friendships WHERE (dst_person_id = :id OR src_person_id = :id)",

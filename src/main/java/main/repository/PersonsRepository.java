@@ -23,7 +23,9 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
     Optional<Person> findPersonByEmail(String email);
 
     Page<Person> findAllByCity(String city, Pageable page);
-    Page<Person> findPersonBySrcFriendshipsIn(List<Person> friendlyPersons, Pageable pageable);
+
+
+    Page<Person> findPersonByIdIn (List<Long> personIds, Pageable pageable);
 
     Page<Person> findAllByCity(City city, Pageable page);
 
