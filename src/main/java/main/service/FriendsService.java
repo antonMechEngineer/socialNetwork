@@ -1,5 +1,4 @@
 package main.service;
-
 import lombok.RequiredArgsConstructor;
 import main.api.response.CommonResponse;
 import main.api.response.ComplexRs;
@@ -26,11 +25,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import static main.model.enums.FriendshipStatusTypes.*;
 
-
 @RequiredArgsConstructor
 @Service
 public class FriendsService {
-
     private final FriendshipsRepository friendshipsRepository;
     private final FriendshipStatusesRepository friendshipStatusesRepository;
     private final PersonsRepository personsRepository;
@@ -149,7 +146,6 @@ public class FriendsService {
                 .build();
     }
 
-
     private List<PersonResponse> personsToPersonResponses(List<Person> persons, Person srcPerson) {
         List<PersonResponse> personResponses = new ArrayList<>();
         for (Person person : persons) {
@@ -161,5 +157,4 @@ public class FriendsService {
     private Optional <Friendship> getFriendshipByDstPerson(List<Friendship> friendships, Person dstPerson) {
         return friendships.stream().filter(fs -> fs.getDstPerson() == dstPerson).findFirst();
     }
-
 }

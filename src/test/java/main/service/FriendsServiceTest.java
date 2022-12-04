@@ -32,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static main.model.enums.FriendshipStatusTypes.*;
 import static org.mockito.Mockito.*;
-
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureEmbeddedDatabase
@@ -172,7 +171,6 @@ class FriendsServiceTest {
         friendsService.deleteFriend(C_FRIEND.getId());
         verify(friendshipsRepository, times(1)).delete(fsCurPsFr);
         verify(friendshipsRepository, times(1)).delete(fsFr);
-
     }
 
     @Test
