@@ -28,6 +28,8 @@ server:
 auth:
   secret: someSecretCode
   time-to-live: 3600000000
+  pass-restore: http://195.133.48.174:8080/change-password?token=
+  email-restore: http://195.133.48.174:8080/shift-email?token=
 
 logging:
   file:
@@ -40,3 +42,11 @@ yandex:
 
 user:
   time-to-delete: 2592000000
+
+spring.mail.protocol: smtps
+spring.mail.host: smtp.mail.ru
+spring.mail.port: 465
+spring.mail.username:  testbd@internet.ru
+spring.mail.password: hvYDUwgKj6fkDkFCkgSN
+spring.mail.properties.mail.smtp.auth: true
+spring.mail.properties.mail.smtp.ssl.enable: true
