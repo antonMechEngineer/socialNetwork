@@ -26,18 +26,18 @@ public class FriendsController {
     }
 
     @PostMapping("/{id}")
-    public FriendshipRs addFriend(@PathVariable Long id) {
+    public FriendshipRs sendFriendshipRequest (@PathVariable Long id) {
         return friendsService.sendFriendshipRequest(id);
+    }
+
+    @PostMapping("/request/{id}")
+    public FriendshipRs addFriend (@PathVariable Long id) {
+        return friendsService.addFriend(id);
     }
 
     @DeleteMapping("/{id}")
     public FriendshipRs deleteFriend(@PathVariable Long id) {
         return friendsService.deleteFriend(id);
-    }
-
-    @PostMapping("/request/{id}")
-    public FriendshipRs sendFriendshipRequest(@PathVariable Long id) {
-        return friendsService.addFriend(id);
     }
 
     @DeleteMapping("request/{id}")
