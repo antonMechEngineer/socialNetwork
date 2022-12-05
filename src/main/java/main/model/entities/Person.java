@@ -1,6 +1,7 @@
 package main.model.entities;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import main.model.enums.MessagePermissionTypes;
 import main.model.enums.ReadStatusTypes;
 import org.hibernate.annotations.LazyCollection;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@NoArgsConstructor
 @Entity
 @Data
 @Table(name = "persons", indexes = @Index(name = "full_name_index", columnList = "first_name, last_name", unique = true))
@@ -143,5 +145,15 @@ public class Person {
                 ", messagesCount=" + messages.size() +
                 ", likesCount=" + likes.size() +
                 '}';
+    }
+
+    public Person(Long id, String email) {
+        this.id = id;
+        this.email = email;
+    }
+
+    public Person(Long id) {
+        this.id = id;
+        this.email = email;
     }
 }

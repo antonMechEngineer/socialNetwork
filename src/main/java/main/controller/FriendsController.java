@@ -26,44 +26,46 @@ public class FriendsController {
     }
 
     @PostMapping("/{id}")
-    public FriendshipRs addFriend(@RequestHeader("Authorization") String token, @PathVariable Long id) {
-        return friendsService.sendFriendshipRequest(token, id);
+    public FriendshipRs sendFriendshipRequest (@PathVariable Long id) {
+        return friendsService.sendFriendshipRequest(id);
+    }
+
+    @PostMapping("/request/{id}")
+    public FriendshipRs addFriend (@PathVariable Long id) {
+        return friendsService.addFriend(id);
     }
 
     @DeleteMapping("/{id}")
-    public FriendshipRs deleteFriend(@RequestHeader("Authorization") String token, @PathVariable Long id) {
-        return friendsService.deleteFriend(token, id);
+    public FriendshipRs deleteFriend(@PathVariable Long id) {
+        return friendsService.deleteFriend(id);
+    }
+
+    @DeleteMapping("request/{id}")
+    public FriendshipRs deleteSentFriendshipRequest (@PathVariable Long id) {
+        return friendsService.deleteSentFriendshipRequest(id);
     }
 
     @GetMapping()
     @ResponseBody
     public CommonResponse<List<PersonResponse>> getFriends(
-            @RequestParam(required = false, defaultValue = "${socialNetwork.default.page}") int offset,
-            @RequestParam(required = false, defaultValue = "${socialNetwork.default.size}") int perPage,
-            @RequestHeader("Authorization") String token) {
-        return friendsService.getFriends(offset, perPage, token);
-    }
-
-    @PostMapping("/request/{id}")
-    public FriendshipRs sendFriendshipRequest(@RequestHeader("Authorization") String token,
-                                              @PathVariable Long id) {
-        return friendsService.addFriend(token, id);
+            @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
+            @RequestParam(name = "perPage", required = false, defaultValue = "${socialNetwork.default.size}") int size
+    )
+    {
+        return friendsService.getFriends(offset, size);
     }
 
     @GetMapping("/request")
     @ResponseBody
     public CommonResponse<List<PersonResponse>> getPotentialFriends(
-            @RequestParam(required = false, defaultValue = "${socialNetwork.default.page}") int offset,
-            @RequestParam(required = false, defaultValue = "${socialNetwork.default.size}") int perPage,
-            @RequestHeader("Authorization") String token) {
-        return friendsService.getRequestedPersons(offset, perPage, token);
+            @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
+            @RequestParam(name = "perPage", required = false, defaultValue = "${socialNetwork.default.size}") int size
+    )
+    {
+        return friendsService.getRequestedPersons(offset, size);
     }
 
-    @DeleteMapping("request/{id}")
-    public FriendshipRs deleteSentFriendshipRequest(@RequestHeader("Authorization") String token,
-                                                    @PathVariable Long id) {
-        return friendsService.deleteSentFriendshipRequest(token, id);
-    }
+
 
 
 }

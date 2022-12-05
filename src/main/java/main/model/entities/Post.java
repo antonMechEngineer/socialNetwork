@@ -1,7 +1,10 @@
 package main.model.entities;
 
 import lombok.Data;
+import main.model.entities.interfaces.Liked;
+import main.model.entities.interfaces.Notificationed;
 import main.model.enums.LikeTypes;
+import main.model.enums.NotificationTypes;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -12,7 +15,7 @@ import java.util.List;
 @Entity
 @Data
 @Table(name = "posts", indexes = @Index(name = "post_name_index", columnList = "title"))
-public class Post implements Liked {
+public class Post implements Liked, Notificationed {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,6 +55,11 @@ public class Post implements Liked {
     @Override
     public LikeTypes getType() {
         return LikeTypes.POST;
+    }
+
+    @Override
+    public NotificationTypes getNotificationType() {
+        return NotificationTypes.POST;
     }
 
     @Override
