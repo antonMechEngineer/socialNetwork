@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class PasswordRq {
-    private String token;
+    private String secret;
     private String password;
 }

@@ -101,7 +101,7 @@ public class AccountService {
     }
 
     public RegisterRs getPasswordReSet(PasswordRq passwordRq){
-        Optional<Person> optPerson = personsRepository.checkToken(passwordRq.getToken());
+        Optional<Person> optPerson = personsRepository.checkToken(passwordRq.getSecret());
         Person rescuePerson=null;
         if (optPerson.isPresent()){rescuePerson = optPerson.get();}
 
