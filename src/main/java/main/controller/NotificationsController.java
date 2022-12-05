@@ -17,8 +17,8 @@ public class NotificationsController {
 
     @GetMapping("/notifications")
     public CommonResponse<List<NotificationResponse>> getNotifications(
-            @RequestParam(required = false, defaultValue = "0") int offset,
-            @RequestParam(required = false, defaultValue = "10") int itemPerPage) {
+            @RequestParam(required = false, defaultValue = "${socialNetwork.default.page}") int offset,
+            @RequestParam(required = false, defaultValue = "${socialNetwork.default.noteSize}") int itemPerPage) {
 
         return notificationsService.getAllNotificationsByPerson(offset, itemPerPage);
     }
@@ -26,7 +26,7 @@ public class NotificationsController {
     @PutMapping("/notifications")
     public CommonResponse<List<NotificationResponse>> markAsReadNotification(
             @RequestParam(required = false) Long id,
-            @RequestParam boolean all) {
+            @RequestParam(required = false, defaultValue = "false") boolean all) {
 
         return notificationsService.markNotificationStatusAsRead(id, all);
     }
