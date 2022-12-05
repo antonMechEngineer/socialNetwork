@@ -27,7 +27,7 @@ server:
 
 auth:
   secret: someSecretCode
-  time-to-live: 60000
+  time-to-live: 36000000
 
 logging:
   file:
