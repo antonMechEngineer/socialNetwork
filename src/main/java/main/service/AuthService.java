@@ -33,6 +33,7 @@ public class AuthService {
                 return response;
             }
         }
+        // TODO: 02.12.2022 exception if user is not exist 
         return null;
     }
 

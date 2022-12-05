@@ -3,9 +3,7 @@ package main.model.entities;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.ZonedDateTime;
 
 @Entity
 @Data
@@ -16,11 +14,12 @@ public class Dialog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "last_time_active")
-    private LocalDateTime lastTimeActive;
+    @Column(name = "last_active_time")
+    private ZonedDateTime lastActiveTime;
 
-    @OneToMany(mappedBy = "dialog", cascade = CascadeType.ALL)
-    private List<Message> messages = new ArrayList<>();
+    @OneToOne
+    @JoinColumn(name = "last_message_id", referencedColumnName = "dialog_id")
+    private Message lastMessage;
 
     @ManyToOne
     @JoinColumn(name = "first_person_id", nullable = false)
@@ -29,15 +28,4 @@ public class Dialog {
     @ManyToOne
     @JoinColumn(name = "second_person_id", nullable = false)
     private Person secondPerson;
-
-    @Override
-    public String toString() {
-        return "Dialog{" +
-                "id=" + id +
-                ", lastTimeActive=" + lastTimeActive +
-                ", messagesCount=" + messages.size() +
-                ", firstPersonId=" + firstPerson.getId() +
-                ", secondPersonId=" + secondPerson.getId() +
-                '}';
-    }
 }

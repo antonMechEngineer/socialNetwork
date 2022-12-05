@@ -5,6 +5,7 @@ import main.model.enums.ReadStatusTypes;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
 @Data
@@ -16,7 +17,7 @@ public class Message {
     private Long id;
 
     @Column(nullable = false)
-    private LocalDateTime time;
+    private ZonedDateTime time;
 
     @Column(name = "message_text", nullable = false, columnDefinition = "TEXT")
     private String messageText;
@@ -36,20 +37,7 @@ public class Message {
     @JoinColumn(name = "recipient_id", nullable = false)
     private Person recipient;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "dialog_id", nullable = false)
     private Dialog dialog;
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "id=" + id +
-                ", messageText='" + messageText +
-                "', readStatus=" + readStatus +
-                ", isDeleted=" + isDeleted +
-                ", authorId=" + author.getId() +
-                ", recipientId=" + recipient.getId() +
-                ", dialogId=" + dialog.getId() +
-                '}';
-    }
 }
