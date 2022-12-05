@@ -12,12 +12,17 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @Setter
 @JsonInclude(NON_NULL)
 public class ComplexRs {
-    private int id;
+    private Integer id;
     private int count;
     private String message;
     private int message_id;
 
     public ComplexRs(String message) {
+        this.message = message;
+    }
+
+    public ComplexRs(Integer id, String message) {
+        this.id = id;
         this.message = message;
     }
 }

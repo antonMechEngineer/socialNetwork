@@ -54,7 +54,7 @@ public class FriendsService {
         Person srcPerson = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow();
         Person dstPerson = personsRepository.findPersonById(idDeletableFriend).orElseThrow();
         deleteFriendships(srcPerson, dstPerson);
-        return new FriendshipRs(defaultError, LocalDateTime.now().toString(), new ComplexRs(defaultError));
+        return new FriendshipRs(defaultError, LocalDateTime.now().toString(), new ComplexRs(Integer.valueOf(idDeletableFriend.toString()), defaultError));
     }
 
     public FriendshipRs deleteSentFriendshipRequest(Long idRequestedFriend) {

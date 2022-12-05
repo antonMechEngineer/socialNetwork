@@ -1,5 +1,6 @@
 package main.controller;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
+import main.model.enums.FriendshipStatusTypes;
 import main.repository.FriendshipStatusesRepository;
 import main.repository.FriendshipsRepository;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode.BEFORE_EACH_TEST_METHOD;
+import static main.model.enums.FriendshipStatusTypes.REQUEST;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -91,10 +93,15 @@ class FriendsControllerTest {
 
     @Test
     void deleteSentRequest() throws Exception {
-        Integer expectedFriendshipsAfterDeleting = 4;
-        mockMvc.perform(delete("/api/v1/friends/4"))
+        Integer expectedNumberFriendships = 4;
+        Integer expectedNumberFriendshipsWithRequest = 1;
+        mockMvc.perform(delete("/api/v1/friends/request/4"))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful());
-        assertEquals(expectedFriendshipsAfterDeleting, friendshipsRepository.findAll().size());
+        Integer actualNumberFriendshipsWithRequest = Math.toIntExact(friendshipsRepository.findAll().
+                stream().filter(fs -> fs.getFriendshipStatus().getCode() == REQUEST).count());
+        assertEquals(expectedNumberFriendships, friendshipsRepository.findAll().size());
+        assertEquals(expectedNumberFriendshipsWithRequest, actualNumberFriendshipsWithRequest);
     }
+
 }
