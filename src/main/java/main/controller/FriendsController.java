@@ -1,17 +1,15 @@
 package main.controller;
-
 import lombok.RequiredArgsConstructor;
 import main.api.response.CommonResponse;
 import main.api.response.FriendshipRs;
 import main.api.response.PersonResponse;
 import main.service.FriendsRecommendationService;
 import main.service.FriendsService;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/api/v1/friends")
 @RequiredArgsConstructor
 public class FriendsController {
@@ -26,21 +24,26 @@ public class FriendsController {
     }
 
     @PostMapping("/{id}")
+    @ResponseBody
     public FriendshipRs sendFriendshipRequest (@PathVariable Long id) {
         return friendsService.sendFriendshipRequest(id);
     }
 
     @PostMapping("/request/{id}")
+    @ResponseBody
     public FriendshipRs addFriend (@PathVariable Long id) {
         return friendsService.addFriend(id);
     }
 
     @DeleteMapping("/{id}")
+    @ResponseBody
     public FriendshipRs deleteFriend(@PathVariable Long id) {
-        return friendsService.deleteFriend(id);
+        FriendshipRs friendshipRs = friendsService.deleteFriend(id);
+        return friendshipRs;
     }
 
     @DeleteMapping("request/{id}")
+    @ResponseBody
     public FriendshipRs deleteSentFriendshipRequest (@PathVariable Long id) {
         return friendsService.deleteSentFriendshipRequest(id);
     }
@@ -64,8 +67,4 @@ public class FriendsController {
     {
         return friendsService.getRequestedPersons(offset, size);
     }
-
-
-
-
 }
