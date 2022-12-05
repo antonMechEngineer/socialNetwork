@@ -25,7 +25,9 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
     Optional<Person> findPersonByEmail(String email);
 
     Page<Person> findAllByCity(String city, Pageable page);
-    Page<Person> findPersonBySrcFriendshipsIn(List<Person> friendlyPersons, Pageable pageable);
+
+
+    Page<Person> findPersonByIdIn (List<Long> personIds, Pageable pageable);
 
     Page<Person> findAllByCity(City city, Pageable page);
 
@@ -40,6 +42,9 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
 
     @Query(value = "SELECT * FROM persons WHERE is_deleted = true AND (select(select extract(epoch from now()) - (extract(epoch from(deleted_time)))) * 1000 > :timeToDel)", nativeQuery = true)
     List<Person> findOldDeletes(@Param("timeToDel") long timeToDel);
+
+    @Query(value = "SELECT * FROM persons WHERE change_password_token = :token", nativeQuery = true)
+    Optional<Person> checkToken(@Param("token") String token);
 
     @Modifying
     @Transactional

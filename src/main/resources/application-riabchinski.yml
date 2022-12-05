@@ -30,9 +30,9 @@ spring:
 #  servlet:
 #    context-path: "/"
 
-#auth:
-#  secret: someSecretCode
-#  time-to-live: 3600000000
+auth:
+  pass-restore: http://localhost:8080/change-password?token=
+  email-restore: http://localhost:8080/shift-email?token=
 
 logging:
   file:

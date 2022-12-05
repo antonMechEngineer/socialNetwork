@@ -96,7 +96,8 @@ public class Person {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<BlockHistory> blockHistoryList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Post> posts = new ArrayList<>();
 
@@ -124,8 +125,6 @@ public class Person {
     @OneToMany(mappedBy = "author", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @LazyCollection(LazyCollectionOption.FALSE)
     @OnDelete(action = OnDeleteAction.CASCADE)
-//    @CollectionTable(name = "messages")
-//    @ElementCollection(targetClass = ReadStatusTypes.class, fetch = FetchType.EAGER)
     private List<Message> messages = new ArrayList<>();
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.REMOVE)
