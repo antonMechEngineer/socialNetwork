@@ -7,7 +7,6 @@ import main.api.response.PersonResponse;
 import main.service.FriendsRecommendationService;
 import main.service.FriendsService;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
