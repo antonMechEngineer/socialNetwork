@@ -45,7 +45,7 @@ public class AuthService {
                 .offset(0)
                 .perPage(0)
                 .errorDescription("")
-                .data(new ComplexRs())
+                .data(ComplexRs.builder().build())
                 .build();
     }
 }

@@ -41,45 +41,45 @@ public class FriendsService {
         Optional<Person> dstPersonOptional = personsRepository.findPersonById(futureFriendId);
         if (dstPersonOptional.isEmpty()) {
            String descriptionError = "Person with ID" + futureFriendId + " doesn't exist";
-            return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), new ComplexRs(descriptionError));
+            return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), ComplexRs.builder().message(descriptionError).build());
         }
         Person dstPerson = dstPersonOptional.get();
         modifyFriendShipStatus(srcPerson, dstPerson);
         modifyFriendShipStatus(dstPerson, srcPerson);
-        return new FriendshipRs(defaultError, LocalDateTime.now().toString(), new ComplexRs(defaultError));
+        return new FriendshipRs(defaultError, LocalDateTime.now().toString(), ComplexRs.builder().message(defaultError).build());
     }
 
     public FriendshipRs sendFriendshipRequest(String token, Long potentialFriendId) {
         Optional<Person> dstPersonOptional = personsRepository.findPersonById(potentialFriendId);
         if (dstPersonOptional.isEmpty()) {
            String descriptionError = "Person with ID" + potentialFriendId + " doesn't exist";
-            return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), new ComplexRs(descriptionError));
+            return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), ComplexRs.builder().message(descriptionError).build());
         }
         Person dstPerson = dstPersonOptional.get();
         createFriendshipObjects(getSrcPersonByToken(token), dstPerson);
-        return new FriendshipRs(defaultError, LocalDateTime.now().toString(), new ComplexRs(defaultError));
+        return new FriendshipRs(defaultError, LocalDateTime.now().toString(),ComplexRs.builder().message(defaultError).build());
     }
 
     public FriendshipRs deleteFriend(String token, Long idDeletableFriend) {
         Optional<Person> optionalDstPerson = personsRepository.findPersonById(idDeletableFriend);
         if (optionalDstPerson.isEmpty()) {
            String descriptionError = "Person with ID" + idDeletableFriend + " isn't your friend";
-            return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), new ComplexRs(descriptionError));
+            return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), ComplexRs.builder().message(descriptionError).build());
         }
         Person dstPerson = optionalDstPerson.get();
         deleteFriendships(getSrcPersonByToken(token), dstPerson);
-        return new FriendshipRs(defaultError, LocalDateTime.now().toString(), new ComplexRs(defaultError));
+        return new FriendshipRs(defaultError, LocalDateTime.now().toString(),ComplexRs.builder().message(defaultError).build());
     }
 
     public FriendshipRs deleteSentFriendshipRequest(String token, Long idRequestedPerson) {
         Optional<Person> dstPersonOptional = personsRepository.findPersonById(idRequestedPerson);
         if (dstPersonOptional.isEmpty()) {
             String descriptionError = "Person with ID" + idRequestedPerson + " isn't requested";
-            return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), new ComplexRs(descriptionError));
+            return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), ComplexRs.builder().message(descriptionError).build());
         }
         Person dstPerson = dstPersonOptional.get();
         deleteFriendships(getSrcPersonByToken(token), dstPerson);
-        return new FriendshipRs(defaultError, LocalDateTime.now().toString(), new ComplexRs(defaultError));
+        return new FriendshipRs(defaultError, LocalDateTime.now().toString(), ComplexRs.builder().message(defaultError).build());
     }
 
     public CommonResponse<List<PersonResponse>> getFriends(int offset, int perPage,String token) {

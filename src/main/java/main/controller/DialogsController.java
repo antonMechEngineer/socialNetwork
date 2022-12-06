@@ -6,13 +6,12 @@ import main.api.response.CommonResponse;
 import main.api.response.ComplexRs;
 import main.api.response.DialogRs;
 import main.service.DialogsService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/api/v1/dialogs")
 @RequiredArgsConstructor
 public class DialogsController {
@@ -20,17 +19,22 @@ public class DialogsController {
     private final DialogsService dialogsService;
 
     @GetMapping
-    public ResponseEntity<CommonResponse<List<DialogRs>>> dialogs() {
-        return ResponseEntity.ok(dialogsService.getAllDialogs());
+    public CommonResponse<List<DialogRs>> dialogs() {
+        return dialogsService.getAllDialogs();
     }
 
     @PostMapping
-    public ResponseEntity<CommonResponse<ComplexRs>> dialogsPreSend(@RequestBody DialogUserShortListDto dialogUserShortListDto) {
-        return ResponseEntity.ok(dialogsService.getMessage());
+    public CommonResponse<ComplexRs> dialogsStart(@RequestBody DialogUserShortListDto dialogUserShortListDto) {
+        return dialogsService.beginDialog(dialogUserShortListDto);
     }
 
     @GetMapping("/unreaded")
-    public ResponseEntity<CommonResponse<ComplexRs>> unreaded() {
-        return ResponseEntity.ok(dialogsService.getMessage());
+    public CommonResponse<ComplexRs> unreaded() {
+        return dialogsService.getMessage();
+    }
+
+    @PutMapping("/{dialogId}/read")
+    public CommonResponse<ComplexRs> read() {
+        return null;
     }
 }

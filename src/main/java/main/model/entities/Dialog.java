@@ -1,9 +1,10 @@
 package main.model.entities;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Entity
 @Data

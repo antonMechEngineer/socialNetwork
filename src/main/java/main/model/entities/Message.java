@@ -37,7 +37,7 @@ public class Message {
     @JoinColumn(name = "recipient_id", nullable = false)
     private Person recipient;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "dialog_id", nullable = false)
     private Dialog dialog;
 }
