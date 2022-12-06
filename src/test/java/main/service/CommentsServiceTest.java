@@ -96,6 +96,7 @@ class CommentsServiceTest {
         when(personMapper.toPersonResponse(any())).thenReturn(PersonResponse.builder().id(1L).build());
 
         assertEquals(commentsService.createComment(post, request).getData().getCommentText(), commentText);
+        verify(notificationsService).createNotification(any(), any());
     }
 
     @Test

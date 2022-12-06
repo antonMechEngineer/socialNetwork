@@ -1,6 +1,10 @@
 package main.service;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import main.api.request.EmailRq;
+import main.api.request.PasswordRq;
+import main.api.request.PasswordSetRq;
 import main.api.request.RegisterRq;
 import main.api.response.ComplexRs;
 import main.api.response.RegisterRs;
@@ -9,18 +13,33 @@ import main.model.entities.Person;
 import main.model.enums.MessagePermissionTypes;
 import main.repository.CaptchaRepository;
 import main.repository.PersonsRepository;
+import main.security.jwt.JWTUtil;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AccountService {
     private final PersonsRepository personsRepository;
     private final CaptchaRepository captchaRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EMailService eMailService;
+    private final JWTUtil jwtUtil;
+    private final AuthenticationManager authenticationManager;
+    @Value("${auth.pass-restore}")
+    String basePassUrl;
+    @Value("${auth.email-restore}")
+    String baseEmailUrl;
 
     public RegisterRs getRegResponse(RegisterRq regRequest){
         RegisterRs registerRs = new RegisterRs();
@@ -60,5 +79,93 @@ public class AccountService {
             personsRepository.save(person);
         }
         return registerRs;
+    }
+
+    public RegisterRs getPasswordSet(PasswordSetRq passwordSetRq){
+        Person person = personsRepository.findPersonByEmail(SecurityContextHolder
+                .getContext().getAuthentication().getName()).get();
+        RegisterRs response = new RegisterRs();
+        ComplexRs data = new ComplexRs();
+        data.setId(0);
+        data.setCount(0);
+        data.setMessage("OK");
+        data.setMessage_id(0);
+        response.setEmail(person.getEmail());
+        response.setTimestamp(0);
+        response.setData(data);
+
+        person.setPassword(passwordEncoder.encode(passwordSetRq.getPassword()));
+        personsRepository.save(person);
+
+        return response;
+    }
+
+    public RegisterRs getPasswordReSet(PasswordRq passwordRq){
+        Optional<Person> optPerson = personsRepository.checkToken(passwordRq.getSecret());
+        Person rescuePerson=null;
+        if (optPerson.isPresent()){rescuePerson = optPerson.get();}
+
+        RegisterRs response = new RegisterRs();
+        ComplexRs data = new ComplexRs();
+        data.setId(0);
+        data.setCount(0);
+        data.setMessage("OK");
+        data.setMessage_id(0);
+        response.setEmail(rescuePerson.getEmail());
+        response.setTimestamp(0);
+        response.setData(data);
+
+        rescuePerson.setPassword(passwordEncoder.encode(passwordRq.getPassword()));
+        personsRepository.save(rescuePerson);
+
+        return response;
+    }
+    public RegisterRs getPasswordRecovery(String email){
+        RegisterRs response = new RegisterRs();
+        ComplexRs data = new ComplexRs();
+        data.setId(0);
+        data.setCount(0);
+        data.setMessage("OK");
+        data.setMessage_id(0);
+        response.setEmail(email);
+        response.setTimestamp(0);
+        response.setData(data);
+
+        Person person = personsRepository.findPersonByEmail(email).get();
+        String token = UUID.randomUUID().toString().replaceAll("-", "");
+        Person userToRestore = person;
+        userToRestore.setChangePasswordToken(token);
+        personsRepository.save(userToRestore);
+
+        String to = email;
+        String subject = "Восстановление пароля";
+        String text =  basePassUrl+ token;
+        eMailService.sendSimpleMessage(to, subject, text);
+
+        return response;
+    }
+
+    public RegisterRs getEmailRecovery(){
+        Person person = personsRepository.findPersonByEmail(SecurityContextHolder
+                .getContext().getAuthentication().getName()).get();
+        RegisterRs response = new RegisterRs();
+        ComplexRs data = new ComplexRs();
+        data.setId(0);
+        data.setCount(0);
+        data.setMessage("OK");
+        data.setMessage_id(0);
+        response.setEmail(person.getEmail());
+        response.setTimestamp(0);
+        response.setData(data);
+
+        String token = UUID.randomUUID().toString().replaceAll("-", "");
+        person.setChangePasswordToken(token);
+        personsRepository.save(person);
+
+        String to = person.getEmail();
+        String subject = "Смена ящика почты";
+        String text =  baseEmailUrl+ token;
+        eMailService.sendSimpleMessage(to, subject, text);
+        return response;
     }
 }

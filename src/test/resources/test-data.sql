@@ -1,64 +1,8 @@
-INSERT INTO countries (title)
-VALUES
-    ('China'),
-    ('Nigeria'),
-    ('Russian Federation'),
-    ('Pakistan'),
-    ('Turkey'),
-    ('Canada'),
-    ('Belgium'),
-    ('New Zealand'),
-    ('South Korea'),
-    ('Norway');
-
-INSERT INTO cities (title)
-VALUES
-    ('Puqueldón'),
-    ('Warszawa'),
-    ('Choa Chu Kang'),
-    ('Sarreguemines'),
-    ('Queenstown'),
-    ('Vienna'),
-    ('Fairbanks'),
-    ('Ivano-Frankivsk'),
-    ('Belfast'),
-    ('Anamur'),
-    ('Chandigarh'),
-    ('Drohobych'),
-    ('Phan Rang–Tháp Chàm'),
-    ('Nässjö'),
-    ('Kaneohe'),
-    ('Châtellerault'),
-    ('Leticia'),
-    ('Hubei'),
-    ('Sunset Point'),
-    ('Kozan'),
-    ('Sachs Harbour'),
-    ('Warrington'),
-    ('Heilongjiang'),
-    ('Mildura'),
-    ('Pescantina'),
-    ('Chambave'),
-    ('Jecheon'),
-    ('Chandigarh'),
-    ('Chilpancingo'),
-    ('Labico'),
-    ('Woodstock'),
-    ('Montenegro'),
-    ('Puerto Princesa'),
-    ('Meugliano'),
-    ('Pontarlier'),
-    ('Guápiles'),
-    ('Algeciras'),
-    ('Jiangxi'),
-    ('Huacho'),
-    ('Bergen');
-
 INSERT INTO persons (first_name,last_name,reg_date,birth_date,email,phone,password,about)
 VALUES
+    ('Gretchen','Contreras','2022-09-29 21:49:07','2000-06-08 10:54:06','rhoncus.nullam@yahoo.edu','+7 (978) 311-43-59','ZvJ57ekY5Tc','senectus et netus et malesuada fames ac turpis egestas. Fusce aliquet magna a neque. Nullam ut'),
+    ('Jescie','Logan','2022-04-18 23:14:12','1979-01-03 15:07:47','molestie@yahoo.edu','+7 (965) 698-46-45','UbQ85uuS8Lu','molestie arcu. Sed eu nibh vulputate mauris sagittis placerat. Cras dictum ultricies ligula. Nullam enim. Sed nulla ante,');
 
-    (1, 'Gretchen','Contreras','2022-09-29 21:49:07','2000-06-08 10:54:06','rhoncus.nullam@yahoo.edu','+7 (978) 311-43-59','ZvJ57ekY5Tc','senectus et netus et malesuada fames ac turpis egestas. Fusce aliquet magna a neque. Nullam ut'),
-    (2, 'Jescie','Logan','2022-04-18 23:14:12','1979-01-03 15:07:47','molestie@yahoo.edu','+7 (965) 698-46-45','UbQ85uuS8Lu','molestie arcu. Sed eu nibh vulputate mauris sagittis placerat. Cras dictum ultricies ligula. Nullam enim. Sed nulla ante,');
 
 INSERT INTO posts (time,author_id,title,post_text)
 VALUES
@@ -81,6 +25,7 @@ VALUES
     ('2022-03-17 14:55:48',2,3,'magnis dis parturient montes, nascetur ridiculus mus. Aenean eget magna. Suspendisse tristique neque venenatis lacus. Etiam bibendum fermentum metus. Aenean sed pede nec ante blandit viverra. Donec tempus, lorem fringilla ornare placerat, orci lacus vestibulum lorem,'),
     ('2022-07-03 16:47:51',1,5,'nulla vulputate dui, nec tempus mauris erat eget ipsum. Suspendisse sagittis. Nullam vitae diam.'),
     ('2022-03-21 08:00:59',2,5,'id nunc interdum feugiat. Sed nec metus facilisis lorem tristique aliquet. Phasellus fermentum convallis');
+
 
 INSERT INTO tags (tag) VALUES  ('impedit');
 INSERT INTO tags (tag) VALUES  ('voluptatum');

@@ -25,7 +25,7 @@ public class Notification {
     @Column(name = "sent_time")
     private LocalDateTime sentTime;
 
-    @Any(metaColumn = @Column(name = "notification_type"), fetch = FetchType.EAGER)
+    @Any(metaColumn = @Column(name = "notification_type"))
     @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
             @MetaValue(targetEntity = Post.class, value = "POST"),
             @MetaValue(targetEntity = Comment.class, value = "POST_COMMENT"),

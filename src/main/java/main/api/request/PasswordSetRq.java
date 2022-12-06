@@ -3,7 +3,6 @@ package main.api.request;
 import lombok.Data;
 
 @Data
-public class PasswordRq {
-    private String secret;
+public class PasswordSetRq {
     private String password;
 }
