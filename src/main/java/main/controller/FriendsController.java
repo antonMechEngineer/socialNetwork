@@ -24,23 +24,23 @@ public class FriendsController {
     }
 
     @PostMapping("/{id}")
-    public FriendshipRs sendFriendshipRequest (@PathVariable Long id) {
+    public FriendshipRs sendFriendshipRequest (@PathVariable Long id) throws Exception {
         return friendsService.sendFriendshipRequest(id);
     }
 
     @PostMapping("/request/{id}")
-    public FriendshipRs addFriend (@PathVariable Long id) {
+    public FriendshipRs addFriend (@PathVariable Long id) throws Exception {
         return friendsService.addFriend(id);
     }
 
     @DeleteMapping("/{id}")
-    public FriendshipRs deleteFriend(@PathVariable Long id) {
+    public FriendshipRs deleteFriend(@PathVariable Long id) throws Exception {
         FriendshipRs friendshipRs = friendsService.deleteFriend(id);
         return friendshipRs;
     }
 
     @DeleteMapping("request/{id}")
-    public FriendshipRs deleteSentFriendshipRequest (@PathVariable Long id) {
+    public FriendshipRs deleteSentFriendshipRequest (@PathVariable Long id) throws Exception {
         return friendsService.deleteSentFriendshipRequest(id);
     }
 
@@ -48,8 +48,7 @@ public class FriendsController {
     public CommonResponse<List<PersonResponse>> getFriends(
             @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
             @RequestParam(name = "perPage", required = false, defaultValue = "${socialNetwork.default.size}") int size
-    )
-    {
+    ) throws Exception {
         return friendsService.getFriends(offset, size);
     }
 
@@ -57,8 +56,7 @@ public class FriendsController {
     public CommonResponse<List<PersonResponse>> getPotentialFriends(
             @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
             @RequestParam(name = "perPage", required = false, defaultValue = "${socialNetwork.default.size}") int size
-    )
-    {
+    ) throws Exception {
         return friendsService.getRequestedPersons(offset, size);
     }
 }
