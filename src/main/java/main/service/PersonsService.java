@@ -11,9 +11,13 @@ import main.model.entities.Person;
 import main.model.enums.FriendshipStatusTypes;
 import main.repository.FriendshipsRepository;
 import main.repository.PersonsRepository;
+import org.springframework.context.event.EventListener;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -32,7 +36,7 @@ public class PersonsService {
     private final FriendshipsRepository friendshipsRepository;
 
     public CommonResponse<PersonResponse> getPersonDataById(Long id, String token) {
-        Person srcPerson = friendsService.getSrcPersonByToken(token);
+        Person srcPerson = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow();
         return getCommonPersonResponse(getPersonById(id), srcPerson);
     }
 
@@ -83,5 +87,13 @@ public class PersonsService {
                 .build();
     }
 
-
+    @EventListener
+    public void updatePersonOnlineTime(SessionSubscribeEvent event) {
+        MessageHeaders messageHeaders = event.getMessage().getHeaders();
+        String personIdFromHeader = SimpMessageHeaderAccessor.getSubscriptionId(messageHeaders);
+        Long personIdFromUser = personsRepository.findPersonId(SimpMessageHeaderAccessor.getUser(messageHeaders).getName()).orElse(0L);
+        if (personIdFromUser.equals(Long.parseLong(personIdFromHeader))) {
+            personsRepository.updateOnlineTime(Long.parseLong(personIdFromHeader));
+        }
+    }
 }

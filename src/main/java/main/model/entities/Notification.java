@@ -1,6 +1,7 @@
 package main.model.entities;
 
 import lombok.Data;
+import main.model.entities.interfaces.Notificationed;
 import main.model.enums.NotificationTypes;
 import org.hibernate.annotations.Any;
 import org.hibernate.annotations.AnyMetaDef;
@@ -24,7 +25,7 @@ public class Notification {
     @Column(name = "sent_time")
     private LocalDateTime sentTime;
 
-    @Any(metaColumn = @Column(name = "notification_type"), fetch = FetchType.EAGER)
+    @Any(metaColumn = @Column(name = "notification_type"))
     @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
             @MetaValue(targetEntity = Post.class, value = "POST"),
             @MetaValue(targetEntity = Comment.class, value = "POST_COMMENT"),
@@ -33,7 +34,7 @@ public class Notification {
             @MetaValue(targetEntity = Message.class, value = "MESSAGE"),
     })
     @JoinColumn(name = "entity_id")
-    private Object entity;
+    private Notificationed entity;
 
     private String contact;
 

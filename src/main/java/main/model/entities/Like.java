@@ -1,12 +1,13 @@
 package main.model.entities;
 
 import lombok.Data;
+import main.model.entities.interfaces.Liked;
 import main.model.enums.LikeTypes;
-import org.hibernate.annotations.Any;
-import org.hibernate.annotations.AnyMetaDef;
-import org.hibernate.annotations.MetaValue;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
@@ -25,7 +26,7 @@ public class Like {
     @JoinColumn(name = "person_id", nullable = false)
     private Person person;
 
-    @Any(metaDef = "likesMetaDef",metaColumn = @Column(name = "type"), fetch = FetchType.EAGER)
+    @Any(metaDef = "likesMetaDef",metaColumn = @Column(name = "type"))
     @AnyMetaDef(name = "likesMetaDef", idType = "long", metaType = "string", metaValues = {
             @MetaValue(targetEntity = Post.class, value = "POST"),
             @MetaValue(targetEntity = Comment.class, value = "COMMENT")

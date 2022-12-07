@@ -6,11 +6,7 @@ import com.cloudinary.utils.ObjectUtils;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.InputStream;
 import java.util.Map;
 
 
@@ -33,7 +29,6 @@ public class CloudaryService {
                     "overwrite", true
             );
                     cloudinary.uploader().upload(file, params1);
-       //     cloudinary.uploader().rename(file.toString(), newFileName, params1);
         } catch (Exception e) {
             e.getMessage();
         }

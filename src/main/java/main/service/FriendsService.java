@@ -5,6 +5,7 @@ import main.api.response.CommonResponse;
 import main.api.response.ComplexRs;
 import main.api.response.FriendshipRs;
 import main.api.response.PersonResponse;
+import main.errors.PersonNotFoundException;
 import main.mappers.FriendMapper;
 import main.model.entities.Friendship;
 import main.model.entities.FriendshipStatus;
@@ -13,94 +14,76 @@ import main.model.enums.FriendshipStatusTypes;
 import main.repository.FriendshipStatusesRepository;
 import main.repository.FriendshipsRepository;
 import main.repository.PersonsRepository;
-import main.security.jwt.JWTUtil;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static main.model.enums.FriendshipStatusTypes.*;
+
 @RequiredArgsConstructor
 @Service
 public class FriendsService {
-
     private final FriendshipsRepository friendshipsRepository;
     private final FriendshipStatusesRepository friendshipStatusesRepository;
     private final PersonsRepository personsRepository;
-    private final JWTUtil jwtUtil;
     private final FriendMapper friendMapper;
-    private final String defaultError = "ok";
+    private final NotificationsService notificationsService;
+    private static final String DEFAULT_ERROR = "ok";
+    private static final String DESCRIPTION = "Invalid id";
 
-    public FriendshipRs addFriend(String token, Long futureFriendId) {
-        Person srcPerson = getSrcPersonByToken(token);
-        Optional<Person> dstPersonOptional = personsRepository.findPersonById(futureFriendId);
-        if (dstPersonOptional.isEmpty()) {
-           String descriptionError = "Person with ID" + futureFriendId + " doesn't exist";
-            return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), ComplexRs.builder().message(descriptionError).build());
-        }
-        Person dstPerson = dstPersonOptional.get();
+    public FriendshipRs addFriend(Long receivedFriendId) throws Exception {
+        Person srcPerson = getSrcPerson();
+        Person dstPerson = getDstPerson(receivedFriendId);
         modifyFriendShipStatus(srcPerson, dstPerson);
         modifyFriendShipStatus(dstPerson, srcPerson);
-        return new FriendshipRs(defaultError, LocalDateTime.now().toString(), ComplexRs.builder().message(defaultError).build());
+        return new FriendshipRs(DEFAULT_ERROR, LocalDateTime.now().toString(), new ComplexRs(DEFAULT_ERROR));
     }
 
-    public FriendshipRs sendFriendshipRequest(String token, Long potentialFriendId) {
-        Optional<Person> dstPersonOptional = personsRepository.findPersonById(potentialFriendId);
-        if (dstPersonOptional.isEmpty()) {
-           String descriptionError = "Person with ID" + potentialFriendId + " doesn't exist";
-            return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), ComplexRs.builder().message(descriptionError).build());
-        }
-        Person dstPerson = dstPersonOptional.get();
-        createFriendshipObjects(getSrcPersonByToken(token), dstPerson);
-        return new FriendshipRs(defaultError, LocalDateTime.now().toString(),ComplexRs.builder().message(defaultError).build());
+    public FriendshipRs sendFriendshipRequest(Long requestedFriendId) throws Exception {
+        Person srcPerson = getSrcPerson();
+        Person dstPerson = getDstPerson(requestedFriendId);
+        createFriendshipObjects(srcPerson, dstPerson);
+        return new FriendshipRs(DEFAULT_ERROR, LocalDateTime.now().toString(), new ComplexRs(DEFAULT_ERROR));
     }
 
-    public FriendshipRs deleteFriend(String token, Long idDeletableFriend) {
-        Optional<Person> optionalDstPerson = personsRepository.findPersonById(idDeletableFriend);
-        if (optionalDstPerson.isEmpty()) {
-           String descriptionError = "Person with ID" + idDeletableFriend + " isn't your friend";
-            return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), ComplexRs.builder().message(descriptionError).build());
-        }
-        Person dstPerson = optionalDstPerson.get();
-        deleteFriendships(getSrcPersonByToken(token), dstPerson);
-        return new FriendshipRs(defaultError, LocalDateTime.now().toString(),ComplexRs.builder().message(defaultError).build());
+    public FriendshipRs deleteFriend(Long idDeletableFriend) throws Exception {
+        Person srcPerson = getSrcPerson();
+        Person dstPerson = getDstPerson(idDeletableFriend);
+        deleteFriendships(srcPerson, dstPerson);
+        return new FriendshipRs(DEFAULT_ERROR, LocalDateTime.now().toString(), new ComplexRs(DEFAULT_ERROR));
     }
 
-    public FriendshipRs deleteSentFriendshipRequest(String token, Long idRequestedPerson) {
-        Optional<Person> dstPersonOptional = personsRepository.findPersonById(idRequestedPerson);
-        if (dstPersonOptional.isEmpty()) {
-            String descriptionError = "Person with ID" + idRequestedPerson + " isn't requested";
-            return new FriendshipRs(descriptionError, LocalDateTime.now().toString(), ComplexRs.builder().message(descriptionError).build());
-        }
-        Person dstPerson = dstPersonOptional.get();
-        deleteFriendships(getSrcPersonByToken(token), dstPerson);
-        return new FriendshipRs(defaultError, LocalDateTime.now().toString(), ComplexRs.builder().message(defaultError).build());
+    public FriendshipRs deleteSentFriendshipRequest(Long idRequestedFriend) throws Exception {
+        Person srcPerson = getSrcPerson();
+        Person dstPerson = getDstPerson(idRequestedFriend);
+        deleteFriendships(srcPerson, dstPerson);
+        return new FriendshipRs(DEFAULT_ERROR, LocalDateTime.now().toString(), new ComplexRs(DEFAULT_ERROR));
     }
 
-    public CommonResponse<List<PersonResponse>> getFriends(int offset, int perPage,String token) {
-        List<PersonResponse> requestedPersons = getPersons(token, FriendshipStatusTypes.FRIEND);
-        return buildCommonResponse(offset, perPage, requestedPersons);
+    public CommonResponse<List<PersonResponse>> getFriends(Integer offset, Integer size) throws Exception {
+        Person srcPerson = getSrcPerson();
+        Page<Person> requestedPersons = getPersons(srcPerson, offset, size, FriendshipStatusTypes.FRIEND);
+        return buildCommonResponse(requestedPersons, srcPerson, offset);
     }
 
-    public CommonResponse<List<PersonResponse>> getRequestedPersons(int offset, int perPage, String token) {
-        List<PersonResponse> personsSentResponse = getPersons(token, FriendshipStatusTypes.RECEIVED_REQUEST);
-        return buildCommonResponse(offset, perPage, personsSentResponse);
+    public CommonResponse<List<PersonResponse>> getRequestedPersons(Integer offset, Integer size) throws Exception {
+        Person srcPerson = getSrcPerson();
+        Page<Person> personsSentResponse = getPersons(srcPerson, offset, size, RECEIVED_REQUEST);
+        return buildCommonResponse(personsSentResponse, srcPerson, offset);
     }
 
-    public Person getSrcPersonByToken(String token) {
-        String personEmail = jwtUtil.extractUserName(token);
-        return personsRepository.findPersonByEmail(personEmail).orElseThrow();
-    }
-
-    public FriendshipStatusTypes getStatusTwoPersons(Person dstPerson, Person srcPerson){
-        Optional<Friendship> optionalSrcFriendship = friendshipsRepository.findFriendshipBySrcPerson(srcPerson).
-                stream().filter(fs -> fs.getDstPerson() == dstPerson).collect(Collectors.toList()).stream().findFirst();
-        FriendshipStatusTypes srcFriendshipStatusType = FriendshipStatusTypes.UNKNOWN;
+    public FriendshipStatusTypes getStatusTwoPersons(Person dstPerson, Person srcPerson) {
+        List<Friendship> srcFriendships = friendshipsRepository.findFriendshipBySrcPerson(srcPerson);
+        Optional<Friendship> optionalSrcFriendship = getFriendshipByDstPerson(srcFriendships, dstPerson);
+        FriendshipStatusTypes srcFriendshipStatusType = UNKNOWN;
         if (optionalSrcFriendship.isPresent()) {
             srcFriendshipStatusType = optionalSrcFriendship.get().getFriendshipStatus().getCode();
         }
@@ -108,48 +91,46 @@ public class FriendsService {
     }
 
     private void createFriendshipObjects(Person srcPerson, Person dstPerson) {
-        FriendshipStatus srcFriendshipStatus = new FriendshipStatus(LocalDateTime.now(),
-                FriendshipStatusTypes.REQUEST, FriendshipStatusTypes.REQUEST.toString());
-        FriendshipStatus dstFriendshipStatus = new FriendshipStatus(LocalDateTime.now(),
-                FriendshipStatusTypes.RECEIVED_REQUEST, FriendshipStatusTypes.RECEIVED_REQUEST.toString());
+        FriendshipStatus srcFriendshipStatus = new FriendshipStatus(LocalDateTime.now(), REQUEST, REQUEST.toString());
+        FriendshipStatus dstFriendshipStatus = new FriendshipStatus(LocalDateTime.now(), RECEIVED_REQUEST, RECEIVED_REQUEST.toString());
         friendshipStatusesRepository.save(srcFriendshipStatus);
         friendshipStatusesRepository.save(dstFriendshipStatus);
         Friendship srcFriendship = new Friendship(LocalDateTime.now(), srcPerson, dstPerson, srcFriendshipStatus);
         Friendship dstFriendship = new Friendship(LocalDateTime.now(), dstPerson, srcPerson, dstFriendshipStatus);
         friendshipsRepository.save(srcFriendship);
         friendshipsRepository.save(dstFriendship);
+        notificationsService.createNotification(srcFriendship, dstPerson);
+        notificationsService.createNotification(dstFriendship, srcPerson);
     }
 
     private void deleteFriendships(Person srcPerson, Person dstPerson) {
-        Friendship srcFriendship = getFriendshipByDstPerson(friendshipsRepository.findFriendshipBySrcPerson(srcPerson), dstPerson);
-        Friendship dstFriendship = getFriendshipByDstPerson(friendshipsRepository.findFriendshipBySrcPerson(dstPerson), srcPerson);
+        List<Friendship> srcFriendships = friendshipsRepository.findFriendshipBySrcPerson(srcPerson);
+        List<Friendship> dstFriendships = friendshipsRepository.findFriendshipBySrcPerson(dstPerson);
+        Friendship srcFriendship = getFriendshipByDstPerson(srcFriendships, dstPerson).orElseThrow();
+        Friendship dstFriendship = getFriendshipByDstPerson(dstFriendships, srcPerson).orElseThrow();
         friendshipsRepository.delete(srcFriendship);
         friendshipsRepository.delete(dstFriendship);
     }
 
-    private List<PersonResponse> getPersons(String token, FriendshipStatusTypes friendshipStatusTypes) {
-        Person srcPerson = getSrcPersonByToken(token);
+    private Page<Person> getPersons(Person srcPerson, Integer offset, Integer size, FriendshipStatusTypes friendshipStatusTypes) {
+        Pageable pageable = PageRequest.of(offset, size);
         List<Friendship> srcPersonFriendships = friendshipsRepository.findFriendshipBySrcPerson(srcPerson);
         srcPersonFriendships = getFriendshipsByType(srcPersonFriendships, friendshipStatusTypes);
-        if (srcPersonFriendships.size() == 0) {
-            return new ArrayList<>();
-        } else {
-            List<Person> persons = srcPersonFriendships.stream().map(Friendship::getDstPerson).collect(Collectors.toList());
-            return personsToPersonResponses(persons, srcPerson);
-        }
+        List<Long> friendlyIds = srcPersonFriendships.stream().map(Friendship::getDstPerson).map(Person::getId).collect(Collectors.toList());
+        Page<Person> persons = personsRepository.findPersonByIdIn(friendlyIds, pageable);
+        return persons;
     }
 
     private void modifyFriendShipStatus(Person srcPerson, Person dstPerson) {
-
         List<Friendship> srcFriendships = friendshipsRepository.findFriendshipBySrcPerson(srcPerson);
-        Optional<Friendship> optionalSrcFriendship = srcFriendships.stream().
-                filter(friendship -> friendship.getDstPerson().equals(dstPerson)).findFirst();
+        Optional<Friendship> optionalSrcFriendship = getFriendshipByDstPerson(srcFriendships, dstPerson);
         if (optionalSrcFriendship.isPresent()) {
             FriendshipStatus srcFriendshipStatus = optionalSrcFriendship.get().getFriendshipStatus();
-            srcFriendshipStatus.setCode(FriendshipStatusTypes.FRIEND);
-            srcFriendshipStatus.setName(FriendshipStatusTypes.FRIEND.toString());
+            srcFriendshipStatus.setCode(FRIEND);
+            srcFriendshipStatus.setName(FRIEND.toString());
             srcFriendshipStatus.setTime(LocalDateTime.now());
             friendshipStatusesRepository.save(srcFriendshipStatus);
+            notificationsService.createNotification(optionalSrcFriendship.get(), dstPerson);
         }
     }
 
@@ -158,15 +139,14 @@ public class FriendsService {
                 collect(Collectors.toList());
     }
 
-    private CommonResponse<List<PersonResponse>> buildCommonResponse(int offset, int perPage, List<PersonResponse> personResponses) {
-        Pageable pageable = PageRequest.of(offset, perPage);
-        Page<PersonResponse> pagePersons = new PageImpl<>(personResponses, pageable, personResponses.size());
+    private CommonResponse<List<PersonResponse>> buildCommonResponse(Page<Person> persons, Person srcPerson, Integer offset) {
+        List<PersonResponse> responsePersons = personsToPersonResponses(persons.getContent(), srcPerson);
         return CommonResponse.<List<PersonResponse>>builder()
                 .timestamp(System.currentTimeMillis())
                 .offset(offset)
-                .perPage(perPage)
-                .total(pagePersons.getTotalElements())
-                .data(personResponses)
+                .perPage(persons.getSize())
+                .total(persons.getTotalElements())
+                .data(responsePersons)
                 .build();
     }
 
@@ -178,8 +158,17 @@ public class FriendsService {
         return personResponses;
     }
 
-    private Friendship getFriendshipByDstPerson(List<Friendship> friendships, Person dstPerson) {
-        return friendships.stream().filter(fs -> fs.getDstPerson() == dstPerson).collect(Collectors.toList()).get(0);
+    private Optional<Friendship> getFriendshipByDstPerson(List<Friendship> friendships, Person dstPerson) {
+        return friendships.stream().filter(fs -> fs.getDstPerson() == dstPerson).findFirst();
     }
 
+    private Person getSrcPerson() throws Exception {
+        String srcEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return personsRepository.findPersonByEmail(srcEmail).orElseThrow(new PersonNotFoundException(DESCRIPTION));
+    }
+
+    private Person getDstPerson(Long id) throws Exception {
+        return personsRepository.findPersonById(id).orElseThrow(new PersonNotFoundException(DESCRIPTION));
+
+    }
 }
