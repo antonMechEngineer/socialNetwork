@@ -44,7 +44,6 @@ public class CommonSearchMethods {
         String[] splitName = name.split("\\s+");
         if (splitName.length > 1) {
             persons = personsRepository.findPersonByFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(splitName[0], splitName[1]);
-            persons.forEach(person -> System.out.println(person.getLastName() + " -- " + person.getFirstName()));
         }
         if (splitName.length < 2) {
             persons = personsRepository.findPersonByFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(name, name);
