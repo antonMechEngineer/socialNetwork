@@ -20,7 +20,7 @@ public class UpdatePersonOnlineTimeAspect {
     public void updateOnlineTime() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         if (email != null) {
-//            personsRepository.updateOnlineTime(email, LocalDateTime.now());
+            personsRepository.updateOnlineTime(email, LocalDateTime.now());
         }
     }
 }
