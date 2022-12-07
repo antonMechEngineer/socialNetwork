@@ -6,6 +6,7 @@ import main.api.response.PersonResponse;
 import main.mappers.PersonMapper;
 import main.model.entities.Person;
 import main.repository.PersonsRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,20 +25,21 @@ public class FriendsRecommendationService {
     public CommonResponse<List<PersonResponse>> getFriendsRecommendation() {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
         Pageable page = PageRequest.of(0, 8);
-//        List<PersonResponse> personResponses = personsToPersonResponses(personsRepository.findAllByCity(person.getCity(), page).getContent());
-        List<PersonResponse> personResponses = personsToPersonResponses(personsRepository.findAllByCity(person.getCity(), page).getContent());
-        if (person.getCity() == null || personResponses.size() == 0) {
-            personResponses = personsToPersonResponses(personsRepository.findPageOrderByRegDate(page).getContent());
-            return buildCommonResponse(personResponses);
+        Page<Person> persons = personsRepository.findAllByCity(person.getCity(), page);
+        if (person.getCity() == null || persons.getTotalElements() == 0) {
+            persons = personsRepository.findPageOrderByRegDate(page);
+            return buildCommonResponse(persons, 0, 8);
         }
-        return buildCommonResponse(personResponses);
+        return buildCommonResponse(persons, 0, 8);
     }
 
-    private CommonResponse<List<PersonResponse>> buildCommonResponse(List<PersonResponse> personResponses) {
+    private CommonResponse<List<PersonResponse>> buildCommonResponse(Page<Person> persons, int offset, int perPage) {
         return CommonResponse.<List<PersonResponse>>builder()
                 .timestamp(System.currentTimeMillis())
-                .total((long) personResponses.size())
-                .data(personResponses)
+                .total(persons.getTotalElements())
+                .offset(offset)
+                .perPage(perPage)
+                .data(personsToPersonResponses(persons.getContent()))
                 .build();
     }
 

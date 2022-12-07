@@ -69,7 +69,6 @@ public class PostsController {
             FindPostRq postRq,
             @RequestParam(required = false, defaultValue = "${socialNetwork.default.page}") int offset,
             @RequestParam(required = false, defaultValue = "${socialNetwork.default.size}") int perPage) throws SQLException, EmptyFieldException {
-
         return postsService.findPosts(postRq, offset, perPage);
     }
 }

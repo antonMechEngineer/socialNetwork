@@ -37,7 +37,7 @@ class TagsServiceTest {
 
     @BeforeEach
     void setUp() {
-        post =new Post();
+        post = new Post();
         post.setAuthor(new Person());
         tag = new Tag("tag1");
 

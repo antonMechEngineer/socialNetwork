@@ -1,7 +1,6 @@
 package main.repository;
 
 import main.model.entities.City;
-import main.model.entities.Friendship;
 import main.model.entities.Person;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,13 +28,11 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
 
     Page<Person> findPersonByIdIn (List<Long> personIds, Pageable pageable);
 
-    Page<Person> findAllByCity(City city, Pageable page);
-
     @Query("FROM Person AS p " +
             "ORDER BY p.regDate DESC")
     Page<Person> findPageOrderByRegDate(Pageable page);
 
-    Person findPersonByFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(String firstName, String lastName);
+    List<Person> findPersonByFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(String firstName, String lastName);
 
     @Query(value = "SELECT id FROM persons WHERE is_deleted = true AND (select(select extract(epoch from now()) - (extract(epoch from(deleted_time)))) * 1000 >  :timeToDel)", nativeQuery = true)
     List<Long> findIdtoDelete(@Param("timeToDel") long timeToDel);
