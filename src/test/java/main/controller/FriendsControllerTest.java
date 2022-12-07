@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
@@ -32,6 +33,8 @@ class FriendsControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private TokenCheck tokenCheck;
 
     @Test
     void sendFriendshipRequest() throws Exception {
@@ -96,5 +99,20 @@ class FriendsControllerTest {
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful());
         assertEquals(expectedFriendshipsAfterDeleting, friendshipsRepository.findAll().size());
+    }
+
+    @Test
+    @Sql("/FriendsControllerData/friendsController-getRecommendedFriends.sql")
+    void getRecommendedFriends() throws Exception {
+        String url = "/api/v1/friends/recommendations";
+        mockMvc.perform(get(url))
+                .andDo(print())
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.total").value(8))
+                .andExpect(jsonPath("$.offset").value(0))
+                .andExpect(jsonPath("$.perPage").value(8))
+                .andExpect(jsonPath("$.data").isArray());
+
+        tokenCheck.wrongOrExpiredTokenCheck(mockMvc, HttpMethod.GET, url);
     }
 }

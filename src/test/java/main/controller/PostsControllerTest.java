@@ -1,17 +1,14 @@
 package main.controller;
 
+
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import main.api.request.PostRequest;
-import main.model.entities.Post;
-import main.repository.PostsRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
@@ -38,6 +35,8 @@ class PostsControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private TokenCheck tokenCheck;
 
     @Test
     void getFeeds() throws Exception {
@@ -88,5 +87,24 @@ class PostsControllerTest {
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.data.type").value("POSTED"));
+    }
+
+    @Test
+    @Sql("/PostsControllerData/postsController-findPost.sql")
+    void findPost() throws Exception {
+        String url = "/api/v1/post";
+        mockMvc.perform(get(url)
+                        .param("text", "e")
+                        .param("date_from", "1638883747478")
+                        .param("date_to", "1670419731981")
+                        .param("tags", "funny"))
+                .andDo(print())
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.total").value(4))
+                .andExpect(jsonPath("$.offset").value(0))
+                .andExpect(jsonPath("$.perPage").value(20))
+                .andExpect(jsonPath("$.data").isArray());
+
+        tokenCheck.wrongOrExpiredTokenCheck(mockMvc, HttpMethod.GET, url);
     }
 }

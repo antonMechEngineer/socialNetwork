@@ -19,10 +19,12 @@ public class SearchPosts {
     private long total;
 
     public List<Post> findPosts(FindPostRq postRq, int offset, int perPage) throws SQLException {
-        Person person = null;
+        StringJoiner personIds = new StringJoiner(",");
         StringJoiner tags = new StringJoiner(",");
+        List<Post> postsList;
         if (postRq.getAuthor() != null) {
-            person = commonSearchMethods.findPersonByNameOrLastNameContains(postRq.getAuthor());
+            List<Person> personList = commonSearchMethods.findPersonByNameOrLastNameContains(postRq.getAuthor());
+            personList.forEach(person -> personIds.add("'" + person.getId() + "'"));
         }
         if (postRq.getTags() != null) {
             postRq.getTags().forEach(tag -> tags.add("'" + tag + "'"));
@@ -34,13 +36,14 @@ public class SearchPosts {
                 (postRq.getText() != null ? " post_text ~* '" + postRq.getText() + "'" : "") +
                 (postRq.getDate_from() != null && postRq.getDate_to() != null ? " AND p.time BETWEEN '" + commonSearchMethods.longToLocalDateTime(postRq.getDate_from()) +
                         "' AND '" + commonSearchMethods.longToLocalDateTime(postRq.getDate_to()) + "'" : "") +
-                (postRq.getAuthor() != null ? " AND p.author_id = " + (person == null ? null : person.getId()) : "") +
+                (postRq.getAuthor() != null ? " AND p.author_id IN (" + (personIds.length() == 0 ? null : personIds) + ")" : "") +
                 (postRq.getTags() != null ? " AND t.tag IN (" + tags + ") GROUP BY p.id HAVING COUNT(p2t.tag_id) = " + postRq.getTags().size() : ""));
         List<Long> postsId = commonSearchMethods.getIdsFromResultSet(posts);
-        total = postsId.size();
+        postsList = postsRepository.findAllById(postsId);
+        total = postsList.size();
         commonSearchMethods.closeStatementAndConnection();
         posts.close();
-        return commonSearchMethods.getPageFromList(postsRepository.findAllById(postsId), offset, perPage);
+        return commonSearchMethods.getPageFromList(postsList, offset, perPage);
     }
 
     public Long getTotal() {

@@ -64,8 +64,4 @@ public class FriendsController {
     {
         return friendsService.getRequestedPersons(offset, size);
     }
-
-
-
-
 }

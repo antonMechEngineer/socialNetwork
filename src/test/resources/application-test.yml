@@ -16,6 +16,10 @@ socialNetwork:
     page: 0
     size: 20
 
+token:
+  expiredToken: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyaG9uY3VzLm51bGxhbUB5YWhvby5lZHUiLCJleHAiOiIxNjY4ODQ5NzEwIiwiaWF0IjoiMTY2ODg0OTcxMCJ9.kIcgaLNoOSUef8cf1I3MHB-aqrsnPE1Dp3hAhuAiaUs
+  wrongSecretToken: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyaG9uY3VzLm51bGxhbUB5YWhvby5lZHUiLCJleHAiOiIxNjY4ODQ5NzEwIiwiaWF0IjoiMTY2ODg0OTcxMCJ9.kXZbqzsr9Hg3SNZh6bERQrqIjmhh6tPlsAy-qwtWDxk
+
 
 
 
