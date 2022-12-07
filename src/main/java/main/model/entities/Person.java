@@ -2,6 +2,7 @@ package main.model.entities;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import main.model.enums.FriendshipStatusTypes;
 import main.model.enums.MessagePermissionTypes;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -128,6 +129,9 @@ public class Person {
 //    @LazyCollection(LazyCollectionOption.FALSE)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Like> likes = new ArrayList<>();
+
+    @Transient
+    private FriendshipStatusTypes friendStatus = FriendshipStatusTypes.UNKNOWN;
 
     @Override
     public String toString() {

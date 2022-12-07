@@ -77,7 +77,7 @@ public class NotificationsService {
         notification.setEntity(entity);
         notification.setSentTime(LocalDateTime.now());
         notificationsRepository.save(notification);
-        template.convertAndSend(String.format("/user/%s/queue/notifications", notification.getPerson().getId()),
+        template.convertAndSend(String.format("/user/%s/queue/notifications", person.getId()),
                 getAllNotificationsByPerson(offset, size, person));
     }
 }

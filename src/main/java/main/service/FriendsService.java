@@ -99,8 +99,7 @@ public class FriendsService {
         Friendship dstFriendship = new Friendship(LocalDateTime.now(), dstPerson, srcPerson, dstFriendshipStatus);
         friendshipsRepository.save(srcFriendship);
         friendshipsRepository.save(dstFriendship);
-        notificationsService.createNotification(srcFriendship, dstPerson);
-        notificationsService.createNotification(dstFriendship, srcPerson);
+        notificationsService.createNotification(dstFriendship, dstPerson);
     }
 
     private void deleteFriendships(Person srcPerson, Person dstPerson) {
@@ -130,7 +129,6 @@ public class FriendsService {
             srcFriendshipStatus.setName(FRIEND.toString());
             srcFriendshipStatus.setTime(LocalDateTime.now());
             friendshipStatusesRepository.save(srcFriendshipStatus);
-            notificationsService.createNotification(optionalSrcFriendship.get(), dstPerson);
         }
     }
 
