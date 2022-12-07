@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,6 +49,6 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE Person SET lastOnlineTime = NOW() WHERE email = :personEmail")
-    void updateOnlineTime(String personEmail);
+    @Query(value = "UPDATE Person SET lastOnlineTime = :time WHERE email = :personEmail")
+    void updateOnlineTime(String personEmail, LocalDateTime time);
 }
