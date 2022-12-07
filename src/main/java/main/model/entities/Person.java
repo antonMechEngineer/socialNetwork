@@ -2,10 +2,8 @@ package main.model.entities;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import main.model.enums.FriendshipStatusTypes;
 import main.model.enums.MessagePermissionTypes;
-import main.model.enums.ReadStatusTypes;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -96,12 +94,13 @@ public class Person {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<BlockHistory> blockHistoryList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+//    @LazyCollection(LazyCollectionOption.FALSE)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Post> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
-    @LazyCollection(LazyCollectionOption.FALSE)
+//    @LazyCollection(LazyCollectionOption.FALSE)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Comment> comments = new ArrayList<>();
 
@@ -122,16 +121,17 @@ public class Person {
     private List<Dialog> secondPersonDialogs = new ArrayList<>();
 
     @OneToMany(mappedBy = "author", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @LazyCollection(LazyCollectionOption.FALSE)
+//    @LazyCollection(LazyCollectionOption.FALSE)
     @OnDelete(action = OnDeleteAction.CASCADE)
-//    @CollectionTable(name = "messages")
-//    @ElementCollection(targetClass = ReadStatusTypes.class, fetch = FetchType.EAGER)
     private List<Message> messages = new ArrayList<>();
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.REMOVE)
-    @LazyCollection(LazyCollectionOption.FALSE)
+//    @LazyCollection(LazyCollectionOption.FALSE)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Like> likes = new ArrayList<>();
+
+    @Transient
+    private FriendshipStatusTypes friendStatus = FriendshipStatusTypes.UNKNOWN;
 
     @Override
     public String toString() {

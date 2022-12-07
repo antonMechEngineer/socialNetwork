@@ -1,6 +1,7 @@
 package main.controller;
 
 import lombok.RequiredArgsConstructor;
+import main.AOP.annotations.UpdateOnlineTime;
 import main.api.response.*;
 import main.service.UsersService;
 import org.springframework.http.MediaType;
@@ -17,6 +18,7 @@ public class StorageController {
 
     private final UsersService usersService;
 
+    @UpdateOnlineTime
     @PostMapping(value = "/storage", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     ResponseEntity<StorageRs> storage(@RequestParam(value = "file",required = false) MultipartFile photo) throws IOException {
         return ResponseEntity

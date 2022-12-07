@@ -10,6 +10,7 @@ import main.model.entities.interfaces.Notificationed;
 import main.repository.NotificationsRepository;
 import main.repository.PersonsRepository;
 import main.service.util.NetworkPageRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,9 +30,18 @@ public class NotificationsService {
     private final NotificationMapper notificationMapper;
     private final SimpMessagingTemplate template;
 
+    @Value("${socialNetwork.default.page}")
+    private int offset;
+    @Value("${socialNetwork.default.noteSize}")
+    private int size;
+
     public CommonResponse<List<NotificationResponse>> getAllNotificationsByPerson(int offset, int perPage) {
         Person person = personsRepository.findPersonByEmail(
                 SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+        return getAllNotificationsByPerson(offset, perPage, person);
+    }
+
+    private CommonResponse<List<NotificationResponse>> getAllNotificationsByPerson(int offset, int perPage, Person person) {
         Pageable pageable = NetworkPageRequest.of(offset, perPage);
         Page<Notification> notificationPage = notificationsRepository.findAllByPersonAndIsReadIsFalse(person, pageable);
         return CommonResponse.<List<NotificationResponse>>builder()
@@ -58,7 +67,7 @@ public class NotificationsService {
             notification.setIsRead(true);
             notificationsRepository.save(notification);
         }
-        return getAllNotificationsByPerson(0, 10);
+        return getAllNotificationsByPerson(offset, size, person);
     }
 
     public void createNotification(Notificationed entity, Person person) {
@@ -67,12 +76,8 @@ public class NotificationsService {
         notification.setPerson(person);
         notification.setEntity(entity);
         notification.setSentTime(LocalDateTime.now());
-        sendNotification(notificationsRepository.save(notification));
-    }
-
-    private void sendNotification(Notification notification) {
-        NotificationResponse response = notificationMapper.toNotificationResponse(notification);
-        template.convertAndSend(String.format("/user/%s/queue/notifications", notification.getPerson().getId()),
-                Map.of("body", Map.of("data", response)));
+        notificationsRepository.save(notification);
+        template.convertAndSend(String.format("/user/%s/queue/notifications", person.getId()),
+                getAllNotificationsByPerson(offset, size, person));
     }
 }

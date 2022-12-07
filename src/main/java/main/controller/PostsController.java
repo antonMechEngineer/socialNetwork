@@ -1,6 +1,7 @@
 package main.controller;
 
 import lombok.RequiredArgsConstructor;
+import main.AOP.annotations.UpdateOnlineTime;
 import main.api.request.FindPostRq;
 import main.api.request.PostRequest;
 import main.api.response.CommonResponse;
@@ -20,6 +21,7 @@ public class PostsController {
 
     private final PostsService postsService;
 
+    @UpdateOnlineTime
     @GetMapping("/feeds")
     public CommonResponse<List<PostResponse>> getFeeds(
             @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
@@ -28,6 +30,7 @@ public class PostsController {
         return postsService.getFeeds(offset, size);
     }
 
+    @UpdateOnlineTime
     @GetMapping("/post/{id}")
     public CommonResponse<PostResponse> getPost(
             @PathVariable(name = "id") Long postId) {
@@ -35,6 +38,7 @@ public class PostsController {
         return postsService.getPostById(postId);
     }
 
+    @UpdateOnlineTime
     @PutMapping("/post/{id}")
     public CommonResponse<PostResponse> updatePost(
             @PathVariable int id,
@@ -43,6 +47,7 @@ public class PostsController {
         return postsService.updatePost(id, postRequest);
     }
 
+    @UpdateOnlineTime
     @DeleteMapping("/post/{id}")
     public CommonResponse<PostResponse> deletePost(
             @PathVariable long id) throws PersonNotFoundException {
@@ -50,6 +55,7 @@ public class PostsController {
         return postsService.changeDeleteStatusInPost(id, true);
     }
 
+    @UpdateOnlineTime
     @PutMapping("/post/{id}/recover")
     public CommonResponse<PostResponse> recoverPost(
             @PathVariable long id) throws PersonNotFoundException {
@@ -57,12 +63,12 @@ public class PostsController {
         return postsService.changeDeleteStatusInPost(id, false);
     }
 
+    @UpdateOnlineTime
     @GetMapping("/post")
     public CommonResponse<List<PostResponse>> findPost(
             FindPostRq postRq,
             @RequestParam(required = false, defaultValue = "${socialNetwork.default.page}") int offset,
             @RequestParam(required = false, defaultValue = "${socialNetwork.default.size}") int perPage) throws SQLException, EmptyFieldException {
-
         return postsService.findPosts(postRq, offset, perPage);
     }
 }

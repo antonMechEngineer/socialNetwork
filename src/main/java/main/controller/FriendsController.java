@@ -1,17 +1,16 @@
 package main.controller;
 
 import lombok.RequiredArgsConstructor;
+import main.AOP.annotations.UpdateOnlineTime;
 import main.api.response.CommonResponse;
 import main.api.response.FriendshipRs;
 import main.api.response.PersonResponse;
 import main.service.FriendsRecommendationService;
 import main.service.FriendsService;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/api/v1/friends")
 @RequiredArgsConstructor
 public class FriendsController {
@@ -19,57 +18,52 @@ public class FriendsController {
     private final FriendsService friendsService;
     private final FriendsRecommendationService friendsRecommendationService;
 
+    @UpdateOnlineTime
     @GetMapping("/recommendations")
-    @ResponseBody
     public CommonResponse<List<PersonResponse>> getRecommendedFriends() {
         return friendsRecommendationService.getFriendsRecommendation();
     }
 
+    @UpdateOnlineTime
     @PostMapping("/{id}")
-    public FriendshipRs addFriend(@RequestHeader("Authorization") String token, @PathVariable Long id) {
-        return friendsService.sendFriendshipRequest(token, id);
+    public FriendshipRs sendFriendshipRequest (@PathVariable Long id) throws Exception {
+        return friendsService.sendFriendshipRequest(id);
     }
 
-    @DeleteMapping("/{id}")
-    public FriendshipRs deleteFriend(@RequestHeader("Authorization") String token, @PathVariable Long id) {
-        return friendsService.deleteFriend(token, id);
-    }
-
+    @UpdateOnlineTime
     @PostMapping("/request/{id}")
-    public FriendshipRs sendFriendshipRequest(@RequestHeader("Authorization") String token,
-                                              @PathVariable Long id) {
-        return friendsService.addFriend(token, id);
+    public FriendshipRs addFriend (@PathVariable Long id) throws Exception {
+        return friendsService.addFriend(id);
     }
 
+    @UpdateOnlineTime
+    @DeleteMapping("/{id}")
+    public FriendshipRs deleteFriend(@PathVariable Long id) throws Exception {
+        FriendshipRs friendshipRs = friendsService.deleteFriend(id);
+        return friendshipRs;
+    }
+
+    @UpdateOnlineTime
     @DeleteMapping("request/{id}")
-    public FriendshipRs deleteSentFriendshipRequest (@RequestHeader("Authorization") String token,
-                                                     @PathVariable Long id) {
-        return friendsService.deleteSentFriendshipRequest(token, id);
+    public FriendshipRs deleteSentFriendshipRequest (@PathVariable Long id) throws Exception {
+        return friendsService.deleteSentFriendshipRequest(id);
     }
 
+    @UpdateOnlineTime
     @GetMapping()
-    @ResponseBody
     public CommonResponse<List<PersonResponse>> getFriends(
-            @RequestHeader("Authorization") String token,
             @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
             @RequestParam(name = "perPage", required = false, defaultValue = "${socialNetwork.default.size}") int size
-    )
-    {
-        return friendsService.getFriends(token, offset, size);
+    ) throws Exception {
+        return friendsService.getFriends(offset, size);
     }
 
+    @UpdateOnlineTime
     @GetMapping("/request")
-    @ResponseBody
     public CommonResponse<List<PersonResponse>> getPotentialFriends(
-            @RequestHeader("Authorization") String token,
             @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
             @RequestParam(name = "perPage", required = false, defaultValue = "${socialNetwork.default.size}") int size
-    )
-    {
-        return friendsService.getRequestedPersons(token, offset, size);
+    ) throws Exception {
+        return friendsService.getRequestedPersons(offset, size);
     }
-
-
-
-
 }

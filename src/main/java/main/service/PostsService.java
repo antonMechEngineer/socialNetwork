@@ -149,10 +149,10 @@ public class PostsService {
                 notificationsService.createNotification(post, friendship.getSrcPerson());
             }
         });
-        friendshipsRepository.findFriendshipBySrcPerson(person).forEach(friendship -> {
-            if (friendship.getFriendshipStatus().getCode().equals(FriendshipStatusTypes.FRIEND)) {
-                notificationsService.createNotification(post, friendship.getDstPerson());
-            }
-        });
+//        friendshipsRepository.findFriendshipBySrcPerson(person).forEach(friendship -> {
+//            if (friendship.getFriendshipStatus().getCode().equals(FriendshipStatusTypes.FRIEND)) {
+//                notificationsService.createNotification(post, friendship.getDstPerson());
+//            }
+//        });
     }
 }
