@@ -47,5 +47,5 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
     @Modifying
     @Transactional
     @Query(value = "UPDATE Person SET lastOnlineTime = :time WHERE email = :personEmail")
-    void updateOnlineTime(String personEmail, LocalDateTime time);
+    void updateOnlineTime(@Param("personEmail") String personEmail,@Param("time") LocalDateTime time);
 }
