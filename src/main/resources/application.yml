@@ -21,6 +21,7 @@ socialNetwork:
   default:
     page: 0
     size: 20
+    noteSize: 10
 
 server:
   port: 8086
