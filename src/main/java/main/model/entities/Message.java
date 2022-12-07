@@ -1,24 +1,23 @@
 package main.model.entities;
 
 import lombok.Data;
-import main.model.entities.interfaces.Notificationed;
-import main.model.enums.NotificationTypes;
 import main.model.enums.ReadStatusTypes;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
 @Data
 @Table(name = "messages")
-public class Message implements Notificationed {
+public class Message {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private LocalDateTime time;
+    private ZonedDateTime time;
 
     @Column(name = "message_text", nullable = false, columnDefinition = "TEXT")
     private String messageText;
@@ -41,22 +40,4 @@ public class Message implements Notificationed {
     @ManyToOne
     @JoinColumn(name = "dialog_id", nullable = false)
     private Dialog dialog;
-
-    @Override
-    public NotificationTypes getNotificationType() {
-        return NotificationTypes.MESSAGE;
-    }
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "id=" + id +
-                ", messageText='" + messageText +
-                "', readStatus=" + readStatus +
-                ", isDeleted=" + isDeleted +
-                ", authorId=" + author.getId() +
-                ", recipientId=" + recipient.getId() +
-                ", dialogId=" + dialog.getId() +
-                '}';
-    }
 }

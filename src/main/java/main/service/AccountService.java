@@ -24,8 +24,7 @@ public class AccountService {
 
     public RegisterRs getRegResponse(RegisterRq regRequest){
         RegisterRs registerRs = new RegisterRs();
-        ComplexRs data = new ComplexRs();
-        data.setMessage("OK");
+        ComplexRs data = ComplexRs.builder().message("OK").build();
 
         if (!regRequest.getPasswd1().equals(regRequest.getPasswd2())){
             registerRs.setError("Ошибка в пароле!");
