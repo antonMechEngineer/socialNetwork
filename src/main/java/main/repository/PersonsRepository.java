@@ -45,9 +45,6 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE Person SET lastOnlineTime = NOW() WHERE id = :personId")
-    void updateOnlineTime(long personId);
-
-    @Query("SELECT p.id FROM Person p WHERE p.email = :email")
-    Optional<Long> findPersonId(String email);
+    @Query(value = "UPDATE Person SET lastOnlineTime = NOW() WHERE email = :personEmail")
+    void updateOnlineTime(String personEmail);
 }

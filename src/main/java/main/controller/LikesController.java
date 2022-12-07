@@ -1,6 +1,7 @@
 package main.controller;
 
 import lombok.RequiredArgsConstructor;
+import main.AOP.annotations.UpdateOnlineTime;
 import main.api.request.LikeRequest;
 import main.api.response.CommonResponse;
 import main.api.response.LikeResponse;
@@ -14,6 +15,7 @@ public class LikesController {
 
     private final LikesService likesService;
 
+    @UpdateOnlineTime
     @GetMapping
     public CommonResponse<LikeResponse> getLikesList(
             @RequestParam(name = "item_id") long itemId,
@@ -22,6 +24,7 @@ public class LikesController {
         return likesService.getLikesResponse(itemId, type);
     }
 
+    @UpdateOnlineTime
     @PutMapping
     public CommonResponse<LikeResponse> putLike(
             @RequestBody LikeRequest likeRequest) {
@@ -29,6 +32,7 @@ public class LikesController {
         return likesService.putLike(likeRequest);
     }
 
+    @UpdateOnlineTime
     @DeleteMapping
     public CommonResponse<LikeResponse> deleteLike(
             @RequestParam(name = "item_id") long itemId,
