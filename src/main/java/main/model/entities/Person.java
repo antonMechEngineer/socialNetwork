@@ -1,7 +1,6 @@
 package main.model.entities;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import main.model.enums.FriendshipStatusTypes;
 import main.model.enums.MessagePermissionTypes;
 import org.hibernate.annotations.OnDelete;
@@ -12,9 +11,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@NoArgsConstructor
 @Entity
-@Data
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "persons", indexes = @Index(name = "full_name_index", columnList = "first_name, last_name", unique = true))
 public class Person {
 
