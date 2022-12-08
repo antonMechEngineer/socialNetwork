@@ -155,7 +155,6 @@ class FriendsServiceTest {
         assertEquals(FRIEND, fsCurPsFr.getFriendshipStatus().getCode());
         assertEquals(FRIEND, fsCurPsRcFr.getFriendshipStatus().getCode());
         verify(friendshipStatusesRepository, times(2)).save(any());
-        verify(notificationsService, times(2)).createNotification(any(), any());
     }
 
     @Test
@@ -163,7 +162,7 @@ class FriendsServiceTest {
         friendsService.sendFriendshipRequest(REQUESTED_FRIEND.getId());
         verify(friendshipsRepository, times(2)).save(any());
         verify(friendshipStatusesRepository, times(2)).save(any());
-        verify(notificationsService, times(2)).createNotification(any(), any());
+        verify(notificationsService, times(1)).createNotification(any(), any());
     }
 
     @Test

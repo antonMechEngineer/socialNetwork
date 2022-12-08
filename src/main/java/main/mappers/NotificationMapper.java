@@ -10,6 +10,6 @@ public interface NotificationMapper {
 
     @Mapping(target = "info", constant = "notificationInfo")
     @Mapping(target = "notificationType", source = "entity.notificationType")
-    @Mapping(target = "entityAuthor", source = "person")
+    @Mapping(target = "entityAuthor", source = "entity.author")
     NotificationResponse toNotificationResponse(Notification notification);
 }

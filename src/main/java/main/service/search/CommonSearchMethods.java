@@ -39,19 +39,20 @@ public class CommonSearchMethods {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault());
     }
 
-    public Person findPersonByNameOrLastNameContains(String name) {
-        Person person = null;
+    public List<Person> findPersonByNameOrLastNameContains(String name) {
+        List<Person> persons = null;
         String[] splitName = name.split("\\s+");
         if (splitName.length > 1) {
-            person = personsRepository.findPersonByFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(splitName[0], splitName[1]);
-        }
-        if (person == null && splitName.length > 1) {
-            person = personsRepository.findPersonByFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(splitName[1], splitName[0]);
+            persons = personsRepository.findPersonByFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(splitName[0], splitName[1]);
         }
         if (splitName.length < 2) {
-            person = personsRepository.findPersonByFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(name, name);
+            persons = personsRepository.findPersonByFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(name, name);
         }
-        return person;
+        assert persons != null;
+        if (persons.size() == 0 && splitName.length > 1) {
+            persons = personsRepository.findPersonByFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(splitName[1], splitName[0]);
+        }
+        return persons;
     }
 
     public List getPageFromList(List list, int offset, int perPage) {
