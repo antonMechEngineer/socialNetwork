@@ -1,9 +1,11 @@
 package main.service;
+
 import lombok.RequiredArgsConstructor;
 import main.api.response.CommonResponse;
 import main.api.response.ComplexRs;
 import main.api.response.FriendshipRs;
 import main.api.response.PersonResponse;
+import main.errors.PersonNotFoundException;
 import main.mappers.FriendMapper;
 import main.model.entities.Friendship;
 import main.model.entities.FriendshipStatus;
@@ -12,17 +14,18 @@ import main.model.enums.FriendshipStatusTypes;
 import main.repository.FriendshipStatusesRepository;
 import main.repository.FriendshipsRepository;
 import main.repository.PersonsRepository;
-import main.security.jwt.JWTUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import static main.model.enums.FriendshipStatusTypes.*;
 
 @RequiredArgsConstructor
@@ -33,45 +36,46 @@ public class FriendsService {
     private final PersonsRepository personsRepository;
     private final FriendMapper friendMapper;
     private final NotificationsService notificationsService;
-    private final String defaultError = "ok";
+    private static final String DEFAULT_ERROR = "ok";
+    private static final String DESCRIPTION = "Invalid id";
 
-    public FriendshipRs addFriend(Long receivedFriendId) {
-        Person srcPerson = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow();
-        Person dstPerson = personsRepository.findPersonById(receivedFriendId).orElseThrow();
+    public FriendshipRs addFriend(Long receivedFriendId) throws Exception {
+        Person srcPerson = getSrcPerson();
+        Person dstPerson = getDstPerson(receivedFriendId);
         modifyFriendShipStatus(srcPerson, dstPerson);
         modifyFriendShipStatus(dstPerson, srcPerson);
-        return new FriendshipRs(defaultError, LocalDateTime.now().toString(), new ComplexRs(defaultError));
+        return new FriendshipRs(DEFAULT_ERROR, LocalDateTime.now().toString(), new ComplexRs(DEFAULT_ERROR));
     }
 
-    public FriendshipRs sendFriendshipRequest(Long requestedFriendId) {
-        Person srcPerson = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow();
-        Person dstPerson = personsRepository.findPersonById(requestedFriendId).orElseThrow();
+    public FriendshipRs sendFriendshipRequest(Long requestedFriendId) throws Exception {
+        Person srcPerson = getSrcPerson();
+        Person dstPerson = getDstPerson(requestedFriendId);
         createFriendshipObjects(srcPerson, dstPerson);
-        return new FriendshipRs(defaultError, LocalDateTime.now().toString(), new ComplexRs(defaultError));
+        return new FriendshipRs(DEFAULT_ERROR, LocalDateTime.now().toString(), new ComplexRs(DEFAULT_ERROR));
     }
 
-    public FriendshipRs deleteFriend(Long idDeletableFriend) {
-        Person srcPerson = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow();
-        Person dstPerson = personsRepository.findPersonById(idDeletableFriend).orElseThrow();
+    public FriendshipRs deleteFriend(Long idDeletableFriend) throws Exception {
+        Person srcPerson = getSrcPerson();
+        Person dstPerson = getDstPerson(idDeletableFriend);
         deleteFriendships(srcPerson, dstPerson);
-        return new FriendshipRs(defaultError, LocalDateTime.now().toString(), new ComplexRs(Integer.valueOf(idDeletableFriend.toString()), defaultError));
+        return new FriendshipRs(DEFAULT_ERROR, LocalDateTime.now().toString(), new ComplexRs(DEFAULT_ERROR));
     }
 
-    public FriendshipRs deleteSentFriendshipRequest(Long idRequestedFriend) {
-        Person srcPerson = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow();
-        Person dstPerson = personsRepository.findPersonById(idRequestedFriend).orElseThrow();
+    public FriendshipRs deleteSentFriendshipRequest(Long idRequestedFriend) throws Exception {
+        Person srcPerson = getSrcPerson();
+        Person dstPerson = getDstPerson(idRequestedFriend);
         deleteFriendships(srcPerson, dstPerson);
-        return new FriendshipRs(defaultError, LocalDateTime.now().toString(), new ComplexRs(defaultError));
+        return new FriendshipRs(DEFAULT_ERROR, LocalDateTime.now().toString(), new ComplexRs(DEFAULT_ERROR));
     }
 
-    public CommonResponse<List<PersonResponse>> getFriends(Integer offset, Integer size) {
-        Person srcPerson = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow();
+    public CommonResponse<List<PersonResponse>> getFriends(Integer offset, Integer size) throws Exception {
+        Person srcPerson = getSrcPerson();
         Page<Person> requestedPersons = getPersons(srcPerson, offset, size, FriendshipStatusTypes.FRIEND);
         return buildCommonResponse(requestedPersons, srcPerson, offset);
     }
 
-    public CommonResponse<List<PersonResponse>> getRequestedPersons(Integer offset, Integer size) {
-        Person srcPerson = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow();
+    public CommonResponse<List<PersonResponse>> getRequestedPersons(Integer offset, Integer size) throws Exception {
+        Person srcPerson = getSrcPerson();
         Page<Person> personsSentResponse = getPersons(srcPerson, offset, size, RECEIVED_REQUEST);
         return buildCommonResponse(personsSentResponse, srcPerson, offset);
     }
@@ -95,8 +99,7 @@ public class FriendsService {
         Friendship dstFriendship = new Friendship(LocalDateTime.now(), dstPerson, srcPerson, dstFriendshipStatus);
         friendshipsRepository.save(srcFriendship);
         friendshipsRepository.save(dstFriendship);
-        notificationsService.createNotification(srcFriendship, dstPerson);
-        notificationsService.createNotification(dstFriendship, srcPerson);
+        notificationsService.createNotification(dstFriendship, dstPerson);
     }
 
     private void deleteFriendships(Person srcPerson, Person dstPerson) {
@@ -126,7 +129,6 @@ public class FriendsService {
             srcFriendshipStatus.setName(FRIEND.toString());
             srcFriendshipStatus.setTime(LocalDateTime.now());
             friendshipStatusesRepository.save(srcFriendshipStatus);
-            notificationsService.createNotification(optionalSrcFriendship.get(), dstPerson);
         }
     }
 
@@ -154,7 +156,17 @@ public class FriendsService {
         return personResponses;
     }
 
-    private Optional <Friendship> getFriendshipByDstPerson(List<Friendship> friendships, Person dstPerson) {
+    private Optional<Friendship> getFriendshipByDstPerson(List<Friendship> friendships, Person dstPerson) {
         return friendships.stream().filter(fs -> fs.getDstPerson() == dstPerson).findFirst();
+    }
+
+    private Person getSrcPerson() throws Exception {
+        String srcEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return personsRepository.findPersonByEmail(srcEmail).orElseThrow(new PersonNotFoundException(DESCRIPTION));
+    }
+
+    private Person getDstPerson(Long id) throws Exception {
+        return personsRepository.findPersonById(id).orElseThrow(new PersonNotFoundException(DESCRIPTION));
+
     }
 }

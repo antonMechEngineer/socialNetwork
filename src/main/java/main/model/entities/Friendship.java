@@ -40,6 +40,11 @@ public class Friendship implements Notificationed {
         return NotificationTypes.FRIEND_REQUEST;
     }
 
+    @Override
+    public Person getAuthor() {
+        return dstPerson;
+    }
+
     public Friendship(LocalDateTime sentTime, Person srcPerson, Person dstPerson, FriendshipStatus friendshipStatus) {
         this.sentTime = sentTime;
         this.srcPerson = srcPerson;

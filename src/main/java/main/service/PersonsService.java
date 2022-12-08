@@ -37,7 +37,9 @@ public class PersonsService {
 
     public CommonResponse<PersonResponse> getPersonDataById(Long id, String token) {
         Person srcPerson = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow();
-        return getCommonPersonResponse(getPersonById(id), srcPerson);
+        Person person = getPersonById(id);
+        person.setFriendStatus(friendsService.getStatusTwoPersons(person, srcPerson));
+        return getCommonPersonResponse(person);
     }
 
     public CommonResponse<PersonResponse> getMyData() {
@@ -71,13 +73,13 @@ public class PersonsService {
     }
 
 
-    private CommonResponse<PersonResponse> getCommonPersonResponse(Person person, Person srcPerson) {
-        return CommonResponse.<PersonResponse>builder()
-                .error("success")
-                .timestamp(System.currentTimeMillis())
-                .data(friendMapper.toFriendResponse(person, friendsService.getStatusTwoPersons(person, srcPerson)))
-                .build();
-    }
+//    private CommonResponse<PersonResponse> getCommonPersonResponse(Person person, Person srcPerson) {
+//        return CommonResponse.<PersonResponse>builder()
+//                .error("success")
+//                .timestamp(System.currentTimeMillis())
+//                .data(friendMapper.toFriendResponse(person, friendsService.getStatusTwoPersons(person, srcPerson)))
+//                .build();
+//    }
 
     private CommonResponse<PersonResponse> getCommonPersonResponse(Person person) {
         return CommonResponse.<PersonResponse>builder()
@@ -85,15 +87,5 @@ public class PersonsService {
                 .timestamp(System.currentTimeMillis())
                 .data(personMapper.toPersonResponse(person))
                 .build();
-    }
-
-    @EventListener
-    public void updatePersonOnlineTime(SessionSubscribeEvent event) {
-        MessageHeaders messageHeaders = event.getMessage().getHeaders();
-        String personIdFromHeader = SimpMessageHeaderAccessor.getSubscriptionId(messageHeaders);
-        Long personIdFromUser = personsRepository.findPersonId(SimpMessageHeaderAccessor.getUser(messageHeaders).getName()).orElse(0L);
-        if (personIdFromUser.equals(Long.parseLong(personIdFromHeader))) {
-            personsRepository.updateOnlineTime(Long.parseLong(personIdFromHeader));
-        }
     }
 }

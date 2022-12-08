@@ -150,38 +150,37 @@ class FriendsServiceTest {
     }
 
     @Test
-    void addFriend() {
+    void addFriend() throws Exception {
         friendsService.addFriend(RECEIVED_FRIEND.getId());
         assertEquals(FRIEND, fsCurPsFr.getFriendshipStatus().getCode());
         assertEquals(FRIEND, fsCurPsRcFr.getFriendshipStatus().getCode());
         verify(friendshipStatusesRepository, times(2)).save(any());
-        verify(notificationsService, times(2)).createNotification(any(), any());
     }
 
     @Test
-    void sendFriendshipRequest() {
+    void sendFriendshipRequest() throws Exception {
         friendsService.sendFriendshipRequest(REQUESTED_FRIEND.getId());
         verify(friendshipsRepository, times(2)).save(any());
         verify(friendshipStatusesRepository, times(2)).save(any());
-        verify(notificationsService, times(2)).createNotification(any(), any());
+        verify(notificationsService, times(1)).createNotification(any(), any());
     }
 
     @Test
-    void deleteFriend() {
+    void deleteFriend() throws Exception {
         friendsService.deleteFriend(C_FRIEND.getId());
         verify(friendshipsRepository, times(1)).delete(fsCurPsFr);
         verify(friendshipsRepository, times(1)).delete(fsFr);
     }
 
     @Test
-    void deleteSentFriendshipRequest() {
+    void deleteSentFriendshipRequest() throws Exception {
         friendsService.deleteSentFriendshipRequest(REQUESTED_FRIEND.getId());
         verify(friendshipsRepository, times(1)).delete(fsCurPsRqFr);
         verify(friendshipsRepository, times(1)).delete(fsRqFr);
     }
 
     @Test
-    void getFriends() {
+    void getFriends() throws Exception {
         CommonResponse<List<PersonResponse>> resFriends = friendsService.getFriends(OFFSET, SIZE);
         PersonResponse resDto = resFriends.getData().get(0);
         assertEquals(FRIENDS.size(), resFriends.getData().size());
@@ -190,7 +189,7 @@ class FriendsServiceTest {
     }
 
     @Test
-    void getRequestedPersons() {
+    void getRequestedPersons() throws Exception {
         CommonResponse<List<PersonResponse>> resReceivedFriends = friendsService.getRequestedPersons(OFFSET, SIZE);
         PersonResponse resDto = resReceivedFriends.getData().get(0);
         assertEquals(RECEIVED_FRIENDS.size(), resReceivedFriends.getData().size());

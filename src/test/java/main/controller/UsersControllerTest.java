@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
@@ -19,7 +20,6 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.SerializationFea
 import java.util.ArrayList;
 
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode.BEFORE_EACH_TEST_METHOD;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -35,6 +35,8 @@ class UsersControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private TokenCheck tokenCheck;
 
     @Test
     void getUserById() {
@@ -113,5 +115,20 @@ class UsersControllerTest {
         mockMvc.perform(post("/api/v1/users/me/recover"))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
+    @Sql("/UsersControllerData/usersController-findPersons.sql")
+    void findPersons() throws Exception {
+        String url = "/api/v1/users/search?first_name=Jescie";
+        mockMvc.perform(get(url))
+                .andDo(print())
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.total").value(1))
+                .andExpect(jsonPath("$.offset").value(0))
+                .andExpect(jsonPath("$.perPage").value(20))
+                .andExpect(jsonPath("$.data").isArray());
+
+        tokenCheck.wrongOrExpiredTokenCheck(mockMvc, HttpMethod.GET, url);
     }
 }
