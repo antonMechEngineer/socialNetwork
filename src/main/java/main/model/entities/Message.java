@@ -1,6 +1,6 @@
 package main.model.entities;
 
-import lombok.Data;
+import lombok.*;
 import main.model.entities.interfaces.Notificationed;
 import main.model.enums.NotificationTypes;
 import main.model.enums.ReadStatusTypes;
@@ -9,7 +9,11 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "messages")
 public class Message implements Notificationed {
 
@@ -45,18 +49,5 @@ public class Message implements Notificationed {
     @Override
     public NotificationTypes getNotificationType() {
         return NotificationTypes.MESSAGE;
-    }
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "id=" + id +
-                ", messageText='" + messageText +
-                "', readStatus=" + readStatus +
-                ", isDeleted=" + isDeleted +
-                ", authorId=" + author.getId() +
-                ", recipientId=" + recipient.getId() +
-                ", dialogId=" + dialog.getId() +
-                '}';
     }
 }

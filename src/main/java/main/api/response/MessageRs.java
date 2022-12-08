@@ -3,15 +3,14 @@ package main.api.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
-import main.model.enums.ReadStatusTypes;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
 public class MessageRs {
     private Long id;
-    private ZonedDateTime time;
+    private LocalDateTime time;
     private Boolean isSentByMe;
     @JsonProperty("author_id")
     private Long authorId;
