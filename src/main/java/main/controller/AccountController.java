@@ -39,6 +39,6 @@ public class AccountController {
     public ResponseEntity<RegisterRs> emailSet(@RequestBody EmailRq emailRq) {return null;}
 
     @PutMapping("/email/recovery")
-    public ResponseEntity<RegisterRs> emailRecovery() {
+    public ResponseEntity<RegisterRs> emailRecovery(@RequestBody EmailRq emailRq) {
         return ResponseEntity.ok(accountService.getEmailRecovery());}
 }
