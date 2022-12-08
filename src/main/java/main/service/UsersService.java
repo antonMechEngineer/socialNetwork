@@ -105,6 +105,7 @@ public class UsersService {
         PersonResponse personResponse = personMapper.toPersonResponse(person);
         if (userRq.getAbout() != null) {
             person.setAbout(userRq.getAbout());
+            personResponse.setAbout(userRq.getAbout());
         }
         if (userRq.getBirth_date() != null) {
             person.setBirthDate(LocalDateTime.from(OffsetDateTime.parse(userRq.getBirth_date())));
