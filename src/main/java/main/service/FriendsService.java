@@ -44,28 +44,28 @@ public class FriendsService {
         Person dstPerson = getDstPerson(receivedFriendId);
         modifyFriendShipStatus(srcPerson, dstPerson);
         modifyFriendShipStatus(dstPerson, srcPerson);
-        return new FriendshipRs(DEFAULT_ERROR, LocalDateTime.now().toString(), new ComplexRs(DEFAULT_ERROR));
+        return new FriendshipRs(DEFAULT_ERROR, LocalDateTime.now().toString(), ComplexRs.builder().message(DEFAULT_ERROR).build());
     }
 
     public FriendshipRs sendFriendshipRequest(Long requestedFriendId) throws Exception {
         Person srcPerson = getSrcPerson();
         Person dstPerson = getDstPerson(requestedFriendId);
         createFriendshipObjects(srcPerson, dstPerson);
-        return new FriendshipRs(DEFAULT_ERROR, LocalDateTime.now().toString(), new ComplexRs(DEFAULT_ERROR));
+        return new FriendshipRs(DEFAULT_ERROR, LocalDateTime.now().toString(), ComplexRs.builder().message(DEFAULT_ERROR).build());
     }
 
     public FriendshipRs deleteFriend(Long idDeletableFriend) throws Exception {
         Person srcPerson = getSrcPerson();
         Person dstPerson = getDstPerson(idDeletableFriend);
         deleteFriendships(srcPerson, dstPerson);
-        return new FriendshipRs(DEFAULT_ERROR, LocalDateTime.now().toString(), new ComplexRs(DEFAULT_ERROR));
+        return new FriendshipRs(DEFAULT_ERROR, LocalDateTime.now().toString(), ComplexRs.builder().message(DEFAULT_ERROR).build());
     }
 
     public FriendshipRs deleteSentFriendshipRequest(Long idRequestedFriend) throws Exception {
         Person srcPerson = getSrcPerson();
         Person dstPerson = getDstPerson(idRequestedFriend);
         deleteFriendships(srcPerson, dstPerson);
-        return new FriendshipRs(DEFAULT_ERROR, LocalDateTime.now().toString(), new ComplexRs(DEFAULT_ERROR));
+        return new FriendshipRs(DEFAULT_ERROR, LocalDateTime.now().toString(), ComplexRs.builder().message(DEFAULT_ERROR).build());
     }
 
     public CommonResponse<List<PersonResponse>> getFriends(Integer offset, Integer size) throws Exception {
@@ -116,8 +116,7 @@ public class FriendsService {
         List<Friendship> srcPersonFriendships = friendshipsRepository.findFriendshipBySrcPerson(srcPerson);
         srcPersonFriendships = getFriendshipsByType(srcPersonFriendships, friendshipStatusTypes);
         List<Long> friendlyIds = srcPersonFriendships.stream().map(Friendship::getDstPerson).map(Person::getId).collect(Collectors.toList());
-        Page<Person> persons = personsRepository.findPersonByIdIn(friendlyIds, pageable);
-        return persons;
+        return personsRepository.findPersonByIdIn(friendlyIds, pageable);
     }
 
     private void modifyFriendShipStatus(Person srcPerson, Person dstPerson) {

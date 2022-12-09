@@ -33,6 +33,7 @@ public class AuthService {
                 return response;
             }
         }
+        // TODO: 02.12.2022 exception if user is not exist 
         return null;
     }
 
@@ -44,7 +45,7 @@ public class AuthService {
                 .offset(0)
                 .perPage(0)
                 .errorDescription("")
-                .data(new ComplexRs())
+                .data(ComplexRs.builder().build())
                 .build();
     }
 }

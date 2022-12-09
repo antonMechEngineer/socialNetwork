@@ -105,6 +105,7 @@ public class UsersService {
         PersonResponse personResponse = personMapper.toPersonResponse(person);
         if (userRq.getAbout() != null) {
             person.setAbout(userRq.getAbout());
+            personResponse.setAbout(userRq.getAbout());
         }
         if (userRq.getBirth_date() != null) {
             person.setBirthDate(LocalDateTime.from(OffsetDateTime.parse(userRq.getBirth_date())));
@@ -170,11 +171,12 @@ public class UsersService {
     public ResponseRsComplexRs deleteProfile(){
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
         ResponseRsComplexRs response = new ResponseRsComplexRs();
-        ComplexRs data = new ComplexRs();
-        data.setMessage("OK");
-        data.setId(0);
-        data.setCount(0);
-        data.setMessage_id(0);
+        ComplexRs data = ComplexRs.builder()
+                .id(0)
+                .count(0)
+                .message("OK")
+                .message_id(0L)
+                .build();
         response.setData(data);
         response.setTimestamp(0);
         response.setOffset(0);
@@ -192,11 +194,12 @@ public class UsersService {
     public ResponseRsComplexRs recoverProfile(){
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
         ResponseRsComplexRs response = new ResponseRsComplexRs();
-        ComplexRs data = new ComplexRs();
-        data.setMessage("OK");
-        data.setId(0);
-        data.setCount(0);
-        data.setMessage_id(0);
+        ComplexRs data = ComplexRs.builder()
+                .id(0)
+                .count(0)
+                .message("OK")
+                .message_id(0L)
+                .build();
         response.setData(data);
         response.setTimestamp(0);
         response.setOffset(0);
