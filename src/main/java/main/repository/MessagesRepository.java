@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface MessagesRepository extends JpaRepository<Message, Long> {
@@ -21,6 +20,7 @@ public interface MessagesRepository extends JpaRepository<Message, Long> {
 
     List<Message> findAllByDialogId(Long dialogId);
 
-    List<Message> findAllByRecipientAndAndIsDeletedIsFalse(Person recipient);
+    List<Message> findAllByRecipientAndIsDeletedFalse(Person recipient);
+    List<Message> findAllByAuthorAndIsDeletedFalse(Person author);
     List<Message> findAllByDialogIdAndIsDeletedFalse(Long dialogId);
 }

@@ -3,7 +3,6 @@ package main.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.api.request.DialogUserShortListDto;
-import main.api.request.MessageRq;
 import main.api.response.CommonResponse;
 import main.api.response.ComplexRs;
 import main.api.response.DialogRs;
@@ -36,18 +35,18 @@ public class DialogsController {
         return dialogsService.getMessages(dialogId);
     }
 
-    @PostMapping("/{dialogId}/messages")
-    public CommonResponse<MessageRs> messagesPost(@PathVariable Long dialogId, @RequestBody MessageRq messageRq) {
-        return dialogsService.getLastMessageRs(dialogId, messageRq);
-    }
+//    @PostMapping("/{dialogId}/messages")
+//    public CommonResponse<MessageRs> messagesPost(@PathVariable Long dialogId, @RequestBody MessageRq messageRq) {
+//        return dialogsService.getLastMessageRs(dialogId, messageRq);
+//    }
 
     @GetMapping("/unreaded")
     public CommonResponse<ComplexRs> unread() {
-        return dialogsService.getUnreadMessage();
+        return dialogsService.getUnreadMessages();
     }
 
     @PutMapping("/{dialogId}/read")
     public CommonResponse<ComplexRs> read(@PathVariable Long dialogId) {
-        return null;
+        return dialogsService.setReadMessages(dialogId);
     }
 }

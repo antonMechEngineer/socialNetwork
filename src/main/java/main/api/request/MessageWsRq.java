@@ -18,4 +18,5 @@ public class MessageWsRq {
     private Timestamp time;
     @JsonProperty("read_status")
     private String readStatus;
+    private String token;
 }
