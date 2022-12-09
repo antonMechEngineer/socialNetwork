@@ -21,5 +21,6 @@ public interface DialogsRepository extends JpaRepository<Dialog, Long> {
 
     Optional<Dialog> findDialogByFirstPerson(Person person);
     Optional<Dialog> findDialogBySecondPerson(Person person);
+    Optional<Dialog> findDialogByFirstPersonAndSecondPerson(Person first, Person second);
 
 }
