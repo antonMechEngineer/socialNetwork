@@ -1,28 +1,12 @@
 package main.api.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-
-@NoArgsConstructor
-@Getter
-@Setter
-@JsonInclude(NON_NULL)
+@Data
+@Builder
 public class ComplexRs {
     private Integer id;
-    private int count;
+    private Integer count;
     private String message;
-    private int message_id;
-
-    public ComplexRs(String message) {
-        this.message = message;
-    }
-
-    public ComplexRs(Integer id, String message) {
-        this.id = id;
-        this.message = message;
-    }
+    private Long message_id;
 }

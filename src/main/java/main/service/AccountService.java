@@ -43,8 +43,7 @@ public class AccountService {
 
     public RegisterRs getRegResponse(RegisterRq regRequest){
         RegisterRs registerRs = new RegisterRs();
-        ComplexRs data = new ComplexRs();
-        data.setMessage("OK");
+        ComplexRs data = ComplexRs.builder().message("OK").build();
 
         if (!regRequest.getPasswd1().equals(regRequest.getPasswd2())){
             registerRs.setError("Ошибка в пароле!");
@@ -85,11 +84,12 @@ public class AccountService {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder
                 .getContext().getAuthentication().getName()).get();
         RegisterRs response = new RegisterRs();
-        ComplexRs data = new ComplexRs();
-        data.setId(0);
-        data.setCount(0);
-        data.setMessage("OK");
-        data.setMessage_id(0);
+        ComplexRs data = ComplexRs.builder()
+                .id(0)
+                .count(0)
+                .message("OK")
+                .message_id(0L)
+                .build();
         response.setEmail(person.getEmail());
         response.setTimestamp(0);
         response.setData(data);
@@ -106,11 +106,12 @@ public class AccountService {
         if (optPerson.isPresent()){rescuePerson = optPerson.get();}
 
         RegisterRs response = new RegisterRs();
-        ComplexRs data = new ComplexRs();
-        data.setId(0);
-        data.setCount(0);
-        data.setMessage("OK");
-        data.setMessage_id(0);
+        ComplexRs data = ComplexRs.builder()
+                .id(0)
+                .count(0)
+                .message("OK")
+                .message_id(0L)
+                .build();
         response.setEmail(rescuePerson.getEmail());
         response.setTimestamp(0);
         response.setData(data);
@@ -122,11 +123,12 @@ public class AccountService {
     }
     public RegisterRs getPasswordRecovery(String email){
         RegisterRs response = new RegisterRs();
-        ComplexRs data = new ComplexRs();
-        data.setId(0);
-        data.setCount(0);
-        data.setMessage("OK");
-        data.setMessage_id(0);
+        ComplexRs data = ComplexRs.builder()
+                .id(0)
+                .count(0)
+                .message("OK")
+                .message_id(0L)
+                .build();
         response.setEmail(email);
         response.setTimestamp(0);
         response.setData(data);
@@ -149,11 +151,12 @@ public class AccountService {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder
                 .getContext().getAuthentication().getName()).get();
         RegisterRs response = new RegisterRs();
-        ComplexRs data = new ComplexRs();
-        data.setId(0);
-        data.setCount(0);
-        data.setMessage("OK");
-        data.setMessage_id(0);
+        ComplexRs data = ComplexRs.builder()
+                .id(0)
+                .count(0)
+                .message("OK")
+                .message_id(0L)
+                .build();
         response.setEmail(person.getEmail());
         response.setTimestamp(0);
         response.setData(data);

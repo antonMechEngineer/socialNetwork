@@ -1,11 +1,13 @@
 package main.api.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Data;
 import main.model.entities.Currency;
 import main.model.enums.FriendshipStatusTypes;
 import main.model.enums.MessagePermissionTypes;
 
 @Data
+@Builder
 public class PersonRs {
     private Long id;
     private String email;

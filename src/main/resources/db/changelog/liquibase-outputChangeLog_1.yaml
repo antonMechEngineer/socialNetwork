@@ -1,8 +1,8 @@
 databaseChangeLog:
-- changeSet:
-    id: sprint-2-1
-    author: rialex
-    changes:
+  - changeSet:
+      id: sprint-2-1
+      author: rialex
+      changes:
         - dropColumn:
             - tableName: cities
             - column:
@@ -12,19 +12,19 @@ databaseChangeLog:
             - column:
                 name: temp
 
-- changeSet:
-    id: sprint-2-2
-    author: rialex
-    changes:
+  - changeSet:
+      id: sprint-2-2
+      author: rialex
+      changes:
         - dropColumn:
             - tableName: persons
             - column:
                 name: city_id
 
-- changeSet:
-    id: sprint-2-3
-    author: rialex
-    changes:
+  - changeSet:
+      id: sprint-2-3
+      author: rialex
+      changes:
         - addColumn:
             - tableName: persons
             - columns:
@@ -34,3 +34,26 @@ databaseChangeLog:
                 - column:
                     name: country
                     type: VARCHAR(255)
+
+  - changeSet:
+      id: sprint-2-4
+      author: abdiev
+      changes:
+        - dropColumn:
+            - tableName: dialogs
+            - column:
+                name: last_time_active
+        - addColumn:
+            - tableName: dialogs
+            - column:
+                name: last_active_time
+                type: TIMESTAMP WITHOUT TIME ZONE
+  - changeSet:
+        id: sprint-2-5
+        author: abdiev
+        changes:
+            - addColumn:
+                  - tableName: dialogs
+                  - column:
+                        name: last_message_id
+                        type: BIGINT
