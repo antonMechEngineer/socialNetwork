@@ -22,6 +22,7 @@ socialNetwork:
     page: 0
     size: 20
     noteSize: 10
+  timezone: Europe/Moscow
 
 server:
   port: 8086

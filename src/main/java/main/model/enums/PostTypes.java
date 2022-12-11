@@ -1,6 +1,7 @@
 package main.model.enums;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 public enum PostTypes {
 
@@ -10,6 +11,6 @@ public enum PostTypes {
         if (isDeleted) {
             return DELETED;
         }
-        return timeCreation.isAfter(LocalDateTime.now()) ? QUEUED : POSTED;
+        return timeCreation.isAfter(LocalDateTime.now(ZoneId.of("Europe/Moscow"))) ? QUEUED : POSTED;
     }
 }
