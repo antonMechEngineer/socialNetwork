@@ -48,3 +48,8 @@ VALUES
     (4,6),
     (5,3),
     (5,5);
+
+
+INSERT INTO person_settings (person_id,post_comment_notification,comment_comment_notification,friend_request_notification,message_notification,friend_birthday_notification,like_notification,post_notification)
+VALUES
+    (1,'true','true','true','true','true','true','true');

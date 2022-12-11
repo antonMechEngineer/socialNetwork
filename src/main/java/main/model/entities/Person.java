@@ -1,8 +1,10 @@
 package main.model.entities;
 
 import lombok.*;
+import main.model.entities.interfaces.Notificationed;
 import main.model.enums.FriendshipStatusTypes;
 import main.model.enums.MessagePermissionTypes;
+import main.model.enums.NotificationTypes;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.OnDelete;
@@ -20,7 +22,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "persons", indexes = @Index(name = "full_name_index", columnList = "first_name, last_name", unique = true))
-public class Person {
+public class Person implements Notificationed {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -129,13 +131,23 @@ public class Person {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Message> messages = new ArrayList<>();
 
-    @OneToMany(mappedBy = "person", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)
     @LazyCollection(LazyCollectionOption.FALSE)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Like> likes = new ArrayList<>();
 
     @Transient
     private FriendshipStatusTypes friendStatus = FriendshipStatusTypes.UNKNOWN;
+
+    @Override
+    public NotificationTypes getNotificationType() {
+        return NotificationTypes.FRIEND_BIRTHDAY;
+    }
+
+    @Override
+    public Person getAuthor() {
+        return this;
+    }
 
     @Override
     public String toString() {
@@ -145,10 +157,6 @@ public class Person {
                 "', email='" + email +
                 "', isBlocked=" + isBlocked +
                 ", isDeleted=" + isDeleted +
-                ", postsCount=" + posts.size() +
-                ", commentsCount=" + comments.size() +
-                ", messagesCount=" + messages.size() +
-                ", likesCount=" + likes.size() +
                 '}';
     }
 

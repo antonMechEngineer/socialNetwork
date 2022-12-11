@@ -6,6 +6,7 @@ import main.api.response.PersonResponse;
 import main.mappers.PersonMapper;
 import main.model.entities.Comment;
 import main.model.entities.Person;
+import main.model.entities.PersonSettings;
 import main.model.entities.Post;
 import main.repository.CommentsRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -57,6 +58,7 @@ class CommentsServiceTest {
     private Person person;
     private Post post;
     private Comment comment;
+    private PersonSettings personSettings;
     private final int offset = 0;
     private final int size = 20;
 
@@ -76,6 +78,10 @@ class CommentsServiceTest {
         comment.setId(1L);
         comment.setCommentText(commentText);
         comment.setTime(LocalDateTime.now());
+        personSettings = new PersonSettings();
+        personSettings.setPostCommentNotification(true);
+        personSettings.setCommentCommentNotification(true);
+        person.setPersonSettings(personSettings);
     }
 
     @AfterEach
@@ -84,6 +90,7 @@ class CommentsServiceTest {
         person = null;
         post = null;
         comment = null;
+        personSettings = null;
     }
 
     @Test

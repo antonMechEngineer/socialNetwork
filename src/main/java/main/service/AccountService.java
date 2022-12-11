@@ -1,29 +1,31 @@
 package main.service;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import main.api.request.EmailRq;
-import main.api.request.PasswordRq;
-import main.api.request.PasswordSetRq;
-import main.api.request.RegisterRq;
+import main.api.request.*;
+import main.api.response.CommonResponse;
 import main.api.response.ComplexRs;
+import main.api.response.PersonSettingsResponse;
 import main.api.response.RegisterRs;
+import main.errors.IncorrectRequestTypeException;
+import main.errors.PersonNotFoundException;
 import main.model.entities.Captcha;
 import main.model.entities.Person;
+import main.model.entities.PersonSettings;
 import main.model.enums.MessagePermissionTypes;
+import main.model.enums.NotificationTypes;
 import main.repository.CaptchaRepository;
+import main.repository.PersonSettingsRepository;
 import main.repository.PersonsRepository;
 import main.security.jwt.JWTUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,14 +34,18 @@ import java.util.UUID;
 public class AccountService {
     private final PersonsRepository personsRepository;
     private final CaptchaRepository captchaRepository;
+    private final PersonSettingsRepository personSettingsRepository;
     private final PasswordEncoder passwordEncoder;
     private final EMailService eMailService;
+    private final PersonsService personsService;
     private final JWTUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     @Value("${auth.pass-restore}")
     String basePassUrl;
     @Value("${auth.email-restore}")
     String baseEmailUrl;
+    @Value("${socialNetwork.timezone}")
+    private String timezone;
 
     public RegisterRs getRegResponse(RegisterRq regRequest){
         RegisterRs registerRs = new RegisterRs();
@@ -67,7 +73,7 @@ public class AccountService {
             person.setFirstName(regRequest.getFirstName());
             person.setLastName(regRequest.getLastName());
             person.setPassword(passwordEncoder.encode(regRequest.getPasswd1()));
-            person.setRegDate(LocalDateTime.now());
+            person.setRegDate(LocalDateTime.now(ZoneId.of(timezone)));
             person.setEmail(regRequest.getEmail());
             person.setPhoto("https://res.cloudinary.com/dre3qhjvh/image/upload/v1669013824/default-1_wzqelg.png");
             person.setIsApproved(false);
@@ -75,6 +81,7 @@ public class AccountService {
             person.setIsDeleted(false);
             person.setEmail(regRequest.getEmail());
             person.setMessagePermission(MessagePermissionTypes.ALL);
+            person.setPersonSettings(createDefaultNotificationsSettings(person));
             personsRepository.save(person);
         }
         return registerRs;
@@ -170,5 +177,99 @@ public class AccountService {
         String text =  baseEmailUrl+ token;
         eMailService.sendSimpleMessage(to, subject, text);
         return response;
+    }
+
+    private PersonSettings createDefaultNotificationsSettings(Person person) {
+        PersonSettings settings = new PersonSettings();
+        settings.setPerson(person);
+        settings.setPostNotification(true);
+        settings.setPostCommentNotification(true);
+        settings.setCommentCommentNotification(true);
+        settings.setLikeNotification(true);
+        settings.setFriendBirthdayNotification(true);
+        settings.setFriendRequestNotification(true);
+        settings.setMessageNotification(true);
+        return settings;
+    }
+
+    public CommonResponse<ComplexRs> setPersonSetting(PersonSettingsRequest request) throws PersonNotFoundException, IncorrectRequestTypeException {
+        Person person = personsService.getPersonByContext();
+        if (person == null) {
+            throw new PersonNotFoundException("Person not found");
+        }
+        PersonSettings personSettings = person.getPersonSettings();
+        switch (request.getNotificationType()) {
+            case "POST" : {
+                personSettings.setPostNotification(request.isEnable());
+                break;
+            }
+            case "POST_COMMENT" : {
+                personSettings.setPostCommentNotification(request.isEnable());
+                break;
+            }
+            case "COMMENT_COMMENT" : {
+                personSettings.setCommentCommentNotification(request.isEnable());
+                break;
+            }
+            case "FRIEND_REQUEST" : {
+                personSettings.setFriendRequestNotification(request.isEnable());
+                break;
+            }
+            case "MESSAGE" : {
+                personSettings.setMessageNotification(request.isEnable());
+                break;
+            }
+            case "FRIEND_BIRTHDAY" : {
+                personSettings.setFriendBirthdayNotification(request.isEnable());
+                break;
+            }
+            case "POST_LIKE" : {
+                personSettings.setLikeNotification(request.isEnable());
+                break;
+            }
+            default : throw new IncorrectRequestTypeException("Incorrect notification type");
+        }
+        personSettingsRepository.save(personSettings);
+        return CommonResponse.<ComplexRs>builder()
+                .timestamp(System.currentTimeMillis())
+                .data(new ComplexRs())
+                .build();
+    }
+
+    public CommonResponse<List<PersonSettingsResponse>> getPersonSettings() throws PersonNotFoundException {
+        Person person = personsService.getPersonByContext();
+        if (person == null) {
+            throw new PersonNotFoundException("Person not found");
+        }
+        PersonSettings personSettings = person.getPersonSettings();
+        if (personSettings == null) {
+            person.setPersonSettings(createDefaultNotificationsSettings(person));
+            personSettings = personsRepository.save(person).getPersonSettings();
+        }
+        PersonSettingsResponse postValue = PersonSettingsResponse.builder()
+                .type(String.valueOf(NotificationTypes.POST)).enable(personSettings.getPostNotification()).build();
+        PersonSettingsResponse postCommentValue = PersonSettingsResponse.builder()
+                .type(String.valueOf(NotificationTypes.POST_COMMENT)).enable(personSettings.getPostCommentNotification()).build();
+        PersonSettingsResponse commentCommentValue = PersonSettingsResponse.builder()
+                .type(String.valueOf(NotificationTypes.COMMENT_COMMENT)).enable(personSettings.getCommentCommentNotification()).build();
+        PersonSettingsResponse friendRequestValue = PersonSettingsResponse.builder()
+                .type(String.valueOf(NotificationTypes.FRIEND_REQUEST)).enable(personSettings.getFriendRequestNotification()).build();
+        PersonSettingsResponse messageValue = PersonSettingsResponse.builder()
+                .type(String.valueOf(NotificationTypes.MESSAGE)).enable(personSettings.getMessageNotification()).build();
+        PersonSettingsResponse friendsBirthdayValue = PersonSettingsResponse.builder()
+                .type(String.valueOf(NotificationTypes.FRIEND_BIRTHDAY)).enable(personSettings.getFriendBirthdayNotification()).build();
+        PersonSettingsResponse postLikeValue = PersonSettingsResponse.builder()
+                .type(String.valueOf(NotificationTypes.POST_LIKE)).enable(personSettings.getLikeNotification()).build();
+        return CommonResponse.<List<PersonSettingsResponse>>builder()
+                .timestamp(System.currentTimeMillis())
+                .data(List.of(
+                        postValue,
+                        postCommentValue,
+                        commentCommentValue,
+                        friendRequestValue,
+                        messageValue,
+                        friendsBirthdayValue,
+                        postLikeValue))
+                .build();
     }
 }
