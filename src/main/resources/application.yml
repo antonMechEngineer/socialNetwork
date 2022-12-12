@@ -52,6 +52,7 @@ spring.mail.password: hvYDUwgKj6fkDkFCkgSN
 spring.mail.properties.mail.smtp.auth: true
 spring.mail.properties.mail.smtp.ssl.enable: true
 
+
 management:
   endpoints:
     web:
