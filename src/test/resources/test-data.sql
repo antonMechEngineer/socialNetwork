@@ -1,7 +1,8 @@
-INSERT INTO persons (first_name,last_name,reg_date,birth_date,email,phone,password,about)
+INSERT INTO persons (first_name,last_name,reg_date,birth_date,email,phone,password,about,change_password_token)
 VALUES
-    ('Gretchen','Contreras','2022-09-29 21:49:07','2000-06-08 10:54:06','rhoncus.nullam@yahoo.edu','+7 (978) 311-43-59','ZvJ57ekY5Tc','senectus et netus et malesuada fames ac turpis egestas. Fusce aliquet magna a neque. Nullam ut'),
-    ('Jescie','Logan','2022-04-18 23:14:12','1979-01-03 15:07:47','molestie@yahoo.edu','+7 (965) 698-46-45','UbQ85uuS8Lu','molestie arcu. Sed eu nibh vulputate mauris sagittis placerat. Cras dictum ultricies ligula. Nullam enim. Sed nulla ante,');
+    ('Gretchen','Contreras','2022-09-29 21:49:07','2000-06-08 10:54:06','rhoncus.nullam@yahoo.edu','+7 (978) 311-43-59','ZvJ57ekY5Tc','senectus et netus et malesuada fames ac turpis egestas. Fusce aliquet magna a neque. Nullam ut','changeword1'),
+    ('Jescie','Logan','2022-04-18 23:14:12','1979-01-03 15:07:47','molestie@yahoo.edu','+7 (965) 698-46-45','UbQ85uuS8Lu','molestie arcu. Sed eu nibh vulputate mauris sagittis placerat. Cras dictum ultricies ligula. Nullam enim. Sed nulla ante,','changeword2'),
+    ('Peter','First','2022-09-29 21:49:07','2000-06-08 10:54:06','testbd@internet.ru','+7 (978) 311-43-59','ZvJ57ekY5Tc','senectus et netus et malesuada fames ac turpis egestas. Fusce aliquet magna a neque. Nullam ut','changeword3');
 
 
 INSERT INTO posts (time,author_id,title,post_text)
@@ -48,3 +49,7 @@ VALUES
     (4,6),
     (5,3),
     (5,5);
+
+INSERT INTO captcha (code,secret_code, time)
+VALUES
+('code','secret','2022-11-27 07:44:53')
