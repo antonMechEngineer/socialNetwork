@@ -17,6 +17,7 @@ import main.repository.PersonsRepository;
 import main.repository.PostsRepository;
 import main.service.search.SearchPosts;
 import main.service.util.NetworkPageRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,21 +43,26 @@ public class PostsService {
     private final PostMapper postMapper;
     private final SearchPosts searchPosts;
 
+    @Value("${socialNetwork.timezone}")
+    private String timezone;
+
     public CommonResponse<PostResponse> createPost(PostRequest postRequest, long userId, Long timestamp) throws PersonNotFoundException {
         Person person = personsRepository.findById(userId).orElse(null);
         if (!validatePerson(person)) {
             throw new PersonNotFoundException("Invalid user id");
         }
-        LocalDateTime postPublishingTime = timestamp == null ? LocalDateTime.now() : new Timestamp(timestamp).toLocalDateTime();
+        LocalDateTime postPublishingTime = timestamp == null ? LocalDateTime.now(ZoneId.of(timezone)) : new Timestamp(timestamp).toLocalDateTime();
         Post post = postMapper.postRequestToNewPost(postRequest, person, postPublishingTime);
         PostResponse postResponse = postMapper.postToResponse(postsRepository.save(updateTagsInPost(new ArrayList<>(post.getTags()), post)));
-        createNotifications(post, person);
+        if (person.getPersonSettings() != null && person.getPersonSettings().getPostNotification()) {
+            createNotifications(post, person);
+        }
         return buildCommonResponse(postResponse);
     }
 
     public CommonResponse<List<PostResponse>> getFeeds(int offset, int size) {
         Pageable pageable = NetworkPageRequest.of(offset, size);
-        Page<Post> postPage = postsRepository.findPostsByTimeBeforeAndIsDeletedFalseOrderByTimeDesc(pageable, LocalDateTime.now());
+        Page<Post> postPage = postsRepository.findPostsByTimeBeforeAndIsDeletedFalseOrderByTimeDesc(pageable, LocalDateTime.now(ZoneId.of(timezone)));
         return buildCommonResponse(offset, size, postPage.getContent(), postPage.getTotalElements());
     }
 
@@ -89,7 +96,7 @@ public class PostsService {
             throw new PersonNotFoundException("Invalid user id");
         }
         post.setIsDeleted(deleteStatus);
-        post.setTimeDelete(LocalDateTime.now());
+        post.setTimeDelete(LocalDateTime.now(ZoneId.of(timezone)));
         PostResponse postResponse = postMapper.postToResponse(postsRepository.save(post));
         return buildCommonResponse(postResponse);
     }
@@ -149,10 +156,10 @@ public class PostsService {
                 notificationsService.createNotification(post, friendship.getSrcPerson());
             }
         });
-        friendshipsRepository.findFriendshipBySrcPerson(person).forEach(friendship -> {
-            if (friendship.getFriendshipStatus().getCode().equals(FriendshipStatusTypes.FRIEND)) {
-                notificationsService.createNotification(post, friendship.getDstPerson());
-            }
-        });
+//        friendshipsRepository.findFriendshipBySrcPerson(person).forEach(friendship -> {
+//            if (friendship.getFriendshipStatus().getCode().equals(FriendshipStatusTypes.FRIEND)) {
+//                notificationsService.createNotification(post, friendship.getDstPerson());
+//            }
+//        });
     }
 }

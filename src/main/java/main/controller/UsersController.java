@@ -1,6 +1,7 @@
 package main.controller;
 
 import lombok.RequiredArgsConstructor;
+import main.AOP.annotations.UpdateOnlineTime;
 import main.api.request.FindPersonRq;
 import main.api.request.PostRequest;
 import main.api.request.UserRq;
@@ -19,18 +20,21 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
+@UpdateOnlineTime
 public class UsersController {
 
     private final PostsService postsService;
     private final PersonsService personsService;
     private final UsersService usersService;
 
+    @UpdateOnlineTime
     @GetMapping("/{id}")
     public CommonResponse<PersonResponse> getUserById(@PathVariable long id,
                                                       @RequestHeader("Authorization") String token) {
         return personsService.getPersonDataById(id, token);
     }
 
+    @UpdateOnlineTime
     @GetMapping("/{id}/wall")
     public CommonResponse<List<PostResponse>> getUsersPosts(
             @PathVariable long id,
@@ -40,6 +44,7 @@ public class UsersController {
         return postsService.getAllPostsByAuthor(offset, size, personsService.getPersonById(id));
     }
 
+    @UpdateOnlineTime
     @PostMapping("/{id}/wall")
     public CommonResponse<PostResponse> createPost(
             @PathVariable(name = "id") Long personId,
@@ -49,12 +54,13 @@ public class UsersController {
         return postsService.createPost(postRequest, personId, publishingDate);
     }
 
+    @UpdateOnlineTime
     @GetMapping("/me")
     public CommonResponse<PersonResponse> getMyData() {
         return personsService.getMyData();
     }
 
-
+    @UpdateOnlineTime
     @PutMapping("/me")
     ResponseEntity<UserRs> updateMyData(@RequestBody UserRq userRq) {
         return ResponseEntity
@@ -72,6 +78,7 @@ public class UsersController {
                 .ok(usersService.recoverProfile());
     }
 
+    @UpdateOnlineTime
     @GetMapping("/search")
     public CommonResponse<List<PersonResponse>> findPersons(
             FindPersonRq personRq,

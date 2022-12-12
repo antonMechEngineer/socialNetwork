@@ -2,6 +2,9 @@ package main.repository;
 
 import main.model.entities.Notification;
 import main.model.entities.Person;
+import main.model.entities.interfaces.Notificationed;
+import main.model.enums.LikeTypes;
+import main.model.enums.NotificationTypes;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface NotificationsRepository extends JpaRepository<Notification, Long> {
@@ -23,4 +27,7 @@ public interface NotificationsRepository extends JpaRepository<Notification, Lon
     Page<Notification> findAllByPersonAndIsReadIsFalse(Person person, Pageable pageable);
 
     List<Notification> findAllByPersonAndIsReadIsFalse(Person person);
+
+    @Query(value = "FROM Notification WHERE notificationType = :type AND entity = :entity")
+    Optional<Notification> findNotificationByEntity(@Param("type") NotificationTypes type, @Param("entity") Notificationed entity);
 }

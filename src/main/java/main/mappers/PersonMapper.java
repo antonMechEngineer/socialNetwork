@@ -4,19 +4,19 @@ import main.api.response.CurrencyRateRs;
 import main.api.response.PersonResponse;
 import main.api.response.WeatherRs;
 import main.model.entities.Person;
-import main.model.enums.FriendshipStatusTypes;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 
 @Mapper(componentModel = "spring")
 public interface PersonMapper {
 
-    @Mapping(target = "city", source = "person.city")
-    @Mapping(target = "country", source = "person.country")
     @Mapping(target = "weather", source = "person")
     @Mapping(target = "currency", source = "person")
-    @Mapping(target = "friendStatus", source = "person")
-    @Mapping(target = "online", expression = "java(true)")
+    @Mapping(target = "online", source = "person")
     @Mapping(target = "token", ignore = true)
     PersonResponse toPersonResponse(Person person);
 
@@ -35,7 +35,9 @@ public interface PersonMapper {
                 .build();
     }
 
-    default FriendshipStatusTypes getFriendStatus(Person person) {
-        return FriendshipStatusTypes.REQUEST;
+    default boolean getOnlineStatus(Person person) {
+        return person.getLastOnlineTime() != null &&
+                LocalDateTime.now(ZoneId.of("Europe/Moscow")).minus(1, ChronoUnit.MINUTES)
+                        .isBefore(person.getLastOnlineTime());
     }
 }

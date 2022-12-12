@@ -3,10 +3,10 @@ package main.service;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import main.api.response.PersonResponse;
 import main.mappers.PersonMapper;
-import main.model.entities.Notification;
-import main.model.entities.Person;
-import main.model.entities.Post;
+import main.model.entities.*;
+import main.model.enums.FriendshipStatusTypes;
 import main.model.enums.NotificationTypes;
+import main.repository.FriendshipsRepository;
 import main.repository.NotificationsRepository;
 import main.repository.PersonsRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -28,8 +28,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -48,6 +47,8 @@ class NotificationsServiceTest {
     @MockBean
     private NotificationsRepository notificationsRepository;
     @MockBean
+    private FriendshipsRepository friendshipsRepository;
+    @MockBean
     private PersonMapper personMapper;
     @MockBean
     private SimpMessagingTemplate template;
@@ -56,6 +57,9 @@ class NotificationsServiceTest {
     private Notification notification1;
     private Notification notification2;
     private Post post;
+    private PersonSettings personSettings;
+    private Friendship friendship;
+    private FriendshipStatus friendshipStatus;
     private final int offset = 0;
     private final int size = 10;
 
@@ -77,6 +81,15 @@ class NotificationsServiceTest {
         notification2.setIsRead(false);
         notification1.setPerson(person);
         notification2.setPerson(person);
+        personSettings = new PersonSettings();
+        personSettings.setFriendBirthdayNotification(true);
+        person.setPersonSettings(personSettings);
+        friendship = new Friendship();
+        friendshipStatus = new FriendshipStatus();
+        friendshipStatus.setCode(FriendshipStatusTypes.FRIEND);
+        friendship.setSrcPerson(person);
+        friendship.setDstPerson(person);
+        friendship.setFriendshipStatus(friendshipStatus);
     }
 
     @AfterEach
@@ -85,6 +98,9 @@ class NotificationsServiceTest {
         notification1 = null;
         notification2 = null;
         post = null;
+        personSettings = null;
+        friendshipStatus = null;
+        friendship = null;
     }
 
     @Test
@@ -143,5 +159,23 @@ class NotificationsServiceTest {
         notificationsService.createNotification(post, person);
         verify(notificationsRepository).save(any());
         verify(template).convertAndSend(anyString(), (Object) any());
+    }
+
+    @Test
+    void birthdayNotificator() {
+        when(personsRepository.findPeopleByBirthDate(anyInt(), anyInt())).thenReturn(List.of(person));
+        when(friendshipsRepository.findFriendshipsByDstPerson(any())).thenReturn(List.of(friendship));
+        when(notificationsRepository.findAllByPersonAndIsReadIsFalse(any(), any())).thenReturn(new PageImpl<>(new ArrayList<>()));
+
+        notificationsService.birthdaysNotificator();
+        verify(notificationsRepository).save(any());
+    }
+
+    @Test
+    void deleteNotification() {
+        when(notificationsRepository.findNotificationByEntity(any(), any())).thenReturn(Optional.of(new Notification()));
+
+        notificationsService.deleteNotification(post);
+        verify(notificationsRepository).delete(any());
     }
 }

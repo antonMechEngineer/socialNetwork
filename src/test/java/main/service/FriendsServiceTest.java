@@ -6,6 +6,7 @@ import main.mappers.FriendMapper;
 import main.model.entities.Friendship;
 import main.model.entities.FriendshipStatus;
 import main.model.entities.Person;
+import main.model.entities.PersonSettings;
 import main.model.enums.FriendshipStatusTypes;
 import main.repository.FriendshipStatusesRepository;
 import main.repository.FriendshipsRepository;
@@ -85,6 +86,7 @@ class FriendsServiceTest {
     private static final Page<Person> PAGE_FRIENDS = new PageImpl<>(FRIENDS, PAGEABLE, FRIENDS.size());
     private static final ArrayList<Person> RECEIVED_FRIENDS = new ArrayList<>(Arrays.asList(RECEIVED_FRIEND));
     private static final Page<Person> PAGE_RECEIVED_FRIENDS = new PageImpl<>(RECEIVED_FRIENDS, PAGEABLE, RECEIVED_FRIENDS.size());
+    private PersonSettings personSettings;
 
     @BeforeEach
     void setUp() {
@@ -95,6 +97,9 @@ class FriendsServiceTest {
         mockPersonsRepository();
         mockFriendshipsRepository();
         mockFriendMapper();
+        personSettings = new PersonSettings();
+        personSettings.setFriendRequestNotification(true);
+        REQUESTED_FRIEND.setPersonSettings(personSettings);
     }
 
     private void mockSecurityContext(){
@@ -155,7 +160,6 @@ class FriendsServiceTest {
         assertEquals(FRIEND, fsCurPsFr.getFriendshipStatus().getCode());
         assertEquals(FRIEND, fsCurPsRcFr.getFriendshipStatus().getCode());
         verify(friendshipStatusesRepository, times(2)).save(any());
-        verify(notificationsService, times(2)).createNotification(any(), any());
     }
 
     @Test
@@ -163,7 +167,7 @@ class FriendsServiceTest {
         friendsService.sendFriendshipRequest(REQUESTED_FRIEND.getId());
         verify(friendshipsRepository, times(2)).save(any());
         verify(friendshipStatusesRepository, times(2)).save(any());
-        verify(notificationsService, times(2)).createNotification(any(), any());
+        verify(notificationsService, times(1)).createNotification(any(), any());
     }
 
     @Test

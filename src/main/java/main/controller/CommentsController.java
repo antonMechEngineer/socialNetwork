@@ -1,6 +1,7 @@
 package main.controller;
 
 import lombok.RequiredArgsConstructor;
+import main.AOP.annotations.UpdateOnlineTime;
 import main.api.request.CommentRequest;
 import main.api.response.CommentResponse;
 import main.api.response.CommonResponse;
@@ -18,6 +19,7 @@ public class CommentsController {
     private final CommentsService commentsService;
     private final PostsService postsService;
 
+    @UpdateOnlineTime
     @PostMapping
     public CommonResponse<CommentResponse> createComment(
             @PathVariable(name = "id") long postId,
@@ -26,6 +28,7 @@ public class CommentsController {
         return commentsService.createComment(postsService.findPostById(postId), commentRequest);
     }
 
+    @UpdateOnlineTime
     @GetMapping
     public CommonResponse<List<CommentResponse>> getComments(
             @PathVariable(name = "id") long postId,
@@ -35,6 +38,7 @@ public class CommentsController {
         return commentsService.getPostComments(postsService.findPostById(postId), offset, size);
     }
 
+    @UpdateOnlineTime
     @DeleteMapping("/{comment_id}")
     public CommonResponse<CommentResponse> deleteComment(
             @PathVariable(name = "id") long postId,
@@ -43,6 +47,7 @@ public class CommentsController {
         return commentsService.changeCommentDeleteStatus(commentId, true);
     }
 
+    @UpdateOnlineTime
     @PutMapping("/{comment_id}/recover")
     public CommonResponse<CommentResponse> recoverComment(
             @PathVariable(name = "id") long postId,
@@ -51,6 +56,7 @@ public class CommentsController {
         return commentsService.changeCommentDeleteStatus(commentId, false);
     }
 
+    @UpdateOnlineTime
     @PutMapping("/{comment_id}")
     public CommonResponse<CommentResponse> editComment(
             @PathVariable(name = "id") long postId,

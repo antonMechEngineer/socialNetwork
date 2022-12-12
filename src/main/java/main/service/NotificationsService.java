@@ -7,6 +7,8 @@ import main.mappers.NotificationMapper;
 import main.model.entities.Notification;
 import main.model.entities.Person;
 import main.model.entities.interfaces.Notificationed;
+import main.model.enums.FriendshipStatusTypes;
+import main.repository.FriendshipsRepository;
 import main.repository.NotificationsRepository;
 import main.repository.PersonsRepository;
 import main.service.util.NetworkPageRequest;
@@ -14,10 +16,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +31,7 @@ public class NotificationsService {
 
     private final NotificationsRepository notificationsRepository;
     private final PersonsRepository personsRepository;
+    private final FriendshipsRepository friendshipsRepository;
     private final NotificationMapper notificationMapper;
     private final SimpMessagingTemplate template;
 
@@ -34,6 +39,8 @@ public class NotificationsService {
     private int offset;
     @Value("${socialNetwork.default.noteSize}")
     private int size;
+    @Value("${socialNetwork.timezone}")
+    private String timezone;
 
     public CommonResponse<List<NotificationResponse>> getAllNotificationsByPerson(int offset, int perPage) {
         Person person = personsRepository.findPersonByEmail(
@@ -74,10 +81,28 @@ public class NotificationsService {
         Notification notification = new Notification();
         notification.setIsRead(false);
         notification.setPerson(person);
+        notification.setNotificationType(entity.getNotificationType());
         notification.setEntity(entity);
-        notification.setSentTime(LocalDateTime.now());
+        notification.setSentTime(LocalDateTime.now(ZoneId.of(timezone)));
         notificationsRepository.save(notification);
-        template.convertAndSend(String.format("/user/%s/queue/notifications", notification.getPerson().getId()),
+        template.convertAndSend(String.format("/user/%s/queue/notifications", person.getId()),
                 getAllNotificationsByPerson(offset, size, person));
+    }
+
+    @Scheduled(cron = "0 0 8 * * *")
+    public void birthdaysNotificator() {
+        LocalDateTime currentDate = LocalDateTime.now(ZoneId.of(timezone));
+        List<Person> personList = personsRepository.findPeopleByBirthDate(currentDate.getMonthValue(), currentDate.getDayOfMonth());
+        personList.forEach(person -> friendshipsRepository.findFriendshipsByDstPerson(person).forEach(friendship -> {
+            if (friendship.getFriendshipStatus().getCode().equals(FriendshipStatusTypes.FRIEND) &&
+                    friendship.getSrcPerson().getPersonSettings() != null &&
+                    friendship.getSrcPerson().getPersonSettings().getFriendBirthdayNotification()) {
+                createNotification(person, friendship.getSrcPerson());
+            }
+        }));
+    }
+
+    public void deleteNotification(Notificationed entity) {
+        notificationsRepository.findNotificationByEntity(entity.getNotificationType(), entity).ifPresent(notificationsRepository::delete);
     }
 }

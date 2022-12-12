@@ -20,7 +20,7 @@ public interface LikesRepository extends JpaRepository<Like, Long> {
     @Query(value = "FROM Like WHERE type = :type AND entity = :entity")
     List<Like> findLikesByEntity(@Param("type") LikeTypes type, @Param("entity") Liked liked);
 
-    @Query(value = "FROM Like WHERE type = :type AND entity = :entity AND person = :person")
+    @Query(value = "FROM Like WHERE type = :type AND entity = :entity AND author = :person")
     Optional<Like> findLikeByPersonAndEntity(@Param("type") LikeTypes type, @Param("entity") Liked liked, @Param("person") Person person);
 
     @Modifying

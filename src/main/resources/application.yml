@@ -1,7 +1,7 @@
 spring:
   jpa:
     hibernate:
-      ddl-auto: validate
+    ddl-auto: validate
     open-in-view: true
     database-platform: org.hibernate.dialect.PostgreSQL9Dialect
     show-sql: false
@@ -22,6 +22,7 @@ socialNetwork:
     page: 0
     size: 20
     noteSize: 10
+  timezone: Europe/Moscow
 
 server:
   port: 8086

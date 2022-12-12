@@ -11,8 +11,10 @@ import main.repository.CommentsRepository;
 import main.repository.LikesRepository;
 import main.repository.PostsRepository;
 import org.mapstruct.Named;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +26,10 @@ public class LikesService {
     private final PostsRepository postsRepository;
     private final CommentsRepository commentsRepository;
     private final PersonsService personsService;
+    private final NotificationsService notificationsService;
+
+    @Value("${socialNetwork.timezone}")
+    private String timezone;
 
     public CommonResponse<LikeResponse> putLike(LikeRequest likeRequest) {
         Person person = personsService.getPersonByContext();
@@ -31,16 +37,19 @@ public class LikesService {
         if (getLikeFromCurrentPerson(person, liked) == null) {
             Like like = new Like();
             like.setEntity(liked);
-            like.setPerson(person);
-            like.setTime(LocalDateTime.now());
+            like.setAuthor(person);
+            like.setTime(LocalDateTime.now(ZoneId.of(timezone)));
             likesRepository.save(like);
+            if (person.getPersonSettings() != null && person.getPersonSettings().getLikeNotification()) {
+                notificationsService.createNotification(like, liked.getAuthor());
+            }
         }
         return getLikesResponse(liked);
     }
 
     private CommonResponse<LikeResponse> getLikesResponse(Liked liked) {
         List<Like> likes = likesRepository.findLikesByEntity(liked.getType(), liked);
-        List<Long> users = likes.stream().map(like -> like.getPerson().getId()).collect(Collectors.toList());
+        List<Long> users = likes.stream().map(like -> like.getAuthor().getId()).collect(Collectors.toList());
         LikeResponse likeResponse = LikeResponse.builder()
                 .likes(likes.size())
                 .users(users)
@@ -57,6 +66,7 @@ public class LikesService {
         Liked liked = getLikedEntity(entityId, type);
         Like like = getLikeFromCurrentPerson(person, liked);
         if (like != null) {
+            notificationsService.deleteNotification(like);
             likesRepository.delete(like);
         }
         return getLikesResponse(liked);
@@ -91,7 +101,7 @@ public class LikesService {
     public Boolean getMyLike(Liked liked) {
         Person person = personsService.getPersonByContext();
         Like like = likesRepository.findLikeByPersonAndEntity(liked.getType(), liked, person).orElse(null);
-        return like != null && person.getId().equals(like.getPerson().getId());
+        return like != null && person.getId().equals(like.getAuthor().getId());
     }
 
     private CommonResponse<LikeResponse> buildCommonResponse(LikeResponse likeResponse) {
