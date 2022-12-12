@@ -40,7 +40,7 @@ class AccountControllerTest {
         RegisterRq registerRq = new RegisterRq();
         registerRq.setEmail("a@b.ru");
         registerRq.setFirstName("Peter");
-        registerRq.setLastName("First");
+        registerRq.setLastName("Second");
         registerRq.setCode("code");
         registerRq.setCodeSecret("secret");
         registerRq.setPasswd1("parole");
