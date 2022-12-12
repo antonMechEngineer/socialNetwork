@@ -50,6 +50,7 @@ VALUES
     (5,3),
     (5,5);
 
-INSERT INTO captcha (code,secret_code, time)
+
+INSERT INTO person_settings (person_id,post_comment_notification,comment_comment_notification,friend_request_notification,message_notification,friend_birthday_notification,like_notification,post_notification)
 VALUES
-('code','secret','2022-11-27 07:44:53')
+    (1,'true','true','true','true','true','true','true');

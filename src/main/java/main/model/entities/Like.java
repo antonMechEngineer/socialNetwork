@@ -2,7 +2,9 @@ package main.model.entities;
 
 import lombok.Data;
 import main.model.entities.interfaces.Liked;
+import main.model.entities.interfaces.Notificationed;
 import main.model.enums.LikeTypes;
+import main.model.enums.NotificationTypes;
 import org.hibernate.annotations.*;
 
 import javax.persistence.*;
@@ -13,7 +15,7 @@ import java.time.LocalDateTime;
 @Entity
 @Data
 @Table(name = "likes")
-public class Like {
+public class Like implements Notificationed {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +26,7 @@ public class Like {
 
     @ManyToOne
     @JoinColumn(name = "person_id", nullable = false)
-    private Person person;
+    private Person author;
 
     @Any(metaDef = "likesMetaDef",metaColumn = @Column(name = "type"))
     @AnyMetaDef(name = "likesMetaDef", idType = "long", metaType = "string", metaValues = {
@@ -42,9 +44,14 @@ public class Like {
     public String toString() {
         return "Like{" +
                 "id=" + id +
-                ", personId=" + person.getId() +
+                ", personId=" + author.getId() +
                 ", entity=" + entity.getId() +
                 ", type=" + type +
                 '}';
+    }
+
+    @Override
+    public NotificationTypes getNotificationType() {
+        return NotificationTypes.POST_LIKE;
     }
 }

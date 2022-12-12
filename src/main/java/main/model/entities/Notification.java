@@ -32,6 +32,8 @@ public class Notification {
             @MetaValue(targetEntity = Comment.class, value = "COMMENT_COMMENT"),
             @MetaValue(targetEntity = Friendship.class, value = "FRIEND_REQUEST"),
             @MetaValue(targetEntity = Message.class, value = "MESSAGE"),
+            @MetaValue(targetEntity = Person.class, value = "FRIEND_BIRTHDAY"),
+            @MetaValue(targetEntity = Like.class, value = "POST_LIKE")
     })
     @JoinColumn(name = "entity_id")
     private Notificationed entity;

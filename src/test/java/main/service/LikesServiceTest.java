@@ -47,6 +47,9 @@ class LikesServiceTest {
     @MockBean
     private CommentsRepository commentsRepository;
 
+    @MockBean
+    private NotificationsService notificationsService;
+
     private Person person;
     private Post liked1;
     private Comment liked2;
@@ -103,7 +106,7 @@ class LikesServiceTest {
     @Test
     void getLikesResponse() {
         Like like = new Like();
-        like.setPerson(person);
+        like.setAuthor(person);
         likes.add(like);
         when(postsRepository.findById(any())).thenReturn(Optional.of(liked1));
         when(commentsRepository.findById(any())).thenReturn(Optional.of(liked2));
@@ -116,7 +119,7 @@ class LikesServiceTest {
     @Test
     void deleteLike() {
         Like like = new Like();
-        like.setPerson(person);
+        like.setAuthor(person);
         likes.add(like);
         when(personsService.getPersonByContext()).thenReturn(person);
         when(postsRepository.findById(any())).thenReturn(Optional.of(liked1));
@@ -135,7 +138,7 @@ class LikesServiceTest {
         int likesCount = 5;
         for (int i = 0; i < likesCount; i++) {
             Like like = new Like();
-            like.setPerson(person);
+            like.setAuthor(person);
             likes.add(like);
         }
         when(likesRepository.findLikesByEntity(liked2.getType(), liked2)).thenReturn(likes);
@@ -148,7 +151,7 @@ class LikesServiceTest {
     @Test
     void getMyLike() {
         Like like = new Like();
-        like.setPerson(person);
+        like.setAuthor(person);
         when(personsService.getPersonByContext()).thenReturn(person);
         when(likesRepository.findLikeByPersonAndEntity(liked1.getType(), liked1, person)).thenReturn(Optional.empty());
         when(likesRepository.findLikeByPersonAndEntity(liked2.getType(), liked2, person)).thenReturn(Optional.of(like));

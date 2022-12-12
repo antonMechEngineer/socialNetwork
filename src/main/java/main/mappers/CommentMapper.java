@@ -10,8 +10,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
-@Mapper(componentModel = "spring", uses = {PersonMapper.class, LikesService.class}, imports = LocalDateTime.class)
+@Mapper(componentModel = "spring", uses = {PersonMapper.class, LikesService.class}, imports = {LocalDateTime.class, ZoneId.class})
 public interface CommentMapper {
 
     @Mapping(target = "parentId", source = "parentComment.id")
@@ -22,7 +23,7 @@ public interface CommentMapper {
     CommentResponse commentToResponse(Comment comment);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "time", expression = "java(LocalDateTime.now())")
+    @Mapping(target = "time", expression = "java(LocalDateTime.now(ZoneId.of(\"Europe/Moscow\")))")
     @Mapping(target = "post", source = "post")
     @Mapping(target = "parentComment", source = "parentComment")
     @Mapping(target = "embeddedComments", ignore = true)
