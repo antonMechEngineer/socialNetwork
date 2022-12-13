@@ -26,10 +26,9 @@ socialNetwork:
 
 server:
   port: 8086
-  server:
-    tomcat:
-      mbeanregistry:
-        enabled = true
+  tomcat:
+    mbeanregistry:
+      enabled = true
 
 auth:
   secret: someSecretCode
@@ -52,7 +51,7 @@ user:
 spring.mail.protocol: smtps
 spring.mail.host: smtp.mail.ru
 spring.mail.port: 465
-spring.mail.username:  testbd@internet.ru
+spring.mail.username: testbd@internet.ru
 spring.mail.password: hvYDUwgKj6fkDkFCkgSN
 spring.mail.properties.mail.smtp.auth: true
 spring.mail.properties.mail.smtp.ssl.enable: true
