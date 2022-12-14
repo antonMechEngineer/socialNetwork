@@ -1,5 +1,6 @@
 package main.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import main.AOP.annotations.UpdateOnlineTime;
 import main.api.response.*;
@@ -14,6 +15,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
+@Tag(name = "storage-controller", description = "Work with account image file")
 public class StorageController {
 
     private final UsersService usersService;
