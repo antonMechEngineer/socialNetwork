@@ -109,8 +109,10 @@ public class AccountService {
 
     public RegisterRs getPasswordReSet(PasswordRq passwordRq){
         Optional<Person> optPerson = personsRepository.checkToken(passwordRq.getSecret());
-        Person rescuePerson=null;
-        if (optPerson.isPresent()){rescuePerson = optPerson.get();}
+        Person rescuePerson = null;
+        if (optPerson.isPresent()){
+            rescuePerson = optPerson.get();
+        }
 
         RegisterRs response = new RegisterRs();
         ComplexRs data = ComplexRs.builder()

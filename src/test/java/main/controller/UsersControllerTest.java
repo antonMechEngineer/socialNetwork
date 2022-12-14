@@ -120,8 +120,12 @@ class UsersControllerTest {
     @Test
     @Sql("/UsersControllerData/usersController-findPersons.sql")
     void findPersons() throws Exception {
-        String url = "/api/v1/users/search?first_name=Jescie";
-        mockMvc.perform(get(url))
+        String url = "/api/v1/users/search";
+        mockMvc.perform(get(url)
+                        .param("first_name", "Jescie")
+                        .param("last_name", "Logan")
+                        .param("age_from", "5")
+                        .param("date_to", "80"))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.total").value(1))

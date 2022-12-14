@@ -30,8 +30,7 @@ public class SearchPosts {
             postRq.getTags().forEach(tag -> tags.add("'" + tag + "'"));
         }
         ResultSet posts = commonSearchMethods.getStatement().executeQuery("SELECT p.id FROM posts AS p" +
-                " JOIN post2Tag p2t ON p2t.post_id = p.id" +
-                " JOIN tags t ON p2t.tag_id = t.id" +
+                (postRq.getTags() != null ? " JOIN post2tag p2t ON p2t.post_id = p.id JOIN tags t ON p2t.tag_id = t.id" : "") +
                 " WHERE" +
                 (postRq.getText() != null ? " post_text ~* '" + postRq.getText() + "'" : "") +
                 (postRq.getDate_from() != null && postRq.getDate_to() != null ? " AND p.time BETWEEN '" + commonSearchMethods.longToLocalDateTime(postRq.getDate_from()) +
