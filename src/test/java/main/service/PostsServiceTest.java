@@ -5,10 +5,7 @@ import main.api.request.PostRequest;
 import main.api.response.PersonResponse;
 import main.errors.PersonNotFoundException;
 import main.mappers.PersonMapper;
-import main.model.entities.Friendship;
-import main.model.entities.FriendshipStatus;
-import main.model.entities.Person;
-import main.model.entities.Post;
+import main.model.entities.*;
 import main.model.enums.FriendshipStatusTypes;
 import main.repository.FriendshipsRepository;
 import main.repository.PersonsRepository;
@@ -67,6 +64,7 @@ class PostsServiceTest {
     private Post post;
     private FriendshipStatus friendshipStatus;
     private Friendship friendship;
+    private PersonSettings personSettings;
     private final String postTitle = "postTitle";
     private final String postText = "postText";
     private final int offset = 0;
@@ -96,6 +94,9 @@ class PostsServiceTest {
         post.setIsDeleted(false);
         post.setIsBlocked(false);
         post.setTime(LocalDateTime.now());
+        personSettings = new PersonSettings();
+        personSettings.setPostNotification(true);
+        person.setPersonSettings(personSettings);
     }
 
     @AfterEach
@@ -106,6 +107,7 @@ class PostsServiceTest {
         post = null;
         friendshipStatus = null;
         friendship = null;
+        personSettings = null;
     }
 
     @Test

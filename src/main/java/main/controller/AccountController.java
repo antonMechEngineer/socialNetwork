@@ -13,12 +13,19 @@ import main.api.request.PasswordRq;
 import main.api.request.PasswordSetRq;
 import main.api.request.RegisterRq;
 import main.api.response.CommonResponse;
+import main.AOP.annotations.UpdateOnlineTime;
+import main.api.request.*;
+import main.api.response.ComplexRs;
+import main.api.response.PersonSettingsResponse;
 import main.api.response.RegisterRs;
+import main.errors.IncorrectRequestTypeException;
+import main.errors.PersonNotFoundException;
 import main.service.AccountService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/account")
@@ -97,4 +104,19 @@ public class AccountController {
     })
     public ResponseEntity<RegisterRs> emailRecovery(@RequestBody EmailRq emailRq) {
         return ResponseEntity.ok(accountService.getEmailRecovery());}
+
+    @UpdateOnlineTime
+    @GetMapping("/notifications")
+    public CommonResponse<List<PersonSettingsResponse>> getPersonSettings() throws PersonNotFoundException {
+
+        return accountService.getPersonSettings();
+    }
+
+    @UpdateOnlineTime
+    @PutMapping("/notifications")
+    public CommonResponse<ComplexRs> editPersonSettings(
+            @RequestBody PersonSettingsRequest request) throws PersonNotFoundException, IncorrectRequestTypeException {
+
+        return accountService.setPersonSetting(request);
+    }
 }

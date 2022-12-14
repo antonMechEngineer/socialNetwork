@@ -1,6 +1,5 @@
 package main.repository;
 
-import main.model.entities.City;
 import main.model.entities.Person;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -47,5 +46,8 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
     @Modifying
     @Transactional
     @Query(value = "UPDATE Person SET lastOnlineTime = :time WHERE email = :personEmail")
-    void updateOnlineTime(@Param("personEmail") String personEmail,@Param("time") LocalDateTime time);
+    void updateOnlineTime(@Param("personEmail") String personEmail, @Param("time") LocalDateTime time);
+
+    @Query(value = "FROM Person WHERE MONTH(birthDate) = :month AND DAY(birthDate) = :day")
+    List<Person> findPeopleByBirthDate(@Param("month") int month, @Param("day") int day);
 }

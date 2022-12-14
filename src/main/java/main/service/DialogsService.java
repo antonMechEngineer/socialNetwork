@@ -72,7 +72,7 @@ public class DialogsService {
     public CommonResponse<ComplexRs> beginDialog(DialogUserShortListDto dialogUserShortListDto) {
         Person dialogPerson = personsRepository.findPersonById(dialogUserShortListDto.getUserIds().get(0)).orElseThrow();
         Person currentPerson = findCurrentUser();
-        Dialog dialog = dialogsRepository.findDialogByFirstPersonAndSecondPerson(dialogPerson, currentPerson)
+        Dialog dialog = (dialogsRepository.findDialogByFirstPersonAndSecondPerson(dialogPerson, currentPerson))
                 .orElse(dialogsRepository.findDialogByFirstPersonAndSecondPerson(currentPerson, dialogPerson)
                         .orElse(createNewDialog(dialogPerson)));
         dialogsRepository.save(dialog);

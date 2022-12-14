@@ -11,11 +11,13 @@ import main.model.entities.Post;
 import main.repository.CommentsRepository;
 import main.service.util.NetworkPageRequest;
 import org.mapstruct.Named;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -30,13 +32,20 @@ public class CommentsService {
     private final NotificationsService notificationsService;
     private final CommentMapper commentMapper;
 
+    @Value("${socialNetwork.timezone}")
+    private String timezone;
+
     public CommonResponse<CommentResponse> createComment(Post post, CommentRequest commentRequest) {
         Person person = personsService.getPersonByContext();
         Comment parentComment = getCommentById(commentRequest.getParentId());
         post = parentComment == null ? post : null;
-        Comment comment = commentMapper.commentRequestToNewComment(commentRequest, post, person, parentComment);
-        notificationsService.createNotification(commentRepository.save(comment),
-                post != null ? post.getAuthor() : parentComment.getAuthor());
+        Comment comment = commentRepository.save(commentMapper.commentRequestToNewComment(commentRequest, post, person, parentComment));
+        if (post != null && person.getPersonSettings() != null && person.getPersonSettings().getPostCommentNotification()) {
+            notificationsService.createNotification(comment, post.getAuthor());
+        }
+        if (post == null && person.getPersonSettings() != null && person.getPersonSettings().getCommentCommentNotification()) {
+            notificationsService.createNotification(comment, parentComment.getAuthor());
+        }
         return buildCommonResponse(comment);
     }
 
@@ -50,7 +59,7 @@ public class CommentsService {
         Comment comment = getCommentById(commentId);
         if (personsService.validatePerson(comment.getAuthor())) {
             comment.setCommentText(commentRequest.getCommentText());
-            comment.setTime(LocalDateTime.now());
+            comment.setTime(LocalDateTime.now(ZoneId.of(timezone)));
         }
         return buildCommonResponse(commentRepository.save(comment));
     }

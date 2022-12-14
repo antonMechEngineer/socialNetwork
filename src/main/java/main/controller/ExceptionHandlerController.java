@@ -2,6 +2,7 @@ package main.controller;
 
 import lombok.RequiredArgsConstructor;
 import main.api.response.CommonResponse;
+import main.api.response.ComplexRs;
 import main.api.response.PersonResponse;
 import main.errors.*;
 import main.model.entities.Post;
@@ -36,7 +37,7 @@ public class ExceptionHandlerController {
     @ExceptionHandler(BadAuthorizationException.class)
     public ResponseEntity<CommonResponse<PersonResponse>> handleBadAuthorizationException(Exception e) {
         return ResponseEntity.status(401).body(CommonResponse.<PersonResponse>builder()
-                .error("error")
+                .error(BadAuthorizationException.class.getSimpleName())
                 .timestamp(System.currentTimeMillis())
                 .errorDescription(e.getMessage())
                 .build());
@@ -56,6 +57,15 @@ public class ExceptionHandlerController {
         return ResponseEntity.status(400).body(CommonResponse.builder()
                 .error("error")
                 .timestamp((System.currentTimeMillis()))
+                .errorDescription(e.getMessage())
+                .build());
+    }
+
+    @ExceptionHandler(IncorrectRequestTypeException.class)
+    public ResponseEntity<CommonResponse<ComplexRs>> handleIncorrectRequestTypeException(Exception e) {
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(CommonResponse.<ComplexRs>builder()
+                .error(IncorrectRequestTypeException.class.getSimpleName())
+                .timestamp(System.currentTimeMillis())
                 .errorDescription(e.getMessage())
                 .build());
     }
