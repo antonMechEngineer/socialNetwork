@@ -28,7 +28,7 @@ server:
   port: 8086
   tomcat:
     mbeanregistry:
-      enabled = true
+      enabled: true
 
 auth:
   secret: someSecretCode
