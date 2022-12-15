@@ -18,9 +18,10 @@ public interface MessagesRepository extends JpaRepository<Message, Long> {
             nativeQuery = true)
     void messagesDelete(@Param("id") long id);
 
-    List<Message> findAllByDialogId(Long dialogId);
-
     List<Message> findAllByRecipientAndIsDeletedFalse(Person recipient);
-    List<Message> findAllByAuthorAndIsDeletedFalse(Person author);
     List<Message> findAllByDialogIdAndIsDeletedFalse(Long dialogId);
+
+    Long countAllByDialogId(long id);
+
+    Long countAllByAuthorIdAndRecipientId(long authorId, long recipientId);
 }

@@ -1,6 +1,5 @@
 package main.repository;
 
-import main.model.entities.Friendship;
 import main.model.entities.Person;
 import main.model.entities.Post;
 import org.springframework.data.domain.Page;
@@ -23,4 +22,5 @@ public interface PostsRepository extends JpaRepository<Post, Long> {
     @Query(value = "SELECT * FROM posts WHERE author_id = :id", nativeQuery = true)
     List<Post> findPostsToDelete(@Param("id") long id);
 
+    Long countAllByAuthorId(long authorId);
 }

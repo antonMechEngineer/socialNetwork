@@ -29,4 +29,6 @@ public interface CommentsRepository extends JpaRepository<Comment, Long> {
     @Transactional
     @Query(value = "DELETE FROM post_comments WHERE parent_id = :id", nativeQuery = true)
     void secondaryCommentsDelete(@Param("id") long id);
+
+    Long countAllByPostId(long postId);
 }

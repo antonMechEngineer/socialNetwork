@@ -1,5 +1,6 @@
 package main.repository;
 
+import main.api.response.RegionStatisticRs;
 import main.model.entities.Person;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,8 +19,6 @@ import java.util.Optional;
 public interface PersonsRepository extends JpaRepository<Person, Long> {
 
     Optional<Person>findPersonById(Long id);
-
-    boolean existsPersonByEmail(String email);
 
     Optional<Person> findPersonByEmail(String email);
 
@@ -50,4 +49,18 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
 
     @Query(value = "FROM Person WHERE MONTH(birthDate) = :month AND DAY(birthDate) = :day")
     List<Person> findPeopleByBirthDate(@Param("month") int month, @Param("day") int day);
+
+    Long countAllByCountryIgnoreCase(String country);
+
+    Long countAllByCityIgnoreCase(String city);
+
+    @Query(value = "SELECT new main.api.response.RegionStatisticRs(p.city, COUNT(p.city)) FROM Person AS p " +
+            "WHERE p.city IS NOT NULL " +
+            "GROUP BY p.city")
+    List<RegionStatisticRs> getCityWithUsersCount();
+
+    @Query(value = "SELECT new main.api.response.RegionStatisticRs(p.country, COUNT(p.country)) FROM Person AS p " +
+            "WHERE p.country IS NOT NULL " +
+            "GROUP BY p.country")
+    List<RegionStatisticRs> getCountryWithUsersCount();
 }
