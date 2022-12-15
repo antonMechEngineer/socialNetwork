@@ -1,3 +1,8 @@
+server:
+  port: 8086
+  tomcat:
+    mbeanregistry:
+      enabled: true
 spring:
   jpa:
     hibernate:
@@ -23,12 +28,17 @@ socialNetwork:
     size: 20
     noteSize: 10
   timezone: Europe/Moscow
-
-server:
-  port: 8086
-  tomcat:
-    mbeanregistry:
-      enabled: true
+  #Банк России
+  currency:
+    data-path: https://www.cbr-xml-daily.ru/daily_json.js
+    units: USD, EUR
+  #GisMeteo
+  weather:
+    data-path: https://api.gismeteo.net/v2/weather/current/
+    city-id-path: https://api.gismeteo.net/v2/search/cities/?query=
+    token:
+      header: X-Gismeteo-Token
+      value: 56b30cb255.3443075
 
 auth:
   secret: someSecretCode
@@ -51,7 +61,7 @@ user:
 spring.mail.protocol: smtps
 spring.mail.host: smtp.mail.ru
 spring.mail.port: 465
-spring.mail.username: testbd@internet.ru
+spring.mail.username:  testbd@internet.ru
 spring.mail.password: hvYDUwgKj6fkDkFCkgSN
 spring.mail.properties.mail.smtp.auth: true
 spring.mail.properties.mail.smtp.ssl.enable: true
