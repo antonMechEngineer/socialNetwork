@@ -1,0 +1,64 @@
+databaseChangeLog:
+- changeSet:
+    id: sprint-3-1
+    author: YurK
+    changes:
+    - addColumn:
+        tableName: currencies
+        column:
+            name: update_time
+            type: TIMESTAMP WITHOUT TIME ZONE
+- changeSet:
+    id: sprint-3-2
+    author: YurK
+    changes:
+    - addColumn:
+        tableName: cities
+        column:
+            name: gismeteo_id
+            type: INTEGER
+- changeSet:
+    id: sprint-3-3
+    author: YurK
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+                nullable: false
+                primaryKey: true
+                primaryKeyName: weather_pkey
+            name: id
+            type: INTEGER
+        - column:
+            constraints:
+                nullable: false
+            name: gismeteo_id
+            type: INTEGER
+        - column:
+            constraints:
+                nullable: false
+            name: temperature
+            type: DOUBLE
+        - column:
+            constraints:
+                nullable: false
+            name: description
+            type: VARCHAR(255)
+        - column:
+            constraints:
+                nullable: false
+            name: time
+            type: TIMESTAMP WITHOUT TIME ZONE
+        tableName: weather
+- changeSet:
+    id: sprint-3-4
+    author: YurK
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: gismeteo_id
+        indexName: gismeteo_id_index
+        tableName: weather
