@@ -46,9 +46,8 @@ public class UsersController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<PersonResponse> getUserById(@PathVariable long id,
-                                                      @RequestHeader("Authorization") String token) {
-        return personsService.getPersonDataById(id, token);
+    public CommonResponse<PersonResponse> getUserById(@PathVariable long id) {
+        return personsService.getPersonDataById(id);
     }
 
     @UpdateOnlineTime
