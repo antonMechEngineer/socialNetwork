@@ -1,8 +1,8 @@
 package soialNetworkApp.mappers;
 
-import soialNetworkApp.api.response.CurrencyRateRs;
+import soialNetworkApp.api.response.CurrencyResponse;
 import soialNetworkApp.api.response.PersonResponse;
-import soialNetworkApp.api.response.WeatherRs;
+import soialNetworkApp.api.response.WeatherResponse;
 import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.model.enums.FriendshipStatusTypes;
 import org.mapstruct.Mapper;
@@ -21,16 +21,16 @@ public interface FriendMapper {
     PersonResponse toFriendResponse(Person person, FriendshipStatusTypes friendshipStatusTypes);
 
 
-    default WeatherRs getMapWeather(Person person) {
-        return WeatherRs.builder()
+    default WeatherResponse getMapWeather(Person person) {
+        return WeatherResponse.builder()
                 .clouds("clouds")
                 .temp("9")
                 .city(person.getCity() == null ? null : person.getCity())
                 .build();
     }
 
-    default CurrencyRateRs getMapCurrency(Person person) {
-        return CurrencyRateRs.builder()
+    default CurrencyResponse getMapCurrency(Person person) {
+        return CurrencyResponse.builder()
                 .usd("60")
                 .euro("62")
                 .build();

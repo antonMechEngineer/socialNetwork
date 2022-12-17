@@ -3,6 +3,7 @@ package soialNetworkApp.model.entities;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -16,4 +17,7 @@ public class Currency {
     private String name;
 
     private String price;
+
+    @Column(name = "update_time")
+    private LocalDateTime updateTime;
 }
