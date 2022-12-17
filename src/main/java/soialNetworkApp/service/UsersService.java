@@ -52,6 +52,7 @@ public class UsersService {
     private final CitiesRepository citiesRepository;
     private final CountriesRepository countriesRepository;
     private final CloudinaryService cloudinaryService;
+    private final WeatherService weatherService;
     private final PersonMapper personMapper;
     private final SearchPersons searchPersons;
 
@@ -125,6 +126,7 @@ public class UsersService {
                 Country country = new Country();
                 country.setTitle(userRq.getCountry());
                 countriesRepository.save(country);
+                weatherService.setGismeteoCityId(userRq.getCity());
             }
         }
         if (userRq.getFirst_name() != null) {

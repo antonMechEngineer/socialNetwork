@@ -8,4 +8,6 @@ import java.util.Optional;
 @Repository
 public interface CurrenciesRepository extends JpaRepository<Currency, Long> {
     Optional<Currency> findCurrenciesByName(String name);
+
+    Optional<Currency> findTopByName(String name);
 }

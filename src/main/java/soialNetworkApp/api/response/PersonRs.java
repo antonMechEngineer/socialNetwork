@@ -16,7 +16,7 @@ public class PersonRs {
     private String city;
     private String country;
     private String token;
-    private WeatherRs weatherRs;
+    private WeatherResponse weatherRs;
     private Currency currency;
     private Boolean online;
 

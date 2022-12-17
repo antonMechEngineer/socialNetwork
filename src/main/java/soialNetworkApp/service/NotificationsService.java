@@ -89,7 +89,7 @@ public class NotificationsService {
                 getAllNotificationsByPerson(offset, size, person));
     }
 
-    @Scheduled(cron = "0 0 8 * * *")
+    @Scheduled(cron = "${socialNetwork.scheduling.birthdays}", zone = "${socialNetwork.timezone}")
     public void birthdaysNotificator() {
         LocalDateTime currentDate = LocalDateTime.now(ZoneId.of(timezone));
         List<Person> personList = personsRepository.findPeopleByBirthDate(currentDate.getMonthValue(), currentDate.getDayOfMonth());

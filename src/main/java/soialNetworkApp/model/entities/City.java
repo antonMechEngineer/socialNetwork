@@ -16,6 +16,8 @@ public class City {
     @Column(nullable = false)
     private String title;
 
+    @Column(name = "gismeteo_id")
+    private Integer gismeteoId;
 
     @Override
     public String toString() {

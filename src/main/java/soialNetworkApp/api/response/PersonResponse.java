@@ -45,10 +45,10 @@ public class PersonResponse {
     private String token;
 
     @ApiModelProperty(value = "weather in user city")
-    private WeatherRs weather;
+    private WeatherResponse weather;
 
     @ApiModelProperty(value = "currency in user country")
-    private CurrencyRateRs currency;
+    private CurrencyResponse currency;
 
     @ApiModelProperty(value = "user is online?", example = "true")
     private Boolean online;

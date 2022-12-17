@@ -1,15 +1,6 @@
 package soialNetworkApp.service;
 
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
-import soialNetworkApp.api.request.PostRequest;
-import soialNetworkApp.api.response.PersonResponse;
-import soialNetworkApp.errors.PersonNotFoundException;
-import soialNetworkApp.mappers.PersonMapper;
-import soialNetworkApp.model.entities.*;
-import soialNetworkApp.model.enums.FriendshipStatusTypes;
-import soialNetworkApp.repository.FriendshipsRepository;
-import soialNetworkApp.repository.PersonsRepository;
-import soialNetworkApp.repository.PostsRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +11,15 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
-import soialNetworkApp.security.service.*;
+import soialNetworkApp.api.request.PostRequest;
+import soialNetworkApp.api.response.PersonResponse;
+import soialNetworkApp.errors.PersonNotFoundException;
+import soialNetworkApp.mappers.PersonMapper;
+import soialNetworkApp.model.entities.*;
+import soialNetworkApp.model.enums.FriendshipStatusTypes;
+import soialNetworkApp.repository.FriendshipsRepository;
+import soialNetworkApp.repository.PersonsRepository;
+import soialNetworkApp.repository.PostsRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,8 +27,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
