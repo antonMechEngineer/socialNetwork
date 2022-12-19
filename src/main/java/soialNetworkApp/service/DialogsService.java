@@ -19,8 +19,10 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -104,7 +106,7 @@ public class DialogsService {
                 .dialog(dialogsRepository.findById(messageWsRq.getDialogId()).orElseThrow())
                 .author(personsRepository.findById(messageWsRq.getAuthorId()).orElseThrow())
                 .messageText(messageWsRq.getMessageText())
-                .time(messageWsRq.getTime().toLocalDateTime())
+                .time(messageWsRq.getTime().toLocalDateTime().atZone(ZoneId.systemDefault()))
                 .readStatus(ReadStatusTypes.valueOf(messageWsRq.getReadStatus()))
                 .recipient(getRecipientFromDialog(messageWsRq.getAuthorId(), messageWsRq.getDialogId()))
                 .isDeleted(false)
@@ -130,18 +132,21 @@ public class DialogsService {
                 });
         return CommonResponse.<List<MessageRs>>builder()
                 .timestamp(System.currentTimeMillis())
-                .data(messagesRs).build();
+                .data(messagesRs.stream()
+                        .sorted(Comparator.comparing(MessageRs::getTime))
+                        .collect(Collectors.toList()))
+                .build();
     }
 
-    public CommonResponse<MessageRs> getLastMessageRs(Long dialogId, MessageRq messageRq) {
-        if (getLastMessage(dialogId).getMessageText().equals(messageRq.getMessageText())) {
-            return CommonResponse.<MessageRs>builder()
-                    .data(createLastMessageRs(dialogsRepository.findById(dialogId).orElseThrow()))
-                    .timestamp(System.currentTimeMillis())
-                    .build();
-        }
-        return null;
-    }
+//    public CommonResponse<MessageRs> getLastMessageRs(Long dialogId, MessageRq messageRq) {
+//        if (getLastMessage(dialogId).getMessageText().equals(messageRq.getMessageText())) {
+//            return CommonResponse.<MessageRs>builder()
+//                    .data(createLastMessageRs(dialogsRepository.findById(dialogId).orElseThrow()))
+//                    .timestamp(System.currentTimeMillis())
+//                    .build();
+//        }
+//        return null;
+//    }
 
     private Person getRecipientFromDialog(Long authorId, Long dialogId) {
         Dialog dialog = dialogsRepository.findById(dialogId).orElseThrow();
@@ -164,13 +169,19 @@ public class DialogsService {
                     .authorId(messageRs.getAuthorId())
                     .recipientId(messageRs.getRecipientId())
                     .lastMessage(messageRs)
+                    .unreadCount(getUnreadCountForDialog(d))
+                    .readStatus(messageRs.getReadStatus())
                     .build();
-            if (messageRs.getReadStatus() != null) {
-                dialogRs.setReadStatus(messageRs.getReadStatus());
-            }
             dialogRsList.add(dialogRs);
         }
         return dialogRsList;
+    }
+
+    private Long getUnreadCountForDialog(Dialog dialog) {
+        return messagesRepository.findAllByRecipientAndIsDeletedFalse(findCurrentUser()).stream()
+                .filter(m -> m.getDialog().getId().equals(dialog.getId()) &&
+                        m.getReadStatus().equals(ReadStatusTypes.SENT))
+                .count();
     }
 
     private MessageRs createLastMessageRs(Dialog dialog) {
