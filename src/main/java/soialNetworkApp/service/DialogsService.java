@@ -2,10 +2,13 @@ package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.mapstruct.Context;
+import org.mapstruct.Named;
 import soialNetworkApp.api.request.DialogUserShortListDto;
-import soialNetworkApp.api.request.MessageRq;
 import soialNetworkApp.api.request.MessageWsRq;
 import soialNetworkApp.api.response.*;
+import soialNetworkApp.mappers.DialogMapper;
+import soialNetworkApp.mappers.MessageMapper;
 import soialNetworkApp.mappers.PersonMapper;
 import soialNetworkApp.model.entities.Dialog;
 import soialNetworkApp.model.entities.Message;
@@ -16,15 +19,12 @@ import soialNetworkApp.repository.MessagesRepository;
 import soialNetworkApp.repository.PersonsRepository;
 import soialNetworkApp.security.jwt.JWTUtil;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import soialNetworkApp.service.util.CurrentUser;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -38,14 +38,17 @@ public class DialogsService {
 
     private final PersonsRepository personsRepository;
     private final PersonMapper personMapper;
-    private final SimpMessagingTemplate template;
+    private final MessageMapper messageMapper;
+    private final DialogMapper dialogMapper;
+    private final SimpMessagingTemplate messagingTemplate;
     private final JWTUtil jwtUtil;
+    private final CurrentUser currentUser;
 
 
     public CommonResponse<ComplexRs> getUnreadMessages() {
         return CommonResponse.<ComplexRs>builder()
                 .data(ComplexRs.builder()
-                        .count((int) messagesRepository.findAllByRecipientAndIsDeletedFalse(findCurrentUser()).stream()
+                        .count((int) messagesRepository.findAllByRecipientAndIsDeletedFalse(currentUser.getPerson()).stream()
                                 .filter(m -> m.getReadStatus().equals(ReadStatusTypes.SENT))
                                 .count())
                         .build())
@@ -56,7 +59,7 @@ public class DialogsService {
     public CommonResponse<ComplexRs> setReadMessages(Long dialogId) {
         AtomicReference<Integer> readCount = new AtomicReference<>(0);
         messagesRepository.findAllByDialogIdAndIsDeletedFalse(dialogId).stream()
-                .filter(m -> m.getRecipient().equals(findCurrentUser()))
+                .filter(m -> m.getRecipient().equals(currentUser.getPerson()))
                 .filter(m -> m.getReadStatus().equals(ReadStatusTypes.SENT))
                 .forEach(m -> {
                     m.setReadStatus(ReadStatusTypes.READ);
@@ -73,35 +76,41 @@ public class DialogsService {
 
     public CommonResponse<ComplexRs> beginDialog(DialogUserShortListDto dialogUserShortListDto) {
         Person dialogPerson = personsRepository.findPersonById(dialogUserShortListDto.getUserIds().get(0)).orElseThrow();
-        Person currentPerson = findCurrentUser();
-        Dialog dialog = (dialogsRepository.findDialogByFirstPersonAndSecondPerson(dialogPerson, currentPerson))
-                .orElse(dialogsRepository.findDialogByFirstPersonAndSecondPerson(currentPerson, dialogPerson)
-                        .orElse(createNewDialog(dialogPerson)));
+        Dialog dialog = (dialogsRepository.findDialogByFirstPersonAndSecondPerson(dialogPerson, currentUser.getPerson()))
+                .orElse(dialogsRepository.findDialogByFirstPersonAndSecondPerson(currentUser.getPerson(), dialogPerson)
+                        .orElse(createNewDialog(currentUser.getPerson(), dialogPerson)));
         dialogsRepository.save(dialog);
+        // todo какой именно респонс необходимо возвращать? нужно ли в коунт количество диалогово передать? что передать в месадж?
         return CommonResponse.<ComplexRs>builder()
                 .timestamp(System.currentTimeMillis())
                 .data(ComplexRs.builder().build())
                 .build();
     }
 
-    private Dialog createNewDialog(Person dialogPerson) {
-        Dialog dialog = new Dialog();
-        dialog.setFirstPerson(findCurrentUser());
-        dialog.setSecondPerson(dialogPerson);
-        dialog.setLastActiveTime(ZonedDateTime.now());
-        return dialog;
+    private Dialog createNewDialog(Person currentPerson, Person dialogPerson) {
+        return Dialog.builder()
+                .firstPerson(currentPerson)
+                .secondPerson(dialogPerson)
+                .lastActiveTime(ZonedDateTime.now())
+                .build();
     }
 
     public CommonResponse<List<DialogRs>> getAllDialogs() {
-        List<DialogRs> dialogRsList = createDialogRsList(findCurrentUser());
+        List<DialogRs> dialogRsList = createDialogRsList(currentUser.getPerson());
         return CommonResponse.<List<DialogRs>>builder()
                 .total((long) dialogRsList.size())
                 .timestamp(System.currentTimeMillis())
-                .data(createDialogRsList(findCurrentUser()))
+                .data(createDialogRsList(currentUser.getPerson()))
                 .build();
     }
 
     public void getMessageFromWs(MessageWsRq messageWsRq) {
+        messagingTemplate.convertAndSendToUser(messageWsRq.getDialogId().toString(), "/queue/messages",
+                MessageWsRs.builder()
+                        .authorId(messageWsRq.getAuthorId())
+                        .messageText(messageWsRq.getMessageText())
+                        .build());
+
         Message message = Message.builder()
                 .dialog(dialogsRepository.findById(messageWsRq.getDialogId()).orElseThrow())
                 .author(personsRepository.findById(messageWsRq.getAuthorId()).orElseThrow())
@@ -111,16 +120,14 @@ public class DialogsService {
                 .recipient(getRecipientFromDialog(messageWsRq.getAuthorId(), messageWsRq.getDialogId()))
                 .isDeleted(false)
                 .build();
+
+
         messagesRepository.save(message);
-        log.info(messageWsRq.getToken());
-        template.convertAndSend(String.format("/user/%s/queue/messages", messageWsRq.getDialogId()),
-                MessageWsRs.builder()
-                        .id(message.getId())
-                        .authorId(message.getAuthor().getId())
-                        .userId(personsRepository.findPersonByEmail(jwtUtil.extractUserName(messageWsRq.getToken()))
-                                .orElseThrow().getId())
-                        .messageText(message.getMessageText())
-                        .build());
+    }
+
+    public void messageTypingFromWs(Long dialogId, MessageWsRq messageWsRq, Boolean typing) {
+        Map<String, Object> header = Collections.singletonMap("type", typing ? "start_typing" : "stop_typing");
+        messagingTemplate.convertAndSendToUser(dialogId.toString(), "/queue/messages", messageWsRq, header);
     }
 
     public CommonResponse<List<MessageRs>> getMessages(Long dialogId) {
@@ -138,25 +145,12 @@ public class DialogsService {
                 .build();
     }
 
-//    public CommonResponse<MessageRs> getLastMessageRs(Long dialogId, MessageRq messageRq) {
-//        if (getLastMessage(dialogId).getMessageText().equals(messageRq.getMessageText())) {
-//            return CommonResponse.<MessageRs>builder()
-//                    .data(createLastMessageRs(dialogsRepository.findById(dialogId).orElseThrow()))
-//                    .timestamp(System.currentTimeMillis())
-//                    .build();
-//        }
-//        return null;
-//    }
-
-    private Person getRecipientFromDialog(Long authorId, Long dialogId) {
+    @Named("getRecipientFromDialog")
+    public Person getRecipientFromDialog(Long dialogId, Long authorId) {
         Dialog dialog = dialogsRepository.findById(dialogId).orElseThrow();
         return !authorId.equals(dialog.getFirstPerson().getId()) ?
                 dialog.getFirstPerson() :
                 dialog.getSecondPerson();
-    }
-
-    private Person findCurrentUser() {
-        return personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow();
     }
 
     private List<DialogRs> createDialogRsList(Person person) {
@@ -164,25 +158,18 @@ public class DialogsService {
         List<Dialog> dialogs = getDialogsByPersonId(person.getId());
         for (Dialog d : dialogs) {
             MessageRs messageRs = createLastMessageRs(d);
-            DialogRs dialogRs = DialogRs.builder()
-                    .id(d.getId())
-                    .authorId(messageRs.getAuthorId())
-                    .recipientId(messageRs.getRecipientId())
-                    .lastMessage(messageRs)
-                    .unreadCount(getUnreadCountForDialog(d))
-                    .readStatus(messageRs.getReadStatus())
-                    .build();
-            dialogRsList.add(dialogRs);
+            dialogRsList.add(dialogMapper.toDialogRs(messageRs, d));
         }
         return dialogRsList;
     }
 
-    private Long getUnreadCountForDialog(Dialog dialog) {
-        return messagesRepository.findAllByRecipientAndIsDeletedFalse(findCurrentUser()).stream()
-                .filter(m -> m.getDialog().getId().equals(dialog.getId()) &&
-                        m.getReadStatus().equals(ReadStatusTypes.SENT))
-                .count();
-    }
+//    @Named("getUnreadCountForDialog")
+//    public Long getUnreadCountForDialog(Dialog dialog) {
+//        return messagesRepository.findAllByRecipientAndIsDeletedFalse(findCurrentUser()).stream()
+//                .filter(m -> m.getDialog().getId().equals(dialog.getId()) &&
+//                        m.getReadStatus().equals(ReadStatusTypes.SENT))
+//                .count();
+//    }
 
     private MessageRs createLastMessageRs(Dialog dialog) {
         try {
@@ -206,7 +193,7 @@ public class DialogsService {
         return MessageRs.builder()
                 .id(message.getId())
                 .time(message.getTime())
-                .isSentByMe(isAuthor(findCurrentUser(), message))
+                .isSentByMe(isAuthor(currentUser.getPerson(), message))
                 .authorId(message.getAuthor().getId())
                 .recipientId(message.getRecipient().getId())
                 .messageText(message.getMessageText())
@@ -224,6 +211,4 @@ public class DialogsService {
     private Boolean isAuthor(Person person, Message message) {
         return message.getAuthor().getId().equals(person.getId());
     }
-
-
 }

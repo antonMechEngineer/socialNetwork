@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import soialNetworkApp.api.request.DialogUserShortListDto;
+import soialNetworkApp.api.request.MessageRq;
 import soialNetworkApp.api.response.*;
 import soialNetworkApp.service.DialogsService;
 import org.springframework.web.bind.annotation.*;
@@ -91,7 +92,7 @@ public class DialogsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<ComplexRs> read(@PathVariable Long dialogId) {
-        return dialogsService.setReadMessages(dialogId);
+    public CommonResponse<ComplexRs> read(@RequestBody MessageRq messageRq) {
+        return dialogsService.setReadMessages(messageRq.getDialogId());
     }
 }

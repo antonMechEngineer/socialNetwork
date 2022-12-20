@@ -7,6 +7,9 @@ import java.time.ZonedDateTime;
 
 @Entity
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "dialogs")
 public class Dialog {
 

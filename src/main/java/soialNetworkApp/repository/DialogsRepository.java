@@ -1,4 +1,5 @@
 package soialNetworkApp.repository;
+import org.mapstruct.Named;
 import soialNetworkApp.model.entities.Dialog;
 import soialNetworkApp.model.entities.Person;
 import org.springframework.data.jpa.repository.JpaRepository;

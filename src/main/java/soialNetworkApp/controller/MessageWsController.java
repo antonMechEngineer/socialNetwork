@@ -2,6 +2,8 @@ package soialNetworkApp.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.handler.annotation.Header;
+import soialNetworkApp.api.request.MessageTypingWsRq;
 import soialNetworkApp.api.request.MessageWsRq;
 import soialNetworkApp.service.DialogsService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -25,4 +27,13 @@ public class MessageWsController {
         dialogsService.getMessageFromWs(messageWsRq);
     }
 
+    @MessageMapping("/dialogs/start_typing")
+    public void startTyping(@Header("dialog_id") Long dialogId, @Payload MessageWsRq messageWsRq) {
+        dialogsService.messageTypingFromWs(dialogId, messageWsRq, true);
+    }
+
+    @MessageMapping("/dialogs/stop_typing")
+    public void stopTyping(@Header("dialog_id") Long dialogId, @Payload MessageWsRq messageWsRq) {
+        dialogsService.messageTypingFromWs(dialogId, messageWsRq, false);
+    }
 }
