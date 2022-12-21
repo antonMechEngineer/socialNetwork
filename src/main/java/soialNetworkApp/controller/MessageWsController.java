@@ -28,12 +28,14 @@ public class MessageWsController {
     }
 
     @MessageMapping("/dialogs/start_typing")
-    public void startTyping(@Header("dialog_id") Long dialogId, @Payload MessageWsRq messageWsRq) {
-        dialogsService.messageTypingFromWs(dialogId, messageWsRq, true);
+    public void startTyping(@Header("dialog_id") Long dialogId, @Header Long userId) {
+        log.info("start typing - " + userId.toString());
+        dialogsService.messageTypingFromWs(dialogId, userId, true);
     }
 
     @MessageMapping("/dialogs/stop_typing")
-    public void stopTyping(@Header("dialog_id") Long dialogId, @Payload MessageWsRq messageWsRq) {
-        dialogsService.messageTypingFromWs(dialogId, messageWsRq, false);
+    public void stopTyping(@Header("dialog_id") Long dialogId, @Header Long userId) {
+        log.info("stop typing - " + userId.toString());
+        dialogsService.messageTypingFromWs(dialogId, userId, false);
     }
 }

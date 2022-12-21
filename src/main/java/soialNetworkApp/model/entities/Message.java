@@ -13,6 +13,7 @@ import java.time.ZonedDateTime;
 @Getter
 @Setter
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "messages")
