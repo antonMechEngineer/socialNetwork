@@ -12,7 +12,7 @@ spring:
     show-sql: false
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://195.133.48.174:5432/social
+    url: jdbc:postgresql://194.87.244.66:5432/social
     username: admin
     password: secret
     initialization-mode: never
