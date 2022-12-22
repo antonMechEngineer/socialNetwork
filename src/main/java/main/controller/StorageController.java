@@ -20,7 +20,7 @@ public class StorageController {
 
     @UpdateOnlineTime
     @PostMapping(value = "/storage", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    ResponseEntity<StorageRs> storage(@RequestParam(value = "file",required = false) MultipartFile photo) throws IOException {
+    ResponseEntity<StorageRs> storage(@RequestParam(value = "file",required = true) MultipartFile photo) throws IOException {
         return ResponseEntity
                 .ok(usersService.storeImage(photo));
     }

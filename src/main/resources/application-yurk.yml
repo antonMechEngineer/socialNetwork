@@ -19,6 +19,8 @@ spring:
 auth:
   secret: someSecretCode
   time-to-live: 3600000000
+  pass-restore: http://localhost:8080/change-password?token=
+  email-restore: http://localhost:8080/shift-email?token=
 
 #applicationParams
 socialNetwork:

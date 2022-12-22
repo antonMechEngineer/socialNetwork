@@ -18,11 +18,12 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final PersonsService personsService;
+    private final PersonCacheService personCacheService;
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
 
     public CommonResponse<PersonResponse> loginUser(LoginRq loginRq) {
-        Person person = personsService.getPersonByEmail(loginRq.getEmail());
+        Person person = personCacheService.getPersonByEmail(loginRq.getEmail());
         if (person != null) {
             Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRq.getEmail(), loginRq.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(auth);

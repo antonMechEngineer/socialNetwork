@@ -44,6 +44,9 @@ class CommentsServiceTest {
     private PersonsService personsService;
 
     @MockBean
+    private PersonCacheService personCacheService;
+
+    @MockBean
     private LikesService likesService;
 
     @MockBean
@@ -95,7 +98,7 @@ class CommentsServiceTest {
 
     @Test
     void createComment() {
-        when(personsService.getPersonByContext()).thenReturn(person);
+        when(personCacheService.getPersonByContext()).thenReturn(person);
         when(commentsRepository.findById(anyLong())).thenReturn(Optional.of(comment));
         when(commentsRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(likesService.getLikesCount(any())).thenReturn(0);

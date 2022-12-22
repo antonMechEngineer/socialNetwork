@@ -18,6 +18,8 @@ spring:
     enabled: true
 auth:
   secret: someSecretCode
+  pass-restore: http://localhost:8080/change-password?token=
+  email-restore: http://localhost:8080/shift-email?token=
 
 #applicationParams
 socialNetwork:

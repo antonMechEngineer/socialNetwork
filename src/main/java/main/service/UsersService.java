@@ -13,6 +13,9 @@ import main.model.entities.Person;
 import main.repository.*;
 import main.service.search.SearchPersons;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -52,6 +55,7 @@ public class UsersService {
     private final CountriesRepository countriesRepository;
     private final CaptchaRepository captchaRepository;
     private final CloudaryService cloudaryService;
+    private final PersonCacheService personCacheService;
     private final PersonMapper personMapper;
     private final SearchPersons searchPersons;
 
@@ -94,11 +98,16 @@ public class UsersService {
             response.setData(dataRs);
 
             person.setPhoto(relativePath);
+            person = personCacheService.cachePerson(person);
+
             personsRepository.save(person);
         }
         return response;
     }
 
+
+
+    //@CachePut(value="Person")//, key = "#email", condition = "#result != null")
     public UserRs editProfile(UserRq userRq) {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
         UserRs response = new UserRs();
@@ -146,6 +155,7 @@ public class UsersService {
             personResponse.setPhoto(userRq.getPhoto_id());
         }
 
+        person = personCacheService.cachePerson(person);
         personsRepository.save(person);
         response.setData(personResponse);
         return response;
@@ -214,8 +224,9 @@ public class UsersService {
         return response;
     }
     @Scheduled(fixedRateString = "${user.time-to-delete}")
+    @CacheEvict(value="persons")
     public void executeOldDeletes() {
-        List<Long> idToDelete = personsRepository.findIdtoDelete(timeToDel);
+        List<Long> idToDelete = personsRepository.idToDelete(timeToDel);
         for(long oldId: idToDelete){
             blockHistoriesRepository.deleteAll(blockHistoriesRepository.findBHtoDelete(oldId));
             friendshipsRepository.deleteAll(friendshipsRepository.findFriendsToDelete(oldId));

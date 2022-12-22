@@ -40,11 +40,13 @@ public class AccountController {
         return ResponseEntity.ok(accountService.getPasswordRecovery(email.get("email").toString()));}
 
     @PutMapping("/email")
-    public ResponseEntity<RegisterRs> emailSet(@RequestBody EmailRq emailRq) {return null;}
+    public ResponseEntity<RegisterRs> emailSet(@RequestBody EmailRq emailRq) {
+        return ResponseEntity.ok(accountService.getNewEmail(emailRq));}
 
     @PutMapping("/email/recovery")
-    public ResponseEntity<RegisterRs> emailRecovery(@RequestBody EmailRq emailRq) {
-        return ResponseEntity.ok(accountService.getEmailRecovery());}
+    public ResponseEntity<RegisterRs> emailRecovery() {
+        return ResponseEntity.ok(accountService.getEmailRecovery());
+    }
 
     @UpdateOnlineTime
     @GetMapping("/notifications")

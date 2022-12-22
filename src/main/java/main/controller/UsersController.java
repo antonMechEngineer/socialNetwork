@@ -8,6 +8,7 @@ import main.api.request.UserRq;
 import main.api.response.*;
 import main.errors.EmptyFieldException;
 import main.errors.PersonNotFoundException;
+import main.service.PersonCacheService;
 import main.service.PersonsService;
 import main.service.PostsService;
 import main.service.UsersService;
@@ -26,6 +27,7 @@ public class UsersController {
     private final PostsService postsService;
     private final PersonsService personsService;
     private final UsersService usersService;
+    private final PersonCacheService personCacheService;
 
     @UpdateOnlineTime
     @GetMapping("/{id}")
@@ -41,7 +43,7 @@ public class UsersController {
             @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
             @RequestParam(name = "itemPerPage", required = false, defaultValue = "${socialNetwork.default.size}") int size) {
 
-        return postsService.getAllPostsByAuthor(offset, size, personsService.getPersonById(id));
+        return postsService.getAllPostsByAuthor(offset, size, personCacheService.getPersonById(id));
     }
 
     @UpdateOnlineTime

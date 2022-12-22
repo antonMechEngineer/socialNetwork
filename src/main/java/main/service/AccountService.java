@@ -38,6 +38,7 @@ public class AccountService {
     private final PasswordEncoder passwordEncoder;
     private final EMailService eMailService;
     private final PersonsService personsService;
+    private final PersonCacheService personCacheService;
     private final JWTUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     @Value("${auth.pass-restore}")
@@ -154,6 +155,29 @@ public class AccountService {
         return response;
     }
 
+    public RegisterRs getNewEmail(EmailRq emailRq){
+        Optional<Person> optPerson = personsRepository.checkToken(emailRq.getSecret());
+        Person rescuePerson=null;
+        if (optPerson.isPresent()){rescuePerson = optPerson.get();}
+
+        RegisterRs response = new RegisterRs();
+        ComplexRs data = ComplexRs.builder()
+                .id(0)
+                .count(0)
+                .message("OK")
+                .message_id(0L)
+                .build();
+        response.setEmail(rescuePerson.getEmail());
+        response.setTimestamp(0);
+        response.setData(data);
+
+        rescuePerson.setEmail(emailRq.getEmail());
+        rescuePerson.setChangePasswordToken(null);
+        personsRepository.save(rescuePerson);
+
+        return response;
+    }
+
     public RegisterRs getEmailRecovery(){
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder
                 .getContext().getAuthentication().getName()).get();
@@ -193,7 +217,7 @@ public class AccountService {
     }
 
     public CommonResponse<ComplexRs> setPersonSetting(PersonSettingsRequest request) throws PersonNotFoundException, IncorrectRequestTypeException {
-        Person person = personsService.getPersonByContext();
+        Person person = personCacheService.getPersonByContext();
         if (person == null) {
             throw new PersonNotFoundException("Person not found");
         }
@@ -237,7 +261,7 @@ public class AccountService {
     }
 
     public CommonResponse<List<PersonSettingsResponse>> getPersonSettings() throws PersonNotFoundException {
-        Person person = personsService.getPersonByContext();
+        Person person = personCacheService.getPersonByContext();
         if (person == null) {
             throw new PersonNotFoundException("Person not found");
         }

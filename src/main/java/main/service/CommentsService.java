@@ -29,6 +29,7 @@ public class CommentsService {
 
     private final CommentsRepository commentRepository;
     private final PersonsService personsService;
+    private final PersonCacheService personCacheService;
     private final NotificationsService notificationsService;
     private final CommentMapper commentMapper;
 
@@ -36,7 +37,7 @@ public class CommentsService {
     private String timezone;
 
     public CommonResponse<CommentResponse> createComment(Post post, CommentRequest commentRequest) {
-        Person person = personsService.getPersonByContext();
+        Person person = personCacheService.getPersonByContext();
         Comment parentComment = getCommentById(commentRequest.getParentId());
         post = parentComment == null ? post : null;
         Comment comment = commentRepository.save(commentMapper.commentRequestToNewComment(commentRequest, post, person, parentComment));

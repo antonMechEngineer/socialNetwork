@@ -11,6 +11,7 @@ import main.model.entities.Person;
 import main.model.enums.FriendshipStatusTypes;
 import main.repository.FriendshipsRepository;
 import main.repository.PersonsRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -30,6 +31,7 @@ public class PersonsService {
 
     private final PersonsRepository personsRepository;
     private final CurrencyService currencyService;
+    private final PersonCacheService personCacheService;
     private final PersonMapper personMapper;
     private final FriendMapper friendMapper;
     private final FriendsService friendsService;
@@ -37,13 +39,13 @@ public class PersonsService {
 
     public CommonResponse<PersonResponse> getPersonDataById(Long id, String token) {
         Person srcPerson = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow();
-        Person person = getPersonById(id);
+        Person person = personCacheService.getPersonById(id);
         person.setFriendStatus(friendsService.getStatusTwoPersons(person, srcPerson));
         return getCommonPersonResponse(person);
     }
 
     public CommonResponse<PersonResponse> getMyData() {
-        return getCommonPersonResponse(getPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()));
+        return getCommonPersonResponse(personCacheService.getPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()));
     }
 
     public UserRs editImage(Principal principal, MultipartFile photo, String phone, String about,
@@ -55,21 +57,10 @@ public class PersonsService {
         return response;
     }
 
-    public Person getPersonById(long personId) {
-        return personsRepository.findById(personId).orElse(null);
-    }
 
-    public Person getPersonByEmail(String email) {
-        return personsRepository.findPersonByEmail(email).orElse(null);
-    }
-
-    public Person getPersonByContext() {
-        return personsRepository.findPersonByEmail((SecurityContextHolder.getContext().getAuthentication().getName()))
-                .orElse(null);
-    }
 
     public boolean validatePerson(Person person) {
-        return person != null && person.equals(getPersonByContext());
+        return person != null && person.equals(personCacheService.getPersonByContext());
     }
 
 

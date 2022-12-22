@@ -5,12 +5,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serializable;
+
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @Data
 @Builder
 @JsonInclude(NON_NULL)
-public class CommonResponse<T> {
+public class CommonResponse<T> implements Serializable {
+    private static final long serialVersionUID = -4439114469417994311L;
 
     private String error;
     private Long timestamp;

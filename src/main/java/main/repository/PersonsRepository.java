@@ -25,6 +25,7 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
 
     Page<Person> findAllByCity(String city, Pageable page);
 
+    String findEmailById(long id);
 
     Page<Person> findPersonByIdIn (List<Long> personIds, Pageable pageable);
 
@@ -35,7 +36,7 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
     List<Person> findPersonByFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(String firstName, String lastName);
 
     @Query(value = "SELECT id FROM persons WHERE is_deleted = true AND (select(select extract(epoch from now()) - (extract(epoch from(deleted_time)))) * 1000 >  :timeToDel)", nativeQuery = true)
-    List<Long> findIdtoDelete(@Param("timeToDel") long timeToDel);
+    List<Long> idToDelete(@Param("timeToDel") long timeToDel);
 
     @Query(value = "SELECT * FROM persons WHERE is_deleted = true AND (select(select extract(epoch from now()) - (extract(epoch from(deleted_time)))) * 1000 > :timeToDel)", nativeQuery = true)
     List<Person> findOldDeletes(@Param("timeToDel") long timeToDel);

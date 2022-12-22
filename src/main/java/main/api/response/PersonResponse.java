@@ -7,6 +7,7 @@ import lombok.Data;
 import main.model.enums.FriendshipStatusTypes;
 import main.model.enums.MessagePermissionTypes;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
@@ -14,7 +15,8 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @Data
 @Builder
 @JsonInclude(NON_NULL)
-public class PersonResponse {
+public class PersonResponse implements Serializable {
+    private static final long serialVersionUID = -4439114469417994311L;
 
     private Long id;
 

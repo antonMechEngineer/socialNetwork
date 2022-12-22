@@ -15,6 +15,25 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/changelog-master.yaml
     enabled: true
+  mail:
+      protocol: smtps
+      host: smtp.mail.ru
+      port: 465
+      username: testbd@internet.ru
+      password: hvYDUwgKj6fkDkFCkgSN
+      properties.mail.smtp.auth: true
+      properties.mail.smtp.ssl.enable: true
+  redis:
+    port: 6379
+    host: localhost
+  cache:
+    type: redis
+    redis:
+      cache-null-values: true
+    #redis: time-to-live: 40000
+  main:
+    allow-bean-definition-overriding: true
+
 
 #applicationParams
 socialNetwork:
@@ -44,11 +63,3 @@ yandex:
 
 user:
   time-to-delete: 2592000000
-
-spring.mail.protocol: smtps
-spring.mail.host: smtp.mail.ru
-spring.mail.port: 465
-spring.mail.username:  testbd@internet.ru
-spring.mail.password: hvYDUwgKj6fkDkFCkgSN
-spring.mail.properties.mail.smtp.auth: true
-spring.mail.properties.mail.smtp.ssl.enable: true
