@@ -1,5 +1,6 @@
 package soialNetworkApp.repository;
 
+import org.mapstruct.Named;
 import soialNetworkApp.api.response.RegionStatisticRs;
 import soialNetworkApp.model.entities.Person;
 import org.springframework.data.domain.Page;

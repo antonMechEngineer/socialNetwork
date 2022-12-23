@@ -8,7 +8,11 @@ import lombok.*;
 @AllArgsConstructor
 public class ComplexRs {
     private Integer id;
-    private Integer count;
+    private Long count;
     private String message;
     private Long message_id;
+
+    public ComplexRs(Long count) {
+        this.count = count;
+    }
 }

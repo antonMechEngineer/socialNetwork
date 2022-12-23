@@ -172,12 +172,7 @@ public class UsersService {
     public ResponseRsComplexRs deleteProfile() {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
         ResponseRsComplexRs response = new ResponseRsComplexRs();
-        ComplexRs data = ComplexRs.builder()
-                .id(0)
-                .count(0)
-                .message("OK")
-                .message_id(0L)
-                .build();
+        ComplexRs data = new ComplexRs(0, 0L, "OK", 0L);
         response.setData(data);
         response.setTimestamp(0);
         response.setOffset(0);
@@ -193,12 +188,7 @@ public class UsersService {
     public ResponseRsComplexRs recoverProfile() {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
         ResponseRsComplexRs response = new ResponseRsComplexRs();
-        ComplexRs data = ComplexRs.builder()
-                .id(0)
-                .count(0)
-                .message("OK")
-                .message_id(0L)
-                .build();
+        ComplexRs data = new ComplexRs(0, 0L, "OK", 0L);
         response.setData(data);
         response.setTimestamp(0);
         response.setOffset(0);

@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Data
 @Builder
@@ -17,7 +18,7 @@ public class MessageRs {
     private Long id;
 
     @ApiModelProperty(value = "message time", example = "2022-02-24 06:14:36.000000")
-    private LocalDateTime time;
+    private ZonedDateTime time;
 
     @ApiModelProperty(value = "is my message", example = "true")
     private Boolean isSentByMe;

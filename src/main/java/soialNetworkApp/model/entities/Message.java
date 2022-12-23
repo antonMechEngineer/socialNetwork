@@ -7,11 +7,13 @@ import soialNetworkApp.model.enums.ReadStatusTypes;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
 @Getter
 @Setter
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "messages")
@@ -22,7 +24,7 @@ public class Message implements Notificationed {
     private Long id;
 
     @Column(nullable = false)
-    private LocalDateTime time;
+    private ZonedDateTime time;
 
     @Column(name = "message_text", nullable = false, columnDefinition = "TEXT")
     private String messageText;
