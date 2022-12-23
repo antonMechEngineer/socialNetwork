@@ -20,8 +20,9 @@ public class MessageWsRq {
     private String messageText;
     @JsonProperty("author_id")
     private Long authorId;
-    private Timestamp time;
+    private Long time;
     @JsonProperty("read_status")
     private String readStatus;
     private String token;
+    private Boolean typing;
 }

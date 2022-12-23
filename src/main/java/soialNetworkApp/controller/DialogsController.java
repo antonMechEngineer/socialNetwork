@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import soialNetworkApp.api.request.DialogUserShortListDto;
 import soialNetworkApp.api.request.MessageRq;
 import soialNetworkApp.api.response.*;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/v1/dialogs")
 @RequiredArgsConstructor
@@ -64,11 +62,6 @@ public class DialogsController {
     public CommonResponse<List<MessageRs>> messages(@PathVariable Long dialogId) {
         return dialogsService.getMessages(dialogId);
     }
-
-//    @PostMapping("/{dialogId}/messages")
-//    public CommonResponse<MessageRs> messagesPost(@PathVariable Long dialogId, @RequestBody MessageRq messageRq) {
-//        return dialogsService.getLastMessageRs(dialogId, messageRq);
-//    }
 
     @GetMapping("/unreaded")
     @ApiOperation(value = "get count of unread messages")

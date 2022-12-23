@@ -9,33 +9,27 @@ import soialNetworkApp.service.DialogsService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
+import soialNetworkApp.service.MessageWsService;
 
 @Slf4j
 @Controller
 @RequiredArgsConstructor
 public class MessageWsController {
 
-    private final DialogsService dialogsService;
-
-//    @MessageMapping("/dialogs/start_typing")
-//    @MessageMapping("/dialogs/stop_typing")
-//    @MessageMapping("/dialogs/mark_readed")
-
+    private final MessageWsService messageWsService;
 
     @MessageMapping("/dialogs/send_message")
     public void sendMessage(@Payload MessageWsRq messageWsRq) {
-        dialogsService.getMessageFromWs(messageWsRq);
+        messageWsService.getMessageFromWs(messageWsRq);
     }
 
     @MessageMapping("/dialogs/start_typing")
-    public void startTyping(@Header("dialog_id") Long dialogId, @Header Long userId) {
-        log.info("start typing - " + userId.toString());
-        dialogsService.messageTypingFromWs(dialogId, userId, true);
+    public void startTyping(@Header("dialog_id") Long dialogId, @Header Long userId, @Payload MessageWsRq messageWsRq) {
+        messageWsService.messageTypingFromWs(dialogId, userId, messageWsRq);
     }
 
     @MessageMapping("/dialogs/stop_typing")
-    public void stopTyping(@Header("dialog_id") Long dialogId, @Header Long userId) {
-        log.info("stop typing - " + userId.toString());
-        dialogsService.messageTypingFromWs(dialogId, userId, false);
+    public void stopTyping(@Header("dialog_id") Long dialogId, @Header Long userId, @Payload MessageWsRq messageWsRq) {
+        messageWsService.messageTypingFromWs(dialogId, userId, messageWsRq);
     }
 }

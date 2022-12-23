@@ -5,6 +5,7 @@ import org.mapstruct.Named;
 import org.springframework.stereotype.Service;
 import soialNetworkApp.api.request.MessageWsRq;
 import soialNetworkApp.model.entities.Dialog;
+import soialNetworkApp.model.entities.Message;
 import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.model.enums.ReadStatusTypes;
 import soialNetworkApp.repository.DialogsRepository;
@@ -37,6 +38,19 @@ public class DialogMapService {
         return !authorId.equals(dialog.getFirstPerson().getId()) ?
                 dialog.getFirstPerson() :
                 dialog.getSecondPerson();
+    }
+
+    @Named("isAuthor")
+    public Boolean isAuthor(Message message) {
+        return message.getAuthor().getId().equals(currentUser.getPerson().getId());
+    }
+
+    public Person getRecipientForLastMessage(Message message) {
+        return isAuthor(message) ? message.getRecipient() : message.getAuthor();
+    }
+    @Named("getRecipientIdForLastMessage")
+    public Long getRecipientIdForLastMessage(Message message) {
+        return getRecipientForLastMessage(message).getId();
     }
 
 }
