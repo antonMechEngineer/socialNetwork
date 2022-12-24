@@ -14,5 +14,5 @@ public class UserRs {
     private long timestamp;
 
     @ApiModelProperty(value = "some field", example = "some example")
-    private PersonResponse data;
+    private PersonRs data;
 }

@@ -33,7 +33,7 @@ public class DialogsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<List<DialogRs>> dialogs() {
+    public CommonRs<List<DialogRs>> dialogs() {
         return dialogsService.getAllDialogs();
     }
 
@@ -46,7 +46,7 @@ public class DialogsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<ComplexRs> dialogsStart(@RequestBody DialogUserShortListDto dialogUserShortListDto) {
+    public CommonRs<ComplexRs> dialogsStart(@RequestBody DialogUserShortListDto dialogUserShortListDto) {
         return dialogsService.beginDialog(dialogUserShortListDto);
     }
 
@@ -59,7 +59,7 @@ public class DialogsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<List<MessageRs>> messages(@PathVariable Long dialogId) {
+    public CommonRs<List<MessageRs>> messages(@PathVariable Long dialogId) {
         return dialogsService.getMessages(dialogId);
     }
 
@@ -72,7 +72,7 @@ public class DialogsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<ComplexRs> unread() {
+    public CommonRs<ComplexRs> unread() {
         return dialogsService.getUnreadMessages();
     }
 
@@ -85,7 +85,7 @@ public class DialogsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<ComplexRs> read(@RequestBody MessageRq messageRq) {
+    public CommonRs<ComplexRs> read(@RequestBody MessageRq messageRq) {
         return dialogsService.setReadMessages(messageRq.getDialogId());
     }
 }

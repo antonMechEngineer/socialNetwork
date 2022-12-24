@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import soialNetworkApp.model.entities.interfaces.Notificationed;
+import soialNetworkApp.model.enums.FriendshipStatusTypes;
 import soialNetworkApp.model.enums.NotificationTypes;
 
 import javax.persistence.*;
@@ -31,9 +32,9 @@ public class Friendship implements Notificationed {
     @JoinColumn(name = "dst_person_id", nullable = false)
     private Person dstPerson;
 
-    @OneToOne (cascade = CascadeType.ALL)
-    @JoinColumn(name = "status_id", nullable = false)
-    private FriendshipStatus friendshipStatus;
+    @Column(name = "status_name", columnDefinition = "VARCHAR(255)")
+    @Enumerated(EnumType.STRING)
+    private FriendshipStatusTypes friendshipStatus;
 
     @Override
     public NotificationTypes getNotificationType() {
@@ -45,7 +46,7 @@ public class Friendship implements Notificationed {
         return dstPerson;
     }
 
-    public Friendship(LocalDateTime sentTime, Person srcPerson, Person dstPerson, FriendshipStatus friendshipStatus) {
+    public Friendship(LocalDateTime sentTime, Person srcPerson, Person dstPerson, FriendshipStatusTypes friendshipStatus) {
         this.sentTime = sentTime;
         this.srcPerson = srcPerson;
         this.dstPerson = dstPerson;
@@ -59,7 +60,7 @@ public class Friendship implements Notificationed {
                 ", sentTime=" + sentTime +
                 ", srcPersonId=" + srcPerson.getId() +
                 ", dstPersonId=" + dstPerson.getId() +
-                ", friendshipStatusId=" + friendshipStatus.getId() +
+                ", friendshipStatusId=" + friendshipStatus +
                 '}';
     }
 }

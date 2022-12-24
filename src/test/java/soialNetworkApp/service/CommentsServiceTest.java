@@ -1,8 +1,8 @@
 package soialNetworkApp.service;
 
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
-import soialNetworkApp.api.request.CommentRequest;
-import soialNetworkApp.api.response.PersonResponse;
+import soialNetworkApp.api.request.CommentRq;
+import soialNetworkApp.api.response.PersonRs;
 import soialNetworkApp.mappers.PersonMapper;
 import soialNetworkApp.model.entities.Comment;
 import soialNetworkApp.model.entities.Person;
@@ -52,7 +52,7 @@ class CommentsServiceTest {
     @MockBean
     private PersonMapper personMapper;
 
-    private CommentRequest request;
+    private CommentRq request;
     private final String commentText = "comment text";
     private final String newText = "new comment text";
     private Person person;
@@ -64,7 +64,7 @@ class CommentsServiceTest {
 
     @BeforeEach
     void setUp() {
-        request = new CommentRequest();
+        request = new CommentRq();
         request.setParentId(1L);
         request.setCommentText(commentText);
         person = new Person();
@@ -100,7 +100,7 @@ class CommentsServiceTest {
         when(commentsRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(likesService.getLikesCount(any())).thenReturn(0);
         when(likesService.getMyLike(any())).thenReturn(true);
-        when(personMapper.toPersonResponse(any())).thenReturn(PersonResponse.builder().id(1L).build());
+        when(personMapper.toPersonResponse(any())).thenReturn(PersonRs.builder().id(1L).build());
 
         assertEquals(commentsService.createComment(post, request).getData().getCommentText(), commentText);
         verify(notificationsService).createNotification(any(), any());
@@ -109,7 +109,7 @@ class CommentsServiceTest {
     @Test
     void getPostComments() {
         when(commentsRepository.findCommentsByPostOrderByTimeAsc(any(), any())).thenReturn(new PageImpl<>(List.of(comment)));
-        when(personMapper.toPersonResponse(any())).thenReturn(PersonResponse.builder().id(1L).build());
+        when(personMapper.toPersonResponse(any())).thenReturn(PersonRs.builder().id(1L).build());
 
         assertEquals(commentsService.getPostComments(post, offset, size).getData().get(0).getCommentText(), commentText);
     }
@@ -122,7 +122,7 @@ class CommentsServiceTest {
         when(commentsRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(likesService.getLikesCount(any())).thenReturn(0);
         when(likesService.getMyLike(any())).thenReturn(true);
-        when(personMapper.toPersonResponse(any())).thenReturn(PersonResponse.builder().id(1L).build());
+        when(personMapper.toPersonResponse(any())).thenReturn(PersonRs.builder().id(1L).build());
 
         assertEquals(commentsService.editComment(anyLong(), request).getData().getCommentText(), newText);
     }
@@ -134,7 +134,7 @@ class CommentsServiceTest {
         when(commentsRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(likesService.getLikesCount(any())).thenReturn(0);
         when(likesService.getMyLike(any())).thenReturn(true);
-        when(personMapper.toPersonResponse(any())).thenReturn(PersonResponse.builder().id(1L).build());
+        when(personMapper.toPersonResponse(any())).thenReturn(PersonRs.builder().id(1L).build());
 
         assertEquals(commentsService.changeCommentDeleteStatus(anyLong(), true).getData().getIsDeleted(), true);
     }
@@ -156,7 +156,7 @@ class CommentsServiceTest {
         comment.setEmbeddedComments(new ArrayList<>(List.of(embeddedComment)));
         when(likesService.getLikesCount(any())).thenReturn(0);
         when(likesService.getMyLike(any())).thenReturn(true);
-        when(personMapper.toPersonResponse(any())).thenReturn(PersonResponse.builder().id(1L).build());
+        when(personMapper.toPersonResponse(any())).thenReturn(PersonRs.builder().id(1L).build());
 
         assertEquals(2L, (long) commentsService.embeddedCommentsToResponse(new ArrayList<>(List.of(comment))).get(0).getEmbeddedComments().get(0).getId());
     }

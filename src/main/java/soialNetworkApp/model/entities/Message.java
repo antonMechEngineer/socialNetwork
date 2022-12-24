@@ -6,7 +6,6 @@ import soialNetworkApp.model.enums.NotificationTypes;
 import soialNetworkApp.model.enums.ReadStatusTypes;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @Entity

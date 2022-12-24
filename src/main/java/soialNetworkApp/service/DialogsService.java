@@ -1,16 +1,19 @@
 package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import soialNetworkApp.api.request.DialogUserShortListDto;
 import soialNetworkApp.api.response.*;
 import soialNetworkApp.mappers.DialogMapper;
 import soialNetworkApp.mappers.PersonMapper;
 import soialNetworkApp.model.entities.Dialog;
+import soialNetworkApp.model.entities.Friendship;
 import soialNetworkApp.model.entities.Message;
 import soialNetworkApp.model.entities.Person;
+import soialNetworkApp.model.enums.FriendshipStatusTypes;
 import soialNetworkApp.model.enums.ReadStatusTypes;
 import soialNetworkApp.repository.DialogsRepository;
+import soialNetworkApp.repository.FriendshipsRepository;
 import soialNetworkApp.repository.MessagesRepository;
 import soialNetworkApp.repository.PersonsRepository;
 import org.springframework.stereotype.Service;
@@ -21,11 +24,11 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DialogsService {
 
+    private final FriendshipsRepository friendshipsRepository;
     private final DialogsRepository dialogsRepository;
     private final MessagesRepository messagesRepository;
     private final PersonsRepository personsRepository;
@@ -35,15 +38,15 @@ public class DialogsService {
     private final PersonMapper personMapper;
 
 
-    public CommonResponse<ComplexRs> getUnreadMessages() {
-        return new CommonResponse<>(new ComplexRs(messagesRepository
+    public CommonRs<ComplexRs> getUnreadMessages() {
+        return new CommonRs<>(new ComplexRs(messagesRepository
                 .findAllByRecipientAndIsDeletedFalse(currentUser.getPerson())
                 .stream()
                 .filter(m -> m.getReadStatus().equals(ReadStatusTypes.SENT))
                 .count()));
     }
 
-    public CommonResponse<ComplexRs> setReadMessages(Long dialogId) {
+    public CommonRs<ComplexRs> setReadMessages(Long dialogId) {
         final Long[] readCount = {0L};
         messagesRepository.findAllByDialogIdAndIsDeletedFalse(dialogId)
                 .stream()
@@ -54,36 +57,37 @@ public class DialogsService {
                     messagesRepository.save(m);
                     readCount[0]++;
                 });
-        return new CommonResponse<>(new ComplexRs(readCount[0]));
+        return new CommonRs<>(new ComplexRs(readCount[0]));
     }
 
-    public CommonResponse<ComplexRs> beginDialog(DialogUserShortListDto dialogUserShortListDto) {
+    public CommonRs<ComplexRs> beginDialog(DialogUserShortListDto dialogUserShortListDto) {
         Person currentPerson = currentUser.getPerson();
         Person anotherPerson = personsRepository.findPersonById(dialogUserShortListDto.getUserIds().get(0)).orElseThrow();
         Dialog dialog = (dialogsRepository.findDialogByFirstPersonAndSecondPerson(anotherPerson, currentPerson))
                 .orElse(dialogsRepository.findDialogByFirstPersonAndSecondPerson(currentPerson, anotherPerson)
                         .orElse(createNewDialog(currentPerson, anotherPerson)));
         dialogsRepository.save(dialog);
-        return new CommonResponse<>(new ComplexRs(dialogsRepository.countAllByFirstPersonOrSecondPerson(currentPerson, currentPerson)));
+        return new CommonRs<>(new ComplexRs(dialogsRepository.countAllByFirstPersonOrSecondPerson(currentPerson, currentPerson)));
     }
 
     private Dialog createNewDialog(Person currentPerson, Person anotherPerson) {
         return new Dialog(currentPerson, anotherPerson, ZonedDateTime.now());
     }
 
-    public CommonResponse<List<DialogRs>> getAllDialogs() {
+    public CommonRs<List<DialogRs>> getAllDialogs() {
         List<DialogRs> dialogRsList = createDialogRsList(currentUser.getPerson());
-        return new CommonResponse<>(dialogRsList, (long) dialogRsList.size());
+        dialogRsList = blockDialogs(dialogRsList);
+        return new CommonRs<>(dialogRsList, (long) dialogRsList.size());
     }
 
-    public CommonResponse<List<MessageRs>> getMessages(Long dialogId) {
+    public CommonRs<List<MessageRs>> getMessages(Long dialogId) {
         List<MessageRs> messagesRs = new ArrayList<>();
         messagesRepository.findAllByDialogIdAndIsDeletedFalse(dialogId)
                 .forEach(m -> {
                     m.setReadStatus(ReadStatusTypes.READ);
                     messagesRs.add(dialogMapper.toMessageRs(m, dialogMapService.getRecipientForLastMessage(m)));
                 });
-        return new CommonResponse<>(messagesRs
+        return new CommonRs<>(messagesRs
                 .stream()
                 .sorted(Comparator.comparing(MessageRs::getTime))
                 .collect(Collectors.toList()));
@@ -117,5 +121,28 @@ public class DialogsService {
         return messagesRepository.findAllByDialogIdAndIsDeletedFalse(dialogId)
                 .stream()
                 .max(Comparator.comparing(Message::getTime)).orElseThrow();
+    }
+
+    private List<DialogRs> blockDialogs(List<DialogRs> dialogs) {
+        Person me = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
+        List<Friendship> friendships =
+                friendshipsRepository.findFriendshipsBySrcPersonIdOrDstPersonIdAndFriendshipStatus(me.getId(), me.getId(), FriendshipStatusTypes.BLOCKED);
+        Set<Long> srcDstPersonsIds =  getSrcDstPersonsIds(friendships, me);
+        return dialogs
+                .stream()
+                .filter(dialog -> !srcDstPersonsIds.contains(dialog.getAuthorId()) && !srcDstPersonsIds.contains(dialog.getRecipientId()))
+                .collect(Collectors.toList());
+    }
+
+    private Set<Long> getSrcDstPersonsIds(List<Friendship> friendships, Person me) {
+        Set<Long> ids = new HashSet<>();
+        friendships.forEach(friendship -> {
+            if (friendship.getDstPerson().getId().equals(me.getId())) {
+                ids.add(friendship.getSrcPerson().getId());
+            } else {
+                ids.add(friendship.getDstPerson().getId());
+            }
+        });
+        return ids;
     }
 }

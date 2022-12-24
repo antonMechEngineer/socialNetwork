@@ -16,7 +16,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @AllArgsConstructor
 @JsonInclude(NON_NULL)
 @ApiModel(description = "weather in city")
-public class WeatherResponse {
+public class WeatherRs {
 
     @ApiModelProperty(value = "cloudiness in current city", example = "clouds")
     private String clouds;

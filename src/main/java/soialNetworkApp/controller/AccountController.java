@@ -106,15 +106,15 @@ public class AccountController {
 
     @UpdateOnlineTime
     @GetMapping("/notifications")
-    public CommonResponse<List<PersonSettingsResponse>> getPersonSettings() throws PersonNotFoundException {
+    public CommonRs<List<PersonSettingsRs>> getPersonSettings() throws PersonNotFoundException {
 
         return accountService.getPersonSettings();
     }
 
     @UpdateOnlineTime
     @PutMapping("/notifications")
-    public CommonResponse<ComplexRs> editPersonSettings(
-            @RequestBody PersonSettingsRequest request) throws PersonNotFoundException, IncorrectRequestTypeException {
+    public CommonRs<ComplexRs> editPersonSettings(
+            @RequestBody PersonSettingsRq request) throws PersonNotFoundException, IncorrectRequestTypeException {
 
         return accountService.setPersonSetting(request);
     }

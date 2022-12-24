@@ -2,9 +2,9 @@ package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
 import soialNetworkApp.api.request.*;
-import soialNetworkApp.api.response.CommonResponse;
+import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.ComplexRs;
-import soialNetworkApp.api.response.PersonSettingsResponse;
+import soialNetworkApp.api.response.PersonSettingsRs;
 import soialNetworkApp.api.response.RegisterRs;
 import soialNetworkApp.errors.CaptchaException;
 import soialNetworkApp.errors.IncorrectRequestTypeException;
@@ -171,7 +171,7 @@ public class AccountService {
         return settings;
     }
 
-    public CommonResponse<ComplexRs> setPersonSetting(PersonSettingsRequest request) throws PersonNotFoundException, IncorrectRequestTypeException {
+    public CommonRs<ComplexRs> setPersonSetting(PersonSettingsRq request) throws PersonNotFoundException, IncorrectRequestTypeException {
         Person person = personsService.getPersonByContext();
         if (person == null) {
             throw new PersonNotFoundException("Person not found");
@@ -210,13 +210,13 @@ public class AccountService {
                 throw new IncorrectRequestTypeException("Incorrect notification type");
         }
         personSettingsRepository.save(personSettings);
-        return CommonResponse.<ComplexRs>builder()
+        return CommonRs.<ComplexRs>builder()
                 .timestamp(System.currentTimeMillis())
                 .data(new ComplexRs())
                 .build();
     }
 
-    public CommonResponse<List<PersonSettingsResponse>> getPersonSettings() throws PersonNotFoundException {
+    public CommonRs<List<PersonSettingsRs>> getPersonSettings() throws PersonNotFoundException {
         Person person = personsService.getPersonByContext();
         if (person == null) {
             throw new PersonNotFoundException("Person not found");
@@ -226,21 +226,21 @@ public class AccountService {
             person.setPersonSettings(createDefaultNotificationsSettings(person));
             personSettings = personsRepository.save(person).getPersonSettings();
         }
-        PersonSettingsResponse postValue = PersonSettingsResponse.builder()
+        PersonSettingsRs postValue = PersonSettingsRs.builder()
                 .type(String.valueOf(NotificationTypes.POST)).enable(personSettings.getPostNotification()).build();
-        PersonSettingsResponse postCommentValue = PersonSettingsResponse.builder()
+        PersonSettingsRs postCommentValue = PersonSettingsRs.builder()
                 .type(String.valueOf(NotificationTypes.POST_COMMENT)).enable(personSettings.getPostCommentNotification()).build();
-        PersonSettingsResponse commentCommentValue = PersonSettingsResponse.builder()
+        PersonSettingsRs commentCommentValue = PersonSettingsRs.builder()
                 .type(String.valueOf(NotificationTypes.COMMENT_COMMENT)).enable(personSettings.getCommentCommentNotification()).build();
-        PersonSettingsResponse friendRequestValue = PersonSettingsResponse.builder()
+        PersonSettingsRs friendRequestValue = PersonSettingsRs.builder()
                 .type(String.valueOf(NotificationTypes.FRIEND_REQUEST)).enable(personSettings.getFriendRequestNotification()).build();
-        PersonSettingsResponse messageValue = PersonSettingsResponse.builder()
+        PersonSettingsRs messageValue = PersonSettingsRs.builder()
                 .type(String.valueOf(NotificationTypes.MESSAGE)).enable(personSettings.getMessageNotification()).build();
-        PersonSettingsResponse friendsBirthdayValue = PersonSettingsResponse.builder()
+        PersonSettingsRs friendsBirthdayValue = PersonSettingsRs.builder()
                 .type(String.valueOf(NotificationTypes.FRIEND_BIRTHDAY)).enable(personSettings.getFriendBirthdayNotification()).build();
-        PersonSettingsResponse postLikeValue = PersonSettingsResponse.builder()
+        PersonSettingsRs postLikeValue = PersonSettingsRs.builder()
                 .type(String.valueOf(NotificationTypes.POST_LIKE)).enable(personSettings.getLikeNotification()).build();
-        return CommonResponse.<List<PersonSettingsResponse>>builder()
+        return CommonRs.<List<PersonSettingsRs>>builder()
                 .timestamp(System.currentTimeMillis())
                 .data(List.of(
                         postValue,

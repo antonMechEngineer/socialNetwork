@@ -1,7 +1,7 @@
 package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
-import soialNetworkApp.api.response.WeatherResponse;
+import soialNetworkApp.api.response.WeatherRs;
 import soialNetworkApp.model.entities.Weather;
 import soialNetworkApp.model.entities.City;
 import soialNetworkApp.repository.CitiesRepository;
@@ -99,19 +99,19 @@ public class WeatherService {
     }
 
     @Named("getWeatherResponse")
-    public WeatherResponse getWeatherResponse(String cityTitle) {
-        WeatherResponse weatherResponse = new WeatherResponse();
+    public WeatherRs getWeatherResponse(String cityTitle) {
+        WeatherRs weatherRs = new WeatherRs();
         if (cityTitle != null) {
             City city = citiesRepository.findCityByTitle(cityTitle).orElse(new City());
             if (city.getGismeteoId() != null) {
                 weatherRepository.findTopByGismeteoId(city.getGismeteoId()).ifPresent(weather -> {
-                    weatherResponse.setCity(cityTitle);
-                    weatherResponse.setTemp(String.valueOf(weather.getTemperature()));
-                    weatherResponse.setClouds(weather.getWeatherDescription());
-                    weatherResponse.setDate(String.valueOf(weather.getTime()));
+                    weatherRs.setCity(cityTitle);
+                    weatherRs.setTemp(String.valueOf(weather.getTemperature()));
+                    weatherRs.setClouds(weather.getWeatherDescription());
+                    weatherRs.setDate(String.valueOf(weather.getTime()));
                 });
             }
         }
-        return weatherResponse;
+        return weatherRs;
     }
 }
