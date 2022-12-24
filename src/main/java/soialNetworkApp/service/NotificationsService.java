@@ -3,6 +3,7 @@ package soialNetworkApp.service;
 import lombok.RequiredArgsConstructor;
 import soialNetworkApp.api.response.CommonResponse;
 import soialNetworkApp.api.response.NotificationResponse;
+import soialNetworkApp.kafka.NotificationsKafkaProducer;
 import soialNetworkApp.mappers.NotificationMapper;
 import soialNetworkApp.model.entities.Notification;
 import soialNetworkApp.model.entities.Person;
@@ -34,6 +35,7 @@ public class NotificationsService {
     private final FriendshipsRepository friendshipsRepository;
     private final NotificationMapper notificationMapper;
     private final SimpMessagingTemplate template;
+    private final NotificationsKafkaProducer notificationsKafkaProducer;
 
     @Value("${socialNetwork.default.page}")
     private int offset;
@@ -84,7 +86,8 @@ public class NotificationsService {
         notification.setNotificationType(entity.getNotificationType());
         notification.setEntity(entity);
         notification.setSentTime(LocalDateTime.now(ZoneId.of(timezone)));
-        notificationsRepository.save(notification);
+        //notificationsRepository.save(notification);
+        notificationsKafkaProducer.sendMessage(notification);
         template.convertAndSend(String.format("/user/%s/queue/notifications", person.getId()),
                 getAllNotificationsByPerson(offset, size, person));
     }
