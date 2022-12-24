@@ -1,7 +1,7 @@
 package soialNetworkApp.mappers;
 
-import soialNetworkApp.api.request.PostRequest;
-import soialNetworkApp.api.response.PostResponse;
+import soialNetworkApp.api.request.PostRq;
+import soialNetworkApp.api.response.PostRs;
 import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.model.entities.Post;
 import soialNetworkApp.model.enums.PostTypes;
@@ -22,7 +22,7 @@ public interface PostMapper {
     @Mapping(target = "comments", qualifiedByName = "commentsToResponse")
     @Mapping(target = "type", source = "post")
     @Mapping(target = "myLike", source = "post", qualifiedByName = "getMyLike")
-    PostResponse postToResponse(Post post);
+    PostRs postToResponse(Post post);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "time", source = "time")
@@ -33,7 +33,7 @@ public interface PostMapper {
     @Mapping(target = "comments", ignore = true)
     @Mapping(target = "tags", qualifiedByName = "getTagsByStrings")
     @Mapping(target = "postFiles", ignore = true)
-    Post postRequestToNewPost(PostRequest request, Person person, LocalDateTime time);
+    Post postRequestToNewPost(PostRq request, Person person, LocalDateTime time);
 
     default PostTypes getPostType(Post post) {
         return PostTypes.getType(post.getIsDeleted(), post.getTime());

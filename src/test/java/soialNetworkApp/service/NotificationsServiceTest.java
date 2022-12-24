@@ -1,7 +1,7 @@
 package soialNetworkApp.service;
 
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
-import soialNetworkApp.api.response.PersonResponse;
+import soialNetworkApp.api.response.PersonRs;
 import soialNetworkApp.mappers.PersonMapper;
 import soialNetworkApp.model.entities.*;
 import soialNetworkApp.model.enums.FriendshipStatusTypes;
@@ -59,7 +59,6 @@ class NotificationsServiceTest {
     private Post post;
     private PersonSettings personSettings;
     private Friendship friendship;
-    private FriendshipStatus friendshipStatus;
     private final int offset = 0;
     private final int size = 10;
 
@@ -85,11 +84,9 @@ class NotificationsServiceTest {
         personSettings.setFriendBirthdayNotification(true);
         person.setPersonSettings(personSettings);
         friendship = new Friendship();
-        friendshipStatus = new FriendshipStatus();
-        friendshipStatus.setCode(FriendshipStatusTypes.FRIEND);
         friendship.setSrcPerson(person);
         friendship.setDstPerson(person);
-        friendship.setFriendshipStatus(friendshipStatus);
+        friendship.setFriendshipStatus(FriendshipStatusTypes.FRIEND);
     }
 
     @AfterEach
@@ -99,7 +96,6 @@ class NotificationsServiceTest {
         notification2 = null;
         post = null;
         personSettings = null;
-        friendshipStatus = null;
         friendship = null;
     }
 
@@ -107,7 +103,7 @@ class NotificationsServiceTest {
     void getAllNotificationsByPerson() {
         when(personsRepository.findPersonByEmail(any())).thenReturn(Optional.of(person));
         when(notificationsRepository.findAllByPersonAndIsReadIsFalse(any(), any())).thenReturn(new PageImpl<>(List.of(notification1)));
-        when(personMapper.toPersonResponse(any())).thenReturn(PersonResponse.builder().id(1L).build());
+        when(personMapper.toPersonResponse(any())).thenReturn(PersonRs.builder().id(1L).build());
 
         assertEquals(notificationsService.getAllNotificationsByPerson(offset, size).getData().stream().findFirst().get().getNotificationType(), NotificationTypes.POST);
         assertEquals(notificationsService.getAllNotificationsByPerson(offset, size).getData().stream().findFirst().get().getEntityAuthor().getId(), 1L);
@@ -119,7 +115,7 @@ class NotificationsServiceTest {
         when(personsRepository.findPersonByEmail(any())).thenReturn(Optional.of(person));
         when(notificationsRepository.findAllByPersonAndIsReadIsFalse(any(), any())).thenReturn(new PageImpl<>(List.of(notification1, notification2)));
         when(notificationsRepository.findAllByPersonAndIsReadIsFalse(any())).thenReturn(List.of(notification1, notification2));
-        when(personMapper.toPersonResponse(any())).thenReturn(PersonResponse.builder().id(1L).build());
+        when(personMapper.toPersonResponse(any())).thenReturn(PersonRs.builder().id(1L).build());
         when(notificationsRepository.save(any())).then(invocation -> {
             Notification notification = invocation.getArgument(0);
             notifications.add(notification);
@@ -139,7 +135,7 @@ class NotificationsServiceTest {
         when(notificationsRepository.findAllByPersonAndIsReadIsFalse(any(), any())).thenReturn(new PageImpl<>(List.of(notification1, notification2)));
         when(notificationsRepository.findAllByPersonAndIsReadIsFalse(any())).thenReturn(List.of(notification1, notification2));
         when(notificationsRepository.findById(any())).thenReturn(Optional.of(notification1));
-        when(personMapper.toPersonResponse(any())).thenReturn(PersonResponse.builder().id(1L).build());
+        when(personMapper.toPersonResponse(any())).thenReturn(PersonRs.builder().id(1L).build());
         when(notificationsRepository.save(any())).then(invocation -> {
             Notification notification = invocation.getArgument(0);
             notifications.add(notification);

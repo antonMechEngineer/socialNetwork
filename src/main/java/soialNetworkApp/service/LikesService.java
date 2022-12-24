@@ -1,8 +1,8 @@
 package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
-import soialNetworkApp.api.request.LikeRequest;
-import soialNetworkApp.api.response.CommonResponse;
+import soialNetworkApp.api.request.LikeRq;
+import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.LikeResponse;
 import soialNetworkApp.model.entities.Like;
 import soialNetworkApp.model.entities.interfaces.Liked;
@@ -31,9 +31,9 @@ public class LikesService {
     @Value("${socialNetwork.timezone}")
     private String timezone;
 
-    public CommonResponse<LikeResponse> putLike(LikeRequest likeRequest) {
+    public CommonRs<LikeResponse> putLike(LikeRq likeRq) {
         Person person = personsService.getPersonByContext();
-        Liked liked = getLikedEntity(likeRequest.getItemId(), likeRequest.getType());
+        Liked liked = getLikedEntity(likeRq.getItemId(), likeRq.getType());
         if (getLikeFromCurrentPerson(person, liked) == null) {
             Like like = new Like();
             like.setEntity(liked);
@@ -47,7 +47,7 @@ public class LikesService {
         return getLikesResponse(liked);
     }
 
-    private CommonResponse<LikeResponse> getLikesResponse(Liked liked) {
+    private CommonRs<LikeResponse> getLikesResponse(Liked liked) {
         List<Like> likes = likesRepository.findLikesByEntity(liked.getType(), liked);
         List<Long> users = likes.stream().map(like -> like.getAuthor().getId()).collect(Collectors.toList());
         LikeResponse likeResponse = LikeResponse.builder()
@@ -57,11 +57,11 @@ public class LikesService {
         return buildCommonResponse(likeResponse);
     }
 
-    public CommonResponse<LikeResponse> getLikesResponse(long entityId, String type) {
+    public CommonRs<LikeResponse> getLikesResponse(long entityId, String type) {
         return getLikesResponse(getLikedEntity(entityId, type));
     }
 
-    public CommonResponse<LikeResponse> deleteLike(long entityId, String type) {
+    public CommonRs<LikeResponse> deleteLike(long entityId, String type) {
         Person person = personsService.getPersonByContext();
         Liked liked = getLikedEntity(entityId, type);
         Like like = getLikeFromCurrentPerson(person, liked);
@@ -104,8 +104,8 @@ public class LikesService {
         return like != null && person.getId().equals(like.getAuthor().getId());
     }
 
-    private CommonResponse<LikeResponse> buildCommonResponse(LikeResponse likeResponse) {
-        return CommonResponse.<LikeResponse>builder()
+    private CommonRs<LikeResponse> buildCommonResponse(LikeResponse likeResponse) {
+        return CommonRs.<LikeResponse>builder()
                 .timestamp(System.currentTimeMillis())
                 .data(likeResponse)
                 .build();

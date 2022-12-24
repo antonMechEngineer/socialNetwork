@@ -1,8 +1,8 @@
 package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
-import soialNetworkApp.api.response.CommonResponse;
-import soialNetworkApp.api.response.NotificationResponse;
+import soialNetworkApp.api.response.CommonRs;
+import soialNetworkApp.api.response.NotificationRs;
 import soialNetworkApp.mappers.NotificationMapper;
 import soialNetworkApp.model.entities.Notification;
 import soialNetworkApp.model.entities.Person;
@@ -42,16 +42,16 @@ public class NotificationsService {
     @Value("${socialNetwork.timezone}")
     private String timezone;
 
-    public CommonResponse<List<NotificationResponse>> getAllNotificationsByPerson(int offset, int perPage) {
+    public CommonRs<List<NotificationRs>> getAllNotificationsByPerson(int offset, int perPage) {
         Person person = personsRepository.findPersonByEmail(
                 SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
         return getAllNotificationsByPerson(offset, perPage, person);
     }
 
-    private CommonResponse<List<NotificationResponse>> getAllNotificationsByPerson(int offset, int perPage, Person person) {
+    private CommonRs<List<NotificationRs>> getAllNotificationsByPerson(int offset, int perPage, Person person) {
         Pageable pageable = NetworkPageRequest.of(offset, perPage);
         Page<Notification> notificationPage = notificationsRepository.findAllByPersonAndIsReadIsFalse(person, pageable);
-        return CommonResponse.<List<NotificationResponse>>builder()
+        return CommonRs.<List<NotificationRs>>builder()
                 .total(notificationPage.getTotalElements())
                 .offset(offset)
                 .itemPerPage(perPage)
@@ -61,7 +61,7 @@ public class NotificationsService {
                 .build();
     }
 
-    public CommonResponse<List<NotificationResponse>> markNotificationStatusAsRead(Long notificationId, boolean readAll) {
+    public CommonRs<List<NotificationRs>> markNotificationStatusAsRead(Long notificationId, boolean readAll) {
         Person person = personsRepository.findPersonByEmail(
                 SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
         if (readAll) {
@@ -94,7 +94,7 @@ public class NotificationsService {
         LocalDateTime currentDate = LocalDateTime.now(ZoneId.of(timezone));
         List<Person> personList = personsRepository.findPeopleByBirthDate(currentDate.getMonthValue(), currentDate.getDayOfMonth());
         personList.forEach(person -> friendshipsRepository.findFriendshipsByDstPerson(person).forEach(friendship -> {
-            if (friendship.getFriendshipStatus().getCode().equals(FriendshipStatusTypes.FRIEND) &&
+            if (friendship.getFriendshipStatus().equals(FriendshipStatusTypes.FRIEND) &&
                     friendship.getSrcPerson().getPersonSettings() != null &&
                     friendship.getSrcPerson().getPersonSettings().getFriendBirthdayNotification()) {
                 createNotification(person, friendship.getSrcPerson());

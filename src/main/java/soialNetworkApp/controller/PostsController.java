@@ -10,16 +10,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import soialNetworkApp.aop.annotations.UpdateOnlineTime;
 import soialNetworkApp.api.request.FindPostRq;
-import soialNetworkApp.api.request.PostRequest;
-import soialNetworkApp.api.response.CommonResponse;
+import soialNetworkApp.api.request.PostRq;
+import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.ErrorRs;
-import soialNetworkApp.api.response.PostResponse;
+import soialNetworkApp.api.response.PostRs;
 import soialNetworkApp.errors.EmptyFieldException;
 import soialNetworkApp.errors.PersonNotFoundException;
+import soialNetworkApp.repository.PostsRepository;
 import soialNetworkApp.service.PostsService;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -40,7 +40,7 @@ public class PostsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<List<PostResponse>> getFeeds(
+    public CommonRs<List<PostRs>> getFeeds(
             @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
             @RequestParam(name = "perPage", required = false, defaultValue = "${socialNetwork.default.size}") int size) {
 
@@ -57,7 +57,7 @@ public class PostsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<PostResponse> getPost(
+    public CommonRs<PostRs> getPost(
             @PathVariable(name = "id") Long postId) {
 
         return postsService.getPostById(postId);
@@ -73,11 +73,11 @@ public class PostsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<PostResponse> updatePost(
+    public CommonRs<PostRs> updatePost(
             @PathVariable int id,
-            @RequestBody PostRequest postRequest) throws PersonNotFoundException {
+            @RequestBody PostRq postRq) throws PersonNotFoundException {
 
-        return postsService.updatePost(id, postRequest);
+        return postsService.updatePost(id, postRq);
     }
 
     @UpdateOnlineTime
@@ -90,7 +90,7 @@ public class PostsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<PostResponse> deletePost(
+    public CommonRs<PostRs> deletePost(
             @PathVariable long id) throws PersonNotFoundException {
 
         return postsService.changeDeleteStatusInPost(id, true);
@@ -106,7 +106,7 @@ public class PostsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<PostResponse> recoverPost(
+    public CommonRs<PostRs> recoverPost(
             @PathVariable long id) throws PersonNotFoundException {
 
         return postsService.changeDeleteStatusInPost(id, false);
@@ -122,10 +122,10 @@ public class PostsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<List<PostResponse>> findPost(
+    public CommonRs<List<PostRs>> findPost(
             FindPostRq postRq,
             @RequestParam(required = false, defaultValue = "${socialNetwork.default.page}") int offset,
-            @RequestParam(required = false, defaultValue = "${socialNetwork.default.size}") int perPage) throws SQLException, EmptyFieldException {
+            @RequestParam(required = false, defaultValue = "${socialNetwork.default.size}") int perPage) throws EmptyFieldException {
         return postsService.findPosts(postRq, offset, perPage);
     }
 }

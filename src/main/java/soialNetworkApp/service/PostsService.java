@@ -2,12 +2,13 @@ package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
 import soialNetworkApp.api.request.FindPostRq;
-import soialNetworkApp.api.request.PostRequest;
-import soialNetworkApp.api.response.CommonResponse;
-import soialNetworkApp.api.response.PostResponse;
+import soialNetworkApp.api.request.PostRq;
+import soialNetworkApp.api.response.CommonRs;
+import soialNetworkApp.api.response.PostRs;
 import soialNetworkApp.errors.EmptyFieldException;
 import soialNetworkApp.errors.PersonNotFoundException;
 import soialNetworkApp.mappers.PostMapper;
+import soialNetworkApp.model.entities.Friendship;
 import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.model.entities.Post;
 import soialNetworkApp.model.entities.Tag;
@@ -23,7 +24,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -46,59 +46,65 @@ public class PostsService {
     @Value("${socialNetwork.timezone}")
     private String timezone;
 
-    public CommonResponse<PostResponse> createPost(PostRequest postRequest, long userId, Long timestamp) throws PersonNotFoundException {
+    public CommonRs<PostRs> createPost(PostRq postRq, long userId, Long timestamp) throws PersonNotFoundException {
         Person person = personsRepository.findById(userId).orElse(null);
         if (!validatePerson(person)) {
             throw new PersonNotFoundException("Invalid user id");
         }
         LocalDateTime postPublishingTime = timestamp == null ? LocalDateTime.now(ZoneId.of(timezone)) : new Timestamp(timestamp).toLocalDateTime();
-        Post post = postMapper.postRequestToNewPost(postRequest, person, postPublishingTime);
-        PostResponse postResponse = postMapper.postToResponse(postsRepository.save(updateTagsInPost(new ArrayList<>(post.getTags()), post)));
+        Post post = postMapper.postRequestToNewPost(postRq, person, postPublishingTime);
+        PostRs postRs = postMapper.postToResponse(postsRepository.save(updateTagsInPost(new ArrayList<>(post.getTags()), post)));
         if (person.getPersonSettings() != null && person.getPersonSettings().getPostNotification()) {
             createNotifications(post, person);
         }
-        return buildCommonResponse(postResponse);
+        return buildCommonResponse(postRs);
     }
 
-    public CommonResponse<List<PostResponse>> getFeeds(int offset, int size) {
+    public CommonRs<List<PostRs>> getFeeds(int offset, int size) {
         Pageable pageable = NetworkPageRequest.of(offset, size);
-        Page<Post> postPage = postsRepository.findPostsByTimeBeforeAndIsDeletedFalseOrderByTimeDesc(pageable, LocalDateTime.now(ZoneId.of(timezone)));
+        Page<Post> postsWithBlockedPosts = blockPosts(pageable);
+        Page<Post> postPage;
+        if (!postsWithBlockedPosts.isEmpty()) {
+            postPage = postsWithBlockedPosts;
+        } else {
+            postPage = postsRepository.findPostsByTimeBeforeAndIsDeletedFalseOrderByTimeDesc(pageable, LocalDateTime.now(ZoneId.of(timezone)));
+        }
         return buildCommonResponse(offset, size, postPage.getContent(), postPage.getTotalElements());
     }
 
-    public CommonResponse<List<PostResponse>> getAllPostsByAuthor(int offset, int size, Person postsAuthor) {
+    public CommonRs<List<PostRs>> getAllPostsByAuthor(int offset, int size, Person postsAuthor) {
         Pageable pageable = NetworkPageRequest.of(offset, size);
         Page<Post> postPage = postsRepository.findPostsByAuthorOrderByTimeDesc(pageable, postsAuthor);
         return buildCommonResponse(offset, size, postPage.getContent(), postPage.getTotalElements());
     }
 
-    public CommonResponse<PostResponse> getPostById(long postId) {
-        PostResponse postResponse = postMapper.postToResponse(findPostById(postId));
-        return buildCommonResponse(postResponse);
+    public CommonRs<PostRs> getPostById(long postId) {
+        PostRs postRs = postMapper.postToResponse(findPostById(postId));
+        return buildCommonResponse(postRs);
     }
 
-    public CommonResponse<PostResponse> updatePost(long postId, PostRequest postRequest) throws PersonNotFoundException {
+    public CommonRs<PostRs> updatePost(long postId, PostRq postRq) throws PersonNotFoundException {
         Post post = findPostById(postId);
         if (!validatePerson(post.getAuthor())) {
             throw new PersonNotFoundException("Invalid user id");
         }
-        post.setTitle(postRequest.getTitle());
-        post.setPostText(postRequest.getPostText());
-        List<Tag> tags = tagsService.stringsToTagsMapper(postRequest.getTags());
+        post.setTitle(postRq.getTitle());
+        post.setPostText(postRq.getPostText());
+        List<Tag> tags = tagsService.stringsToTagsMapper(postRq.getTags());
         Post newPost = updateTagsInPost(tags, post);
-        PostResponse postResponse = postMapper.postToResponse(postsRepository.save(newPost));
-        return buildCommonResponse(postResponse);
+        PostRs postRs = postMapper.postToResponse(postsRepository.save(newPost));
+        return buildCommonResponse(postRs);
     }
 
-    public CommonResponse<PostResponse> changeDeleteStatusInPost(long postId, boolean deleteStatus) throws PersonNotFoundException {
+    public CommonRs<PostRs> changeDeleteStatusInPost(long postId, boolean deleteStatus) throws PersonNotFoundException {
         Post post = findPostById(postId);
         if (!validatePerson(post.getAuthor())) {
             throw new PersonNotFoundException("Invalid user id");
         }
         post.setIsDeleted(deleteStatus);
         post.setTimeDelete(LocalDateTime.now(ZoneId.of(timezone)));
-        PostResponse postResponse = postMapper.postToResponse(postsRepository.save(post));
-        return buildCommonResponse(postResponse);
+        PostRs postRs = postMapper.postToResponse(postsRepository.save(post));
+        return buildCommonResponse(postRs);
     }
 
     public Post findPostById(long postId) {
@@ -116,7 +122,7 @@ public class PostsService {
         return post;
     }
 
-    private List<PostResponse> postsToResponse(List<Post> posts) {
+    private List<PostRs> postsToResponse(List<Post> posts) {
         return posts.stream().map(postMapper::postToResponse).collect(Collectors.toList());
     }
 
@@ -125,15 +131,16 @@ public class PostsService {
                 (SecurityContextHolder.getContext().getAuthentication().getName())).orElse(null));
     }
 
-    public CommonResponse<List<PostResponse>> findPosts(FindPostRq postRq, int offset, int perPage) throws SQLException, EmptyFieldException {
+    public CommonRs<List<PostRs>> findPosts(FindPostRq postRq, int offset, int perPage) throws EmptyFieldException {
         if (postRq.getText() == null) {
             throw new EmptyFieldException("Field 'text' is required but empty");
         }
-        return buildCommonResponse(offset, perPage, searchPosts.findPosts(postRq, offset, perPage), searchPosts.getTotal());
+        Page<Post> posts = searchPosts.findPosts(postRq, offset, perPage);
+        return buildCommonResponse(offset, perPage, posts.getContent(), posts.getTotalElements());
     }
 
-    private CommonResponse<List<PostResponse>> buildCommonResponse(int offset, int perPage, List<Post> posts, Long total) {
-        return CommonResponse.<List<PostResponse>>builder()
+    private CommonRs<List<PostRs>> buildCommonResponse(int offset, int perPage, List<Post> posts, Long total) {
+        return CommonRs.<List<PostRs>>builder()
                 .timestamp(System.currentTimeMillis())
                 .offset(offset)
                 .perPage(perPage)
@@ -142,17 +149,17 @@ public class PostsService {
                 .build();
     }
 
-    private CommonResponse<PostResponse> buildCommonResponse(PostResponse postResponse) {
-        return CommonResponse.<PostResponse>builder()
+    private CommonRs<PostRs> buildCommonResponse(PostRs postRs) {
+        return CommonRs.<PostRs>builder()
                 .timestamp(System.currentTimeMillis())
-                .data(postResponse)
+                .data(postRs)
                 .build();
     }
 
     private void createNotifications(Post post, Person person) {
         friendshipsRepository.findFriendshipsByDstPerson(person).forEach(friendship -> {
-            if (friendship.getFriendshipStatus().getCode().equals(FriendshipStatusTypes.FRIEND) ||
-                    friendship.getFriendshipStatus().getCode().equals(FriendshipStatusTypes.SUBSCRIBED)) {
+            if (friendship.getFriendshipStatus().equals(FriendshipStatusTypes.FRIEND) ||
+                    friendship.getFriendshipStatus().equals(FriendshipStatusTypes.SUBSCRIBED)) {
                 notificationsService.createNotification(post, friendship.getSrcPerson());
             }
         });
@@ -161,5 +168,17 @@ public class PostsService {
 //                notificationsService.createNotification(post, friendship.getDstPerson());
 //            }
 //        });
+    }
+
+    private Page<Post> blockPosts(Pageable pageable) {
+        Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
+        List<Friendship> friendships = friendshipsRepository.findFriendshipsByDstPersonIdAndFriendshipStatus(person.getId(), FriendshipStatusTypes.BLOCKED);
+        if (friendships.size() != 0) {
+            List<Person> srcPersons = new ArrayList<>();
+            friendships.forEach(friendship -> srcPersons.add(friendship.getSrcPerson()));
+            return postsRepository.findPostsByAuthorIsNotInAndIsDeletedFalseOrderByTimeDesc(pageable, srcPersons);
+        } else {
+            return Page.empty();
+        }
     }
 }

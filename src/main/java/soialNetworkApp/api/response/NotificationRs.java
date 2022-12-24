@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Data
 @ApiModel(description = "info about notifications")
-public class NotificationResponse {
+public class NotificationRs {
 
     @ApiModelProperty(value = "id of notification", example = "1")
     private long id;
@@ -28,5 +28,5 @@ public class NotificationResponse {
 
     @ApiModelProperty(value = "info about notification author")
     @JsonProperty("entity_author")
-    private PersonResponse entityAuthor;
+    private PersonRs entityAuthor;
 }

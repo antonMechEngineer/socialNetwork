@@ -3,9 +3,9 @@ package soialNetworkApp.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import soialNetworkApp.api.request.LoginRq;
-import soialNetworkApp.api.response.CommonResponse;
+import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.ComplexRs;
-import soialNetworkApp.api.response.PersonResponse;
+import soialNetworkApp.api.response.PersonRs;
 import soialNetworkApp.errors.PasswordException;
 import soialNetworkApp.errors.WrongEmailException;
 import soialNetworkApp.mappers.PersonMapper;
@@ -26,7 +26,7 @@ public class AuthService {
 
     private final JWTUtil jwtUtil;
 
-    public CommonResponse<PersonResponse> loginUser(LoginRq loginRq) throws PasswordException, WrongEmailException {
+    public CommonRs<PersonRs> loginUser(LoginRq loginRq) throws PasswordException, WrongEmailException {
         Person person = personsService.getPersonByEmail(loginRq.getEmail());
         if (person != null) {
             if (!passwordEncoder.matches(loginRq.getPassword(), person.getPassword())) {
@@ -39,18 +39,18 @@ public class AuthService {
         }
     }
 
-    public CommonResponse<ComplexRs> logoutUser() {
+    public CommonRs<ComplexRs> logoutUser() {
         SecurityContextHolder.clearContext();
-        return CommonResponse.<ComplexRs>builder()
+        return CommonRs.<ComplexRs>builder()
                 .timestamp(System.currentTimeMillis())
                 .data(ComplexRs.builder().build())
                 .build();
     }
 
-    private CommonResponse<PersonResponse> buildCommonResponse(Person person) {
-        PersonResponse user = personMapper.toPersonResponse(person);
+    private CommonRs<PersonRs> buildCommonResponse(Person person) {
+        PersonRs user = personMapper.toPersonResponse(person);
         user.setToken(jwtUtil.createToken(person.getEmail()));
-        return CommonResponse.<PersonResponse>builder()
+        return CommonRs.<PersonRs>builder()
                 .timestamp(System.currentTimeMillis())
                 .data(user)
                 .build();

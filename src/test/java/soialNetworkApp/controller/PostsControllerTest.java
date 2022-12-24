@@ -2,7 +2,7 @@ package soialNetworkApp.controller;
 
 
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
-import soialNetworkApp.api.request.PostRequest;
+import soialNetworkApp.api.request.PostRq;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -56,7 +56,7 @@ class PostsControllerTest {
 
     @Test
     void updatePost() throws Exception {
-        PostRequest request = new PostRequest();
+        PostRq request = new PostRq();
         request.setTitle("newTitle");
         request.setPostText("newText");
         request.setTags(new ArrayList<>());

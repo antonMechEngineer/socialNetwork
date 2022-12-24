@@ -12,7 +12,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @Builder
 @JsonInclude(NON_NULL)
 @ApiModel(description = "default response from server")
-public class CommonResponse<T> {
+public class CommonRs<T> {
 
     @ApiModelProperty(value = "operation time in timestamp", required = true, example = "1670773804")
     private Long timestamp;
@@ -34,7 +34,7 @@ public class CommonResponse<T> {
 
     @Override
     public String toString() {
-        return "CommonResponse{" +
+        return "CommonRs{" +
                 "data=" + data +
                 '}';
     }

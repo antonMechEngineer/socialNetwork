@@ -1,6 +1,6 @@
 package soialNetworkApp.mappers;
 
-import soialNetworkApp.api.response.PersonResponse;
+import soialNetworkApp.api.response.PersonRs;
 import soialNetworkApp.model.entities.Person;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -18,7 +18,7 @@ public interface PersonMapper {
     @Mapping(target = "currency", source = "person", qualifiedByName = "getCurrencies")
     @Mapping(target = "online", source = "person")
     @Mapping(target = "token", ignore = true)
-    PersonResponse toPersonResponse(Person person);
+    PersonRs toPersonResponse(Person person);
 
     default boolean getOnlineStatus(Person person) {
         return person.getLastOnlineTime() != null &&

@@ -1,6 +1,6 @@
 package soialNetworkApp.mappers;
 
-import soialNetworkApp.api.response.NotificationResponse;
+import soialNetworkApp.api.response.NotificationRs;
 import soialNetworkApp.model.entities.Notification;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -11,5 +11,5 @@ public interface NotificationMapper {
     @Mapping(target = "info", constant = "notificationInfo")
     @Mapping(target = "notificationType", source = "entity.notificationType")
     @Mapping(target = "entityAuthor", source = "entity.author")
-    NotificationResponse toNotificationResponse(Notification notification);
+    NotificationRs toNotificationResponse(Notification notification);
 }

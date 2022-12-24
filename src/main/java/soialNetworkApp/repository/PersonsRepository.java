@@ -1,5 +1,6 @@
 package soialNetworkApp.repository;
 
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import soialNetworkApp.api.response.RegionStatisticRs;
 import soialNetworkApp.model.entities.Person;
 import org.springframework.data.domain.Page;
@@ -16,20 +17,18 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PersonsRepository extends JpaRepository<Person, Long> {
+public interface PersonsRepository extends JpaRepository<Person, Long>, JpaSpecificationExecutor<Person> {
 
     Optional<Person>findPersonById(Long id);
 
     Optional<Person> findPersonByEmail(String email);
 
-    Page<Person> findAllByCity(String city, Pageable page);
+    Page<Person> getPersonByCityAndIdNotIn(Pageable page, String city, List<Long> ids);
 
 
     Page<Person> findPersonByIdIn (List<Long> personIds, Pageable pageable);
 
-    @Query("FROM Person AS p " +
-            "ORDER BY p.regDate DESC")
-    Page<Person> findPageOrderByRegDate(Pageable page);
+    Page<Person> getPersonByIdNotInOrderByRegDateDesc(Pageable page, List<Long> ids);
 
     List<Person> findPersonByFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(String firstName, String lastName);
 
@@ -63,4 +62,6 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
             "WHERE p.country IS NOT NULL " +
             "GROUP BY p.country")
     List<RegionStatisticRs> getCountryWithUsersCount();
+
+    List<Person> findPersonByFirstNameContainsIgnoreCaseAndLastNameContainsIgnoreCase(String firstName, String lastName);
 }

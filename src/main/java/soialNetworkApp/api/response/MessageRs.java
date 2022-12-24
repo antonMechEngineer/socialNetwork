@@ -39,5 +39,5 @@ public class MessageRs {
     private String readStatus;
 
     @ApiModelProperty(value = "info about message recipient")
-    private PersonResponse recipient;
+    private PersonRs recipient;
 }

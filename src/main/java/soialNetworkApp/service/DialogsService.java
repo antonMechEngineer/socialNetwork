@@ -8,10 +8,13 @@ import soialNetworkApp.api.request.MessageWsRq;
 import soialNetworkApp.api.response.*;
 import soialNetworkApp.mappers.PersonMapper;
 import soialNetworkApp.model.entities.Dialog;
+import soialNetworkApp.model.entities.Friendship;
 import soialNetworkApp.model.entities.Message;
 import soialNetworkApp.model.entities.Person;
+import soialNetworkApp.model.enums.FriendshipStatusTypes;
 import soialNetworkApp.model.enums.ReadStatusTypes;
 import soialNetworkApp.repository.DialogsRepository;
+import soialNetworkApp.repository.FriendshipsRepository;
 import soialNetworkApp.repository.MessagesRepository;
 import soialNetworkApp.repository.PersonsRepository;
 import soialNetworkApp.security.jwt.JWTUtil;
@@ -20,9 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -31,17 +32,23 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DialogsService {
 
+    private final FriendshipsRepository friendshipsRepository;
+
     private final DialogsRepository dialogsRepository;
+
     private final MessagesRepository messagesRepository;
 
     private final PersonsRepository personsRepository;
+
     private final PersonMapper personMapper;
+
     private final SimpMessagingTemplate template;
+
     private final JWTUtil jwtUtil;
 
 
-    public CommonResponse<ComplexRs> getUnreadMessages() {
-        return CommonResponse.<ComplexRs>builder()
+    public CommonRs<ComplexRs> getUnreadMessages() {
+        return CommonRs.<ComplexRs>builder()
                 .data(ComplexRs.builder()
                         .count((int) messagesRepository.findAllByRecipientAndIsDeletedFalse(findCurrentUser()).stream()
                                 .filter(m -> m.getReadStatus().equals(ReadStatusTypes.SENT))
@@ -51,7 +58,7 @@ public class DialogsService {
                 .build();
     }
 
-    public CommonResponse<ComplexRs> setReadMessages(Long dialogId) {
+    public CommonRs<ComplexRs> setReadMessages(Long dialogId) {
         AtomicReference<Integer> readCount = new AtomicReference<>(0);
         messagesRepository.findAllByDialogIdAndIsDeletedFalse(dialogId).stream()
                 .filter(m -> m.getRecipient().equals(findCurrentUser()))
@@ -61,7 +68,7 @@ public class DialogsService {
                     messagesRepository.save(m);
                     readCount.getAndSet(readCount.get() + 1);
                 });
-        return CommonResponse.<ComplexRs>builder()
+        return CommonRs.<ComplexRs>builder()
                 .data(ComplexRs.builder()
                         .count(readCount.get())
                         .build())
@@ -69,14 +76,14 @@ public class DialogsService {
                 .build();
     }
 
-    public CommonResponse<ComplexRs> beginDialog(DialogUserShortListDto dialogUserShortListDto) {
+    public CommonRs<ComplexRs> beginDialog(DialogUserShortListDto dialogUserShortListDto) {
         Person dialogPerson = personsRepository.findPersonById(dialogUserShortListDto.getUserIds().get(0)).orElseThrow();
         Person currentPerson = findCurrentUser();
         Dialog dialog = (dialogsRepository.findDialogByFirstPersonAndSecondPerson(dialogPerson, currentPerson))
                 .orElse(dialogsRepository.findDialogByFirstPersonAndSecondPerson(currentPerson, dialogPerson)
                         .orElse(createNewDialog(dialogPerson)));
         dialogsRepository.save(dialog);
-        return CommonResponse.<ComplexRs>builder()
+        return CommonRs.<ComplexRs>builder()
                 .timestamp(System.currentTimeMillis())
                 .data(ComplexRs.builder().build())
                 .build();
@@ -90,12 +97,14 @@ public class DialogsService {
         return dialog;
     }
 
-    public CommonResponse<List<DialogRs>> getAllDialogs() {
-        List<DialogRs> dialogRsList = createDialogRsList(findCurrentUser());
-        return CommonResponse.<List<DialogRs>>builder()
+    public CommonRs<List<DialogRs>> getAllDialogs() {
+        Person me = findCurrentUser();
+        List<DialogRs> dialogRsList = createDialogRsList(me);
+        dialogRsList = blockDialogs(dialogRsList, me);
+        return CommonRs.<List<DialogRs>>builder()
                 .total((long) dialogRsList.size())
                 .timestamp(System.currentTimeMillis())
-                .data(createDialogRsList(findCurrentUser()))
+                .data(dialogRsList)
                 .build();
     }
 
@@ -121,21 +130,21 @@ public class DialogsService {
                         .build());
     }
 
-    public CommonResponse<List<MessageRs>> getMessages(Long dialogId) {
+    public CommonRs<List<MessageRs>> getMessages(Long dialogId) {
         List<MessageRs> messagesRs = new ArrayList<>();
         messagesRepository.findAllByDialogIdAndIsDeletedFalse(dialogId)
                 .forEach(m -> {
                     m.setReadStatus(ReadStatusTypes.READ);
                     messagesRs.add(createMessageRs(m));
                 });
-        return CommonResponse.<List<MessageRs>>builder()
+        return CommonRs.<List<MessageRs>>builder()
                 .timestamp(System.currentTimeMillis())
                 .data(messagesRs).build();
     }
 
-    public CommonResponse<MessageRs> getLastMessageRs(Long dialogId, MessageRq messageRq) {
+    public CommonRs<MessageRs> getLastMessageRs(Long dialogId, MessageRq messageRq) {
         if (getLastMessage(dialogId).getMessageText().equals(messageRq.getMessageText())) {
-            return CommonResponse.<MessageRs>builder()
+            return CommonRs.<MessageRs>builder()
                     .data(createLastMessageRs(dialogsRepository.findById(dialogId).orElseThrow()))
                     .timestamp(System.currentTimeMillis())
                     .build();
@@ -214,5 +223,25 @@ public class DialogsService {
         return message.getAuthor().getId().equals(person.getId());
     }
 
+    private List<DialogRs> blockDialogs(List<DialogRs> dialogs, Person me) {
+        List<Friendship> friendships =
+                friendshipsRepository.findFriendshipsBySrcPersonIdOrDstPersonIdAndFriendshipStatus(me.getId(), me.getId(), FriendshipStatusTypes.BLOCKED);
+        Set<Long> srcDstPersonsIds =  getSrcDstPersonsIds(friendships, me);
+        return dialogs
+                .stream()
+                .filter(dialog -> !srcDstPersonsIds.contains(dialog.getAuthorId()) && !srcDstPersonsIds.contains(dialog.getRecipientId()))
+                .collect(Collectors.toList());
+    }
 
+    private Set<Long> getSrcDstPersonsIds(List<Friendship> friendships, Person me) {
+        Set<Long> ids = new HashSet<>();
+        friendships.forEach(friendship -> {
+            if (friendship.getDstPerson().getId().equals(me.getId())) {
+                ids.add(friendship.getSrcPerson().getId());
+            } else {
+                ids.add(friendship.getDstPerson().getId());
+            }
+        });
+        return ids;
+    }
 }

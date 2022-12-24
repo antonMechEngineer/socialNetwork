@@ -45,7 +45,7 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<PersonResponse> login(@RequestBody LoginRq loginRq) throws PasswordException, WrongEmailException {
+    public CommonRs<PersonRs> login(@RequestBody LoginRq loginRq) throws PasswordException, WrongEmailException {
             return authService.loginUser(loginRq);
     }
 
@@ -58,7 +58,7 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<ComplexRs> logout() {
+    public CommonRs<ComplexRs> logout() {
         return authService.logoutUser();
     }
 }
