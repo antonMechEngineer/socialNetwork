@@ -18,9 +18,7 @@ import soialNetworkApp.model.enums.NotificationTypes;
 import soialNetworkApp.repository.CaptchaRepository;
 import soialNetworkApp.repository.PersonSettingsRepository;
 import soialNetworkApp.repository.PersonsRepository;
-import soialNetworkApp.security.jwt.JWTUtil;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,8 +38,6 @@ public class AccountService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService eMailService;
     private final PersonsService personsService;
-    private final JWTUtil jwtUtil;
-    private final AuthenticationManager authenticationManager;
     @Value("${auth.pass-restore}")
     String basePassUrl;
     @Value("${auth.email-restore}")
@@ -85,14 +81,9 @@ public class AccountService {
 
     public RegisterRs getPasswordSet(PasswordSetRq passwordSetRq) {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder
-                .getContext().getAuthentication().getName()).get();
+                .getContext().getAuthentication().getName()).orElseThrow();
         RegisterRs response = new RegisterRs();
-        ComplexRs data = ComplexRs.builder()
-                .id(0)
-                .count(0)
-                .message("OK")
-                .message_id(0L)
-                .build();
+        ComplexRs data = getComplexRs();
         response.setEmail(person.getEmail());
         response.setTimestamp(0);
         response.setData(data);
@@ -111,58 +102,47 @@ public class AccountService {
         }
 
         RegisterRs response = new RegisterRs();
-        ComplexRs data = ComplexRs.builder()
-                .id(0)
-                .count(0)
-                .message("OK")
-                .message_id(0L)
-                .build();
-        response.setEmail(rescuePerson.getEmail());
+        ComplexRs data = getComplexRs();
+        response.setEmail(rescuePerson != null ? rescuePerson.getEmail() : null);
         response.setTimestamp(0);
         response.setData(data);
 
-        rescuePerson.setPassword(passwordEncoder.encode(passwordRq.getPassword()));
-        personsRepository.save(rescuePerson);
+        if (rescuePerson != null) {
+            rescuePerson.setPassword(passwordEncoder.encode(passwordRq.getPassword()));
+            personsRepository.save(rescuePerson);
+        }
 
         return response;
     }
 
     public RegisterRs getPasswordRecovery(String email) {
         RegisterRs response = new RegisterRs();
-        ComplexRs data = ComplexRs.builder()
-                .id(0)
-                .count(0)
-                .message("OK")
-                .message_id(0L)
-                .build();
+        ComplexRs data = getComplexRs();
         response.setEmail(email);
         response.setTimestamp(0);
         response.setData(data);
 
-        Person person = personsRepository.findPersonByEmail(email).get();
+        Person person = personsRepository.findPersonByEmail(email).orElseThrow();
         String token = UUID.randomUUID().toString().replaceAll("-", "");
-        Person userToRestore = person;
-        userToRestore.setChangePasswordToken(token);
-        personsRepository.save(userToRestore);
+        person.setChangePasswordToken(token);
+        personsRepository.save(person);
 
-        String to = email;
         String subject = "Восстановление пароля";
         String text = basePassUrl + token;
-        eMailService.sendSimpleMessage(to, subject, text);
+        eMailService.sendSimpleMessage(email, subject, text);
 
         return response;
     }
 
+    private static ComplexRs getComplexRs() {
+        return new ComplexRs(0, 0L, "OK", 0L);
+    }
+
     public RegisterRs getEmailRecovery() {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder
-                .getContext().getAuthentication().getName()).get();
+                .getContext().getAuthentication().getName()).orElseThrow();
         RegisterRs response = new RegisterRs();
-        ComplexRs data = ComplexRs.builder()
-                .id(0)
-                .count(0)
-                .message("OK")
-                .message_id(0L)
-                .build();
+        ComplexRs data = getComplexRs();
         response.setEmail(person.getEmail());
         response.setTimestamp(0);
         response.setData(data);

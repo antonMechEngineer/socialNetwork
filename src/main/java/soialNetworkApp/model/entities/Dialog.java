@@ -7,6 +7,7 @@ import java.time.ZonedDateTime;
 
 @Entity
 @Data
+@NoArgsConstructor
 @Table(name = "dialogs")
 public class Dialog {
 
@@ -28,4 +29,10 @@ public class Dialog {
     @ManyToOne
     @JoinColumn(name = "second_person_id", nullable = false)
     private Person secondPerson;
+
+    public Dialog(Person firstPerson, Person secondPerson, ZonedDateTime lastActiveTime) {
+        this.firstPerson = firstPerson;
+        this.secondPerson = secondPerson;
+        this.lastActiveTime = lastActiveTime;
+    }
 }

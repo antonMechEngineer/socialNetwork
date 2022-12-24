@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -18,6 +19,7 @@ public interface DialogsRepository extends JpaRepository<Dialog, Long> {
             nativeQuery = true)
     void dialogsDelete(@Param("id") long id);
     Optional<Dialog> findDialogByFirstPersonAndSecondPerson(Person first, Person second);
-
+    List<Dialog> findAllByFirstPersonOrSecondPerson(Person firstPerson, Person secondPerson);
+    Long countAllByFirstPersonOrSecondPerson(Person first, Person second);
     Long countAllByFirstPersonIdOrSecondPersonId(long firstPerson, long secondPerson);
 }
