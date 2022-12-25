@@ -43,6 +43,16 @@ socialNetwork:
     token:
       header: X-Gismeteo-Token
       value: 56b30cb255.3443075
+  #cities and countries
+  geolocation:
+    countries-path: https://htmlweb.ru/geo/api.php?location&json&api_key=
+    cities-path:
+      main: http://htmlweb.ru/geo/api.php?city_name=
+      params: "&json&api_key="
+    first-countries-in-response: Россия, Беларусь
+    first-cities-in-response: Москва (Московская область, Центральный федеральный округ); Санкт-Петербург (Ленинградская область, Санкт-Петербург)
+    # 20 запросов в сутки
+    token: aae8395d07c1255b0ca5ab1962268afd
 
 auth:
   secret: someSecretCode

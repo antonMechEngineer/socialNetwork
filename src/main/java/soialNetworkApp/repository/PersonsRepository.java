@@ -63,4 +63,7 @@ public interface PersonsRepository extends JpaRepository<Person, Long> {
             "WHERE p.country IS NOT NULL " +
             "GROUP BY p.country")
     List<RegionStatisticRs> getCountryWithUsersCount();
+
+    @Query(value = "SELECT DISTINCT city FROM Person WHERE country = :country")
+    List<String> getCitiesByCountry(@Param("country") String country);
 }

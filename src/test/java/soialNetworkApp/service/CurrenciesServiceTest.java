@@ -48,8 +48,8 @@ class CurrenciesServiceTest {
 
     @Test
     void getCurrencies() {
-        when(currenciesRepository.findTopByName("USD")).thenReturn(Optional.of(usd));
-        when(currenciesRepository.findTopByName("EUR")).thenReturn(Optional.of(eur));
+        when(currenciesRepository.findFirstByNameOrderByUpdateTimeDesc("USD")).thenReturn(Optional.of(usd));
+        when(currenciesRepository.findFirstByNameOrderByUpdateTimeDesc("EUR")).thenReturn(Optional.of(eur));
 
         assertEquals(usd.getPrice(), currenciesService.getCurrencies(new Person()).getUsd());
         assertEquals(eur.getPrice(), currenciesService.getCurrencies(new Person()).getEuro());

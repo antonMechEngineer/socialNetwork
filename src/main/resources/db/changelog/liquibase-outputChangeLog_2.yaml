@@ -62,3 +62,74 @@ databaseChangeLog:
             name: gismeteo_id
         indexName: gismeteo_id_index
         tableName: weather
+- changeSet:
+    id: sprint-3-5
+    author: YurK
+    changes:
+    - addColumn:
+        tableName: cities
+        column:
+            name: country_id
+            type: BIGINT
+- changeSet:
+    id: sprint-3-6
+    author: YurK
+    changes:
+    - addForeignKeyConstraint:
+        baseTableName: cities
+        referencedTableName: countries
+        baseColumnNames: country_id
+        referencedColumnNames: id
+        constraintName: country_id_cities_fk
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        validate: true
+- changeSet:
+    id:  sprint-3-7
+    author:  YurK
+    changes:
+    - renameColumn:
+        columnDataType:  VARCHAR(255)
+        newColumnName:  name
+        oldColumnName:  title
+        tableName:  countries
+- changeSet:
+    id: sprint-3-8
+    author: YurK
+    changes:
+    - addColumn:
+        tableName: countries
+        columns:
+            - column:
+                name: full_name
+                type: VARCHAR(255)
+            - column:
+                name: international_name
+                type: VARCHAR(255)
+            - column:
+                name: code2
+                type: VARCHAR(255)
+- changeSet:
+    id:  sprint-3-9
+    author:  YurK
+    changes:
+    - renameColumn:
+        columnDataType:  VARCHAR(255)
+        newColumnName:  name
+        oldColumnName:  title
+        tableName:  cities
+- changeSet:
+    id: sprint-3-10
+    author: YurK
+    changes:
+    - addColumn:
+        tableName: cities
+        columns:
+        - column:
+            name: district
+            type: VARCHAR(255)
+        - column:
+            name: sub_district
+            type: VARCHAR(255)

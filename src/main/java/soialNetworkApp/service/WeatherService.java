@@ -17,6 +17,7 @@ import java.net.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +37,7 @@ public class WeatherService {
     @Value("${socialNetwork.timezone}")
     private String timezone;
 
-    public void setGismeteoCityId(String cityTitle) {
+    public Integer getGismeteoCityId(City city) {
 //        RestTemplate template = new RestTemplate();
 //        String qwe = new RestTemplate().getForObject(cityIdPath, String.class, Map.of(header, token));
 //        HttpRequest request = HttpRequest.newBuilder().header(header, token).uri(new URI(cityIdPath + "киров")).build();
@@ -48,24 +49,18 @@ public class WeatherService {
 //        String jsonData = new String(connection.getInputStream().readAllBytes());
 //        System.out.println("><>< " + jsonData);
 
-        City city = citiesRepository.findCityByTitle(cityTitle).orElse(null);
-        if (city == null) {
-            city = new City();
-            city.setTitle(cityTitle);
-        }
-        if (city.getGismeteoId() == null) {
-            try {
-                URLConnection connection = new URL(cityIdPath + cityTitle).openConnection();
-                connection.addRequestProperty(header, token);
-                String jsonData = new String(connection.getInputStream().readAllBytes());
-                int cityId = new JSONObject(jsonData).getInt("id");
-                city.setGismeteoId(cityId);
-                citiesRepository.save(city);
 
-                System.out.println("><>< " + jsonData);
-            } catch (IOException ignored) {
-            }
-        }
+       String cityQuery = city.getName() + " " + city.getDistrict() +
+               (city.getSubDistrict().isEmpty() ? "" : " " + city.getSubDistrict());
+        Integer cityId = null;
+        try {
+            URLConnection connection = new URL(cityIdPath + cityQuery).openConnection();
+            connection.addRequestProperty(header, token);
+            String jsonData = new String(connection.getInputStream().readAllBytes());
+            cityId = new JSONObject(jsonData).getInt("id");
+            System.out.println("><>< " + jsonData);
+        } catch (IOException ignored) {}
+        return cityId;
 
 //        String result = Request.Get("https://www.cbr-xml-daily.ru/daily_json.js")
 ////                .setHeader("Authorization", token)
@@ -99,13 +94,15 @@ public class WeatherService {
     }
 
     @Named("getWeatherResponse")
-    public WeatherResponse getWeatherResponse(String cityTitle) {
+    public WeatherResponse getWeatherResponse(String cityName) {
         WeatherResponse weatherResponse = new WeatherResponse();
-        if (cityTitle != null) {
-            City city = citiesRepository.findCityByTitle(cityTitle).orElse(new City());
+        if (cityName != null) {
+            List<String> cityFields = GeolocationsService.getCityFields(cityName);
+            City city = citiesRepository.findCityByNameAndDistrictAndSubDistrict(
+                    cityFields.get(0), cityFields.get(1), cityFields.get(2)).orElse(new City());
             if (city.getGismeteoId() != null) {
-                weatherRepository.findTopByGismeteoId(city.getGismeteoId()).ifPresent(weather -> {
-                    weatherResponse.setCity(cityTitle);
+                weatherRepository.findFirstByGismeteoIdOrderByTimeDesc(city.getGismeteoId()).ifPresent(weather -> {
+                    weatherResponse.setCity(cityName);
                     weatherResponse.setTemp(String.valueOf(weather.getTemperature()));
                     weatherResponse.setClouds(weather.getWeatherDescription());
                     weatherResponse.setDate(String.valueOf(weather.getTime()));

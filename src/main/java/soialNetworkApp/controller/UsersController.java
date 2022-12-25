@@ -110,7 +110,7 @@ public class UsersController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    ResponseEntity<UserRs> updateMyData(@RequestBody UserRq userRq) {
+    ResponseEntity<UserRs> updateMyData(@RequestBody UserRq userRq) throws Exception {
         return ResponseEntity
                 .ok(usersService.editProfile(userRq));
     }

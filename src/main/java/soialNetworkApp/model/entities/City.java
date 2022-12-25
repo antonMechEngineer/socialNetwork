@@ -1,11 +1,15 @@
 package soialNetworkApp.model.entities;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
-@Data
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "cities")
 public class City {
 
@@ -14,16 +18,25 @@ public class City {
     private Long id;
 
     @Column(nullable = false)
-    private String title;
+    private String name;
+
+    private String district;
+
+    @Column(name = "sub_district")
+    private String subDistrict;
 
     @Column(name = "gismeteo_id")
     private Integer gismeteoId;
+
+    @ManyToOne
+    @JoinColumn(name = "country_id")
+    private Country country;
 
     @Override
     public String toString() {
         return "City{" +
                 "id=" + id +
-                ", title='" + title +
+                ", title='" + name +
                 '}';
     }
 }

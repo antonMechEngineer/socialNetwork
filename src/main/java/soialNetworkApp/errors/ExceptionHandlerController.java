@@ -13,7 +13,7 @@ public class ExceptionHandlerController {
 
     //400
     @ExceptionHandler({
-            NoPostEntityException.class,
+            NoSuchEntityException.class,
             EmptyFieldException.class,
             BadCredentialsException.class,
             PasswordException.class,
@@ -23,7 +23,7 @@ public class ExceptionHandlerController {
     })
     public ResponseEntity<ErrorRs> handleBadRequest(Exception e) {
         return ResponseEntity.status(400).body(ErrorRs.builder()
-                .error(NoPostEntityException.class.getName())
+                .error(NoSuchEntityException.class.getName())
                 .timestamp(System.currentTimeMillis())
                 .errorDescription(e.getMessage())
                 .build());

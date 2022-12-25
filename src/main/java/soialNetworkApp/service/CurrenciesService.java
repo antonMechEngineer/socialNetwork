@@ -34,7 +34,7 @@ public class CurrenciesService {
         LocalDateTime time = ZonedDateTime.parse(new JSONObject(jsonData).getString("Date")).toLocalDateTime();
         JSONObject currenciesData = new JSONObject(jsonData).getJSONObject("Valute");
         units.forEach(unit -> {
-            Currency lastCurrency = currenciesRepository.findTopByName(unit).orElse(null);
+            Currency lastCurrency = currenciesRepository.findFirstByNameOrderByUpdateTimeDesc(unit).orElse(null);
             if (lastCurrency == null || lastCurrency.getUpdateTime().isBefore(time)) {
                 JSONObject unitData = currenciesData.getJSONObject(unit);
                 Currency currency = new Currency();
@@ -49,8 +49,8 @@ public class CurrenciesService {
     @Named("getCurrencies")
     public CurrencyResponse getCurrencies(Person person) {
         CurrencyResponse response = new CurrencyResponse();
-        currenciesRepository.findTopByName(units.get(0)).ifPresent(currency -> response.setUsd(currency.getPrice()));
-        currenciesRepository.findTopByName(units.get(1)).ifPresent(currency -> response.setEuro(currency.getPrice()));
+        currenciesRepository.findFirstByNameOrderByUpdateTimeDesc(units.get(0)).ifPresent(currency -> response.setUsd(currency.getPrice()));
+        currenciesRepository.findFirstByNameOrderByUpdateTimeDesc(units.get(1)).ifPresent(currency -> response.setEuro(currency.getPrice()));
         return response;
     }
 }
