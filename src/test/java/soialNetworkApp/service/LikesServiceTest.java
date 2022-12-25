@@ -1,7 +1,7 @@
 package soialNetworkApp.service;
 
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
-import soialNetworkApp.api.request.LikeRequest;
+import soialNetworkApp.api.request.LikeRq;
 import soialNetworkApp.model.entities.Comment;
 import soialNetworkApp.model.entities.Like;
 import soialNetworkApp.model.entities.Person;
@@ -55,8 +55,8 @@ class LikesServiceTest {
     private Comment liked2;
     private final String type1 ="Post";
     private final String type2 ="Comment";
-    private LikeRequest likeRequest1;
-    private LikeRequest likeRequest2;
+    private LikeRq likeRq1;
+    private LikeRq likeRq2;
     private List<Like> likes;
 
     @BeforeEach
@@ -69,10 +69,10 @@ class LikesServiceTest {
         liked2 = new Comment();
         liked2.setId(12L);
         liked2.setAuthor(person);
-        likeRequest1 = new LikeRequest();
-        likeRequest2 = new LikeRequest();
-        likeRequest1.setType(type1);
-        likeRequest2.setType(type2);
+        likeRq1 = new LikeRq();
+        likeRq2 = new LikeRq();
+        likeRq1.setType(type1);
+        likeRq2.setType(type2);
         likes = new ArrayList<>();
     }
 
@@ -81,8 +81,8 @@ class LikesServiceTest {
         person = null;
         liked1 = null;
         liked2 = null;
-        likeRequest1 = null;
-        likeRequest2 = null;
+        likeRq1 = null;
+        likeRq2 = null;
         likes = null;
     }
 
@@ -98,9 +98,9 @@ class LikesServiceTest {
         when(personsService.getPersonByContext()).thenReturn(person);
         when(likesRepository.findLikeByPersonAndEntity(any(), any(), any())).thenReturn(Optional.empty());
 
-        assertTrue(likesService.putLike(likeRequest1).getData().getUsers().contains(person.getId()));
+        assertTrue(likesService.putLike(likeRq1).getData().getUsers().contains(person.getId()));
         verify(likesRepository).save(any(Like.class));
-        assertTrue(likesService.putLike(likeRequest2).getData().getUsers().contains(person.getId()));
+        assertTrue(likesService.putLike(likeRq2).getData().getUsers().contains(person.getId()));
     }
 
     @Test

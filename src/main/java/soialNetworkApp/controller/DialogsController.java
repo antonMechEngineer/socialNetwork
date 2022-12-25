@@ -8,15 +8,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import soialNetworkApp.api.request.DialogUserShortListDto;
+import soialNetworkApp.api.request.MessageRq;
 import soialNetworkApp.api.response.*;
 import soialNetworkApp.service.DialogsService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/v1/dialogs")
 @RequiredArgsConstructor
@@ -34,7 +33,7 @@ public class DialogsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<List<DialogRs>> dialogs() {
+    public CommonRs<List<DialogRs>> dialogs() {
         return dialogsService.getAllDialogs();
     }
 
@@ -47,7 +46,7 @@ public class DialogsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<ComplexRs> dialogsStart(@RequestBody DialogUserShortListDto dialogUserShortListDto) {
+    public CommonRs<ComplexRs> dialogsStart(@RequestBody DialogUserShortListDto dialogUserShortListDto) {
         return dialogsService.beginDialog(dialogUserShortListDto);
     }
 
@@ -60,14 +59,9 @@ public class DialogsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<List<MessageRs>> messages(@PathVariable Long dialogId) {
+    public CommonRs<List<MessageRs>> messages(@PathVariable Long dialogId) {
         return dialogsService.getMessages(dialogId);
     }
-
-//    @PostMapping("/{dialogId}/messages")
-//    public CommonResponse<MessageRs> messagesPost(@PathVariable Long dialogId, @RequestBody MessageRq messageRq) {
-//        return dialogsService.getLastMessageRs(dialogId, messageRq);
-//    }
 
     @GetMapping("/unreaded")
     @ApiOperation(value = "get count of unread messages")
@@ -78,7 +72,7 @@ public class DialogsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<ComplexRs> unread() {
+    public CommonRs<ComplexRs> unread() {
         return dialogsService.getUnreadMessages();
     }
 
@@ -91,7 +85,7 @@ public class DialogsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<ComplexRs> read(@PathVariable Long dialogId) {
-        return dialogsService.setReadMessages(dialogId);
+    public CommonRs<ComplexRs> read(@RequestBody MessageRq messageRq) {
+        return dialogsService.setReadMessages(messageRq.getDialogId());
     }
 }

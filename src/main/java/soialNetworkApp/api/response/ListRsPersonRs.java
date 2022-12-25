@@ -8,7 +8,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class ListResponseRsPersonRs {
+public class ListRsPersonRs {
 
     private Long time;
 

@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
-import soialNetworkApp.api.response.WeatherResponse;
+import soialNetworkApp.api.response.WeatherRs;
 import soialNetworkApp.model.entities.City;
 import soialNetworkApp.model.entities.Weather;
 import soialNetworkApp.repository.CitiesRepository;
@@ -66,6 +66,12 @@ class WeatherServiceTest {
                 .thenReturn(Optional.of(city));
         when(weatherRepository.findFirstByGismeteoIdOrderByTimeDesc(anyInt())).thenReturn(Optional.of(weather));
 
+        WeatherRs weatherRs = weatherService.getWeatherResponse("city");
+        verify(citiesRepository).findCityByTitle(anyString());
+        verify(weatherRepository).findTopByGismeteoId(anyInt());
+        assertEquals(weatherDescription, weatherRs.getClouds());
+        assertEquals(String.valueOf(temperature), weatherRs.getTemp());
+        assertEquals(time.toString(), weatherRs.getDate());
         WeatherResponse weatherResponse = weatherService.getWeatherResponse("city");
         verify(citiesRepository).findCityByNameAndDistrictAndSubDistrict(anyString(), anyString(), anyString());
         verify(weatherRepository).findFirstByGismeteoIdOrderByTimeDesc(anyInt());

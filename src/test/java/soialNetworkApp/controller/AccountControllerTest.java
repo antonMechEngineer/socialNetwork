@@ -142,7 +142,7 @@ class AccountControllerTest {
     @Test
     @WithUserDetails("rhoncus.nullam@yahoo.edu")
     void editPersonSettings() throws Exception {
-        PersonSettingsRequest request = new PersonSettingsRequest();
+        PersonSettingsRq request = new PersonSettingsRq();
         request.setNotificationType("COMMENT_COMMENT");
         request.setEnable(false);
         ObjectMapper mapper = new ObjectMapper();

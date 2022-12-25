@@ -2,6 +2,7 @@ package soialNetworkApp.service;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -22,7 +23,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -97,17 +97,23 @@ public class UsersService {
     public UserRs editProfile(UserRq userRq) throws Exception {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
         UserRs response = new UserRs();
-        PersonResponse personResponse = personMapper.toPersonResponse(person);
+        PersonRs personRs = personMapper.toPersonResponse(person);
         if (userRq.getAbout() != null) {
             person.setAbout(userRq.getAbout());
-            personResponse.setAbout(userRq.getAbout());
+            personRs.setAbout(userRq.getAbout());
         }
         if (userRq.getBirth_date() != null) {
             person.setBirthDate(LocalDateTime.from(OffsetDateTime.parse(userRq.getBirth_date())));
-            personResponse.setBirthDate(LocalDateTime.from(OffsetDateTime.parse(userRq.getBirth_date())));
+            personRs.setBirthDate(LocalDateTime.from(OffsetDateTime.parse(userRq.getBirth_date())));
         }
         if (userRq.getCity() != null) {
             person.setCity(userRq.getCity());
+            personRs.setCity(userRq.getCity());
+            if (!citiesRepository.existsCityByTitle(userRq.getCity())) {
+                City city = new City();
+                city.setTitle(userRq.getCity());
+                citiesRepository.save(city);
+            }
             personResponse.setCity(userRq.getCity());
             geolocationsService.setCityGismeteoId(userRq.getCity());
 //            if (!citiesRepository.existsCityByName(userRq.getCity())) {
@@ -118,6 +124,13 @@ public class UsersService {
         }
         if (userRq.getCountry() != null) {
             person.setCountry(userRq.getCountry());
+            personRs.setCountry(userRq.getCountry());
+            if (!countriesRepository.existsCountryByTitle(userRq.getCountry())) {
+                Country country = new Country();
+                country.setTitle(userRq.getCountry());
+                countriesRepository.save(country);
+                weatherService.setGismeteoCityId(userRq.getCity());
+            }
             personResponse.setCountry(userRq.getCountry());
 //            if (!countriesRepository.existsCountryByName(userRq.getCountry())) {
 //                Country country = new Country();
@@ -127,36 +140,37 @@ public class UsersService {
         }
         if (userRq.getFirst_name() != null) {
             person.setFirstName(userRq.getFirst_name());
-            personResponse.setFirstName(userRq.getFirst_name());
+            personRs.setFirstName(userRq.getFirst_name());
         }
         if (userRq.getLast_name() != null) {
             person.setLastName(userRq.getLast_name());
-            personResponse.setLastName(userRq.getLast_name());
+            personRs.setLastName(userRq.getLast_name());
         }
         if (userRq.getPhone() != null) {
             person.setPhone(userRq.getPhone());
-            personResponse.setPhone(userRq.getPhone());
+            personRs.setPhone(userRq.getPhone());
         }
         if (userRq.getPhoto_id() != null) {
             person.setPhoto(userRq.getPhoto_id());
-            personResponse.setPhoto(userRq.getPhoto_id());
+            personRs.setPhoto(userRq.getPhoto_id());
         }
 
         personsRepository.save(person);
-        response.setData(personResponse);
+        response.setData(personRs);
         return response;
     }
 
-    public CommonResponse<List<PersonResponse>> findPersons(FindPersonRq personRq, int offset, int perPage) throws SQLException, EmptyFieldException {
+    public CommonRs<List<PersonRs>> findPersons(FindPersonRq personRq, int offset, int perPage) throws EmptyFieldException {
         if (personRq.getFirst_name() == null && personRq.getLast_name() == null && personRq.getAge_from() == null
                 && personRq.getAge_to() == null && personRq.getCity() == null && personRq.getCountry() == null) {
             throw new EmptyFieldException("All fields in query are empty");
         }
-        return buildCommonResponse(offset, perPage, searchPersons.findPersons(personRq, offset, perPage), searchPersons.getTotal());
+        Page<Person> persons = searchPersons.findPersons(personRq, offset, perPage);
+        return buildCommonResponse(offset, perPage, persons.getContent(), persons.getTotalElements());
     }
 
-    private CommonResponse<List<PersonResponse>> buildCommonResponse(int offset, int perPAge, List<Person> persons, long total) {
-        return CommonResponse.<List<PersonResponse>>builder()
+    private CommonRs<List<PersonRs>> buildCommonResponse(int offset, int perPAge, List<Person> persons, long total) {
+        return CommonRs.<List<PersonRs>>builder()
                 .timestamp(System.currentTimeMillis())
                 .data(personsToResponse(persons))
                 .offset(offset)
@@ -168,12 +182,7 @@ public class UsersService {
     public ResponseRsComplexRs deleteProfile() {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
         ResponseRsComplexRs response = new ResponseRsComplexRs();
-        ComplexRs data = ComplexRs.builder()
-                .id(0)
-                .count(0)
-                .message("OK")
-                .message_id(0L)
-                .build();
+        ComplexRs data = new ComplexRs(0, 0L, "OK", 0L);
         response.setData(data);
         response.setTimestamp(0);
         response.setOffset(0);
@@ -189,12 +198,7 @@ public class UsersService {
     public ResponseRsComplexRs recoverProfile() {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
         ResponseRsComplexRs response = new ResponseRsComplexRs();
-        ComplexRs data = ComplexRs.builder()
-                .id(0)
-                .count(0)
-                .message("OK")
-                .message_id(0L)
-                .build();
+        ComplexRs data = new ComplexRs(0, 0L, "OK", 0L);
         response.setData(data);
         response.setTimestamp(0);
         response.setOffset(0);
@@ -228,7 +232,7 @@ public class UsersService {
         }
     }
 
-    private List<PersonResponse> personsToResponse(List<Person> persons) {
+    private List<PersonRs> personsToResponse(List<Person> persons) {
         return persons.stream().map(personMapper::toPersonResponse).collect(Collectors.toList());
     }
 }

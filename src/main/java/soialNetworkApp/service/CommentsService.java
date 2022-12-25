@@ -1,9 +1,9 @@
 package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
-import soialNetworkApp.api.request.CommentRequest;
-import soialNetworkApp.api.response.CommentResponse;
-import soialNetworkApp.api.response.CommonResponse;
+import soialNetworkApp.api.request.CommentRq;
+import soialNetworkApp.api.response.CommentRs;
+import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.mappers.CommentMapper;
 import soialNetworkApp.model.entities.Comment;
 import soialNetworkApp.model.entities.Person;
@@ -35,11 +35,11 @@ public class CommentsService {
     @Value("${socialNetwork.timezone}")
     private String timezone;
 
-    public CommonResponse<CommentResponse> createComment(Post post, CommentRequest commentRequest) {
+    public CommonRs<CommentRs> createComment(Post post, CommentRq commentRq) {
         Person person = personsService.getPersonByContext();
-        Comment parentComment = getCommentById(commentRequest.getParentId());
+        Comment parentComment = getCommentById(commentRq.getParentId());
         post = parentComment == null ? post : null;
-        Comment comment = commentRepository.save(commentMapper.commentRequestToNewComment(commentRequest, post, person, parentComment));
+        Comment comment = commentRepository.save(commentMapper.commentRequestToNewComment(commentRq, post, person, parentComment));
         if (post != null && person.getPersonSettings() != null && person.getPersonSettings().getPostCommentNotification()) {
             notificationsService.createNotification(comment, post.getAuthor());
         }
@@ -49,22 +49,22 @@ public class CommentsService {
         return buildCommonResponse(comment);
     }
 
-    public CommonResponse<List<CommentResponse>> getPostComments(Post post, int offset, int size) {
+    public CommonRs<List<CommentRs>> getPostComments(Post post, int offset, int size) {
         Pageable pageable = NetworkPageRequest.of(offset, size);
         Page<Comment> commentPage = commentRepository.findCommentsByPostOrderByTimeAsc(pageable, post);
         return buildCommonResponseList(offset, size, commentPage);
     }
 
-    public CommonResponse<CommentResponse> editComment(long commentId, CommentRequest commentRequest) {
+    public CommonRs<CommentRs> editComment(long commentId, CommentRq commentRq) {
         Comment comment = getCommentById(commentId);
         if (personsService.validatePerson(comment.getAuthor())) {
-            comment.setCommentText(commentRequest.getCommentText());
+            comment.setCommentText(commentRq.getCommentText());
             comment.setTime(LocalDateTime.now(ZoneId.of(timezone)));
         }
         return buildCommonResponse(commentRepository.save(comment));
     }
 
-    public CommonResponse<CommentResponse> changeCommentDeleteStatus(long commentId, boolean status) {
+    public CommonRs<CommentRs> changeCommentDeleteStatus(long commentId, boolean status) {
         Comment comment = getCommentById(commentId);
         if (personsService.validatePerson(comment.getAuthor())) {
             comment.setIsDeleted(status);
@@ -72,8 +72,8 @@ public class CommentsService {
         return buildCommonResponse(commentRepository.save(comment));
     }
 
-    private CommentResponse getCommentResponse(Comment comment) {
-        CommentResponse response = commentMapper.commentToResponse(comment);
+    private CommentRs getCommentResponse(Comment comment) {
+        CommentRs response = commentMapper.commentToResponse(comment);
         response.setEmbeddedComments(embeddedCommentsToResponse(comment.getEmbeddedComments()));
         return response;
     }
@@ -84,30 +84,30 @@ public class CommentsService {
     }
 
     @Named("commentsToResponse")
-    public List<CommentResponse> embeddedCommentsToResponse(List<Comment> comments) {
+    public List<CommentRs> embeddedCommentsToResponse(List<Comment> comments) {
         if (comments == null) {
             return new ArrayList<>();
         }
         comments.sort(Comparator.comparing(Comment::getTime));
         return comments.stream().map(comment -> {
-            CommentResponse commentResponse = commentMapper.commentToResponse(comment);
-            commentResponse.setEmbeddedComments(
+            CommentRs commentRs = commentMapper.commentToResponse(comment);
+            commentRs.setEmbeddedComments(
                     comment.getEmbeddedComments().isEmpty() ?
                             new ArrayList<>() :
                             embeddedCommentsToResponse(comment.getEmbeddedComments()));
-            return commentResponse;
+            return commentRs;
         }).collect(Collectors.toList());
     }
 
-    private CommonResponse<CommentResponse> buildCommonResponse(Comment comment) {
-        return CommonResponse.<CommentResponse>builder()
+    private CommonRs<CommentRs> buildCommonResponse(Comment comment) {
+        return CommonRs.<CommentRs>builder()
                 .timestamp(System.currentTimeMillis())
                 .data(getCommentResponse(comment))
                 .build();
     }
 
-    private CommonResponse<List<CommentResponse>> buildCommonResponseList(int offset, int perPage, Page<Comment> comments) {
-        return CommonResponse.<List<CommentResponse>>builder()
+    private CommonRs<List<CommentRs>> buildCommonResponseList(int offset, int perPage, Page<Comment> comments) {
+        return CommonRs.<List<CommentRs>>builder()
                 .timestamp(System.currentTimeMillis())
                 .offset(offset)
                 .itemPerPage(perPage)

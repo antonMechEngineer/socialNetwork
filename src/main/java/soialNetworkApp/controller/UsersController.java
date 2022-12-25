@@ -10,18 +10,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import soialNetworkApp.aop.annotations.UpdateOnlineTime;
 import soialNetworkApp.api.request.FindPersonRq;
-import soialNetworkApp.api.request.PostRequest;
+import soialNetworkApp.api.request.PostRq;
 import soialNetworkApp.api.request.UserRq;
 import soialNetworkApp.api.response.*;
 import soialNetworkApp.errors.EmptyFieldException;
 import soialNetworkApp.errors.PersonNotFoundException;
+import soialNetworkApp.errors.UserPageBlockedException;
 import soialNetworkApp.service.PersonsService;
 import soialNetworkApp.service.PostsService;
 import soialNetworkApp.service.UsersService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -46,7 +46,7 @@ public class UsersController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<PersonResponse> getUserById(@PathVariable long id) {
+    public CommonRs<PersonRs> getUserById(@PathVariable long id) throws UserPageBlockedException {
         return personsService.getPersonDataById(id);
     }
 
@@ -60,7 +60,7 @@ public class UsersController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<List<PostResponse>> getUsersPosts(
+    public CommonRs<List<PostRs>> getUsersPosts(
             @PathVariable long id,
             @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
             @RequestParam(name = "itemPerPage", required = false, defaultValue = "${socialNetwork.default.size}") int size) {
@@ -78,12 +78,12 @@ public class UsersController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<PostResponse> createPost(
+    public CommonRs<PostRs> createPost(
             @PathVariable(name = "id") Long personId,
             @RequestParam(name = "publish_date", required = false) Long publishingDate,
-            @RequestBody PostRequest postRequest) throws PersonNotFoundException {
+            @RequestBody PostRq postRq) throws PersonNotFoundException {
 
-        return postsService.createPost(postRequest, personId, publishingDate);
+        return postsService.createPost(postRq, personId, publishingDate);
     }
 
     @UpdateOnlineTime
@@ -96,7 +96,7 @@ public class UsersController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<PersonResponse> getMyData() {
+    public CommonRs<PersonRs> getMyData() {
         return personsService.getMyData();
     }
 
@@ -152,10 +152,10 @@ public class UsersController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<List<PersonResponse>> findPersons(
+    public CommonRs<List<PersonRs>> findPersons(
             FindPersonRq personRq,
             @RequestParam(required = false, defaultValue = "${socialNetwork.default.page}") int offset,
-            @RequestParam(required = false, defaultValue = "${socialNetwork.default.size}") int perPage) throws SQLException, EmptyFieldException {
+            @RequestParam(required = false, defaultValue = "${socialNetwork.default.size}") int perPage) throws EmptyFieldException {
         return usersService.findPersons(personRq, offset, perPage);
     }
 }

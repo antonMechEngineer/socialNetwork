@@ -1,7 +1,7 @@
 package soialNetworkApp.controller;
 
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
-import soialNetworkApp.api.request.PostRequest;
+import soialNetworkApp.api.request.PostRq;
 import soialNetworkApp.api.request.UserRq;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +55,7 @@ class UsersControllerTest {
 
     @Test
     void createPost() throws Exception {
-        PostRequest request = new PostRequest();
+        PostRq request = new PostRq();
         request.setTitle("postTitle");
         request.setPostText("postText");
         request.setTags(new ArrayList<>());

@@ -1,7 +1,7 @@
 package soialNetworkApp.controller;
 
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
-import soialNetworkApp.api.request.CommentRequest;
+import soialNetworkApp.api.request.CommentRq;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -34,7 +34,7 @@ class CommentsControllerTest {
 
     @Test
     void createComment() throws Exception {
-        CommentRequest request = new CommentRequest();
+        CommentRq request = new CommentRq();
         request.setCommentText("someText");
         request.setParentId(0);
         ObjectMapper mapper = new ObjectMapper();
@@ -80,7 +80,7 @@ class CommentsControllerTest {
 
     @Test
     void editComment() throws Exception {
-        CommentRequest request = new CommentRequest();
+        CommentRq request = new CommentRq();
         request.setCommentText("newText");
         request.setParentId(0);
         ObjectMapper mapper = new ObjectMapper();

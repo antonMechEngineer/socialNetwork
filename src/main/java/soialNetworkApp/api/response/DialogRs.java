@@ -16,7 +16,7 @@ public class DialogRs {
 
     @ApiModelProperty(value = "count of unread message", example = "15")
     @JsonProperty("unread_count")
-    private Integer unreadCount;
+    private Long unreadCount;
 
     @ApiModelProperty(value = "last message in dialog")
     @JsonProperty("last_message")

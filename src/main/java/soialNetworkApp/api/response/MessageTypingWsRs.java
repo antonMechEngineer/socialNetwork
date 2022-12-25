@@ -6,16 +6,9 @@ import lombok.Data;
 
 @Data
 @Builder
-public class MessageWsRs {
-
-    private Long id;
-
-    @JsonProperty("author_id")
-    private Long authorId;
-
+public class MessageTypingWsRs {
     @JsonProperty("user_id")
     private Long userId;
-
-    @JsonProperty("message_text")
-    private String messageText;
+    private Long dialogId;
+    private Boolean typing;
 }

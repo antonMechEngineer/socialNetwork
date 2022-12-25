@@ -1,7 +1,7 @@
 package soialNetworkApp.config;
 
 import com.fasterxml.classmate.TypeResolver;
-import soialNetworkApp.api.response.CommonResponse;
+import soialNetworkApp.api.response.CommonRs;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,7 +35,7 @@ public class SpringFoxConfig {
                 .paths(PathSelectors.any())
                 .build()
                 .apiInfo(apiInfo())
-                .additionalModels(typeResolver.resolve(CommonResponse.class))
+                .additionalModels(typeResolver.resolve(CommonRs.class))
                 .additionalModels(typeResolver.resolve(ErrorRs.class));
     }
 

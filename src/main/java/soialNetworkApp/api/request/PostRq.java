@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 @ApiModel(description = "data to update the post")
-public class PostRequest {
+public class PostRq {
 
     @ApiModelProperty(value = "new post title", example = "NEW TITLE")
     private String title;

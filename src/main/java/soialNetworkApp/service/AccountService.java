@@ -2,9 +2,9 @@ package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
 import soialNetworkApp.api.request.*;
-import soialNetworkApp.api.response.CommonResponse;
+import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.ComplexRs;
-import soialNetworkApp.api.response.PersonSettingsResponse;
+import soialNetworkApp.api.response.PersonSettingsRs;
 import soialNetworkApp.api.response.RegisterRs;
 import soialNetworkApp.errors.CaptchaException;
 import soialNetworkApp.errors.IncorrectRequestTypeException;
@@ -18,9 +18,7 @@ import soialNetworkApp.model.enums.NotificationTypes;
 import soialNetworkApp.repository.CaptchaRepository;
 import soialNetworkApp.repository.PersonSettingsRepository;
 import soialNetworkApp.repository.PersonsRepository;
-import soialNetworkApp.security.jwt.JWTUtil;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,8 +38,6 @@ public class AccountService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService eMailService;
     private final PersonsService personsService;
-    private final JWTUtil jwtUtil;
-    private final AuthenticationManager authenticationManager;
     @Value("${auth.pass-restore}")
     String basePassUrl;
     @Value("${auth.email-restore}")
@@ -85,14 +81,9 @@ public class AccountService {
 
     public RegisterRs getPasswordSet(PasswordSetRq passwordSetRq) {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder
-                .getContext().getAuthentication().getName()).get();
+                .getContext().getAuthentication().getName()).orElseThrow();
         RegisterRs response = new RegisterRs();
-        ComplexRs data = ComplexRs.builder()
-                .id(0)
-                .count(0)
-                .message("OK")
-                .message_id(0L)
-                .build();
+        ComplexRs data = getComplexRs();
         response.setEmail(person.getEmail());
         response.setTimestamp(0);
         response.setData(data);
@@ -111,58 +102,47 @@ public class AccountService {
         }
 
         RegisterRs response = new RegisterRs();
-        ComplexRs data = ComplexRs.builder()
-                .id(0)
-                .count(0)
-                .message("OK")
-                .message_id(0L)
-                .build();
-        response.setEmail(rescuePerson.getEmail());
+        ComplexRs data = getComplexRs();
+        response.setEmail(rescuePerson != null ? rescuePerson.getEmail() : null);
         response.setTimestamp(0);
         response.setData(data);
 
-        rescuePerson.setPassword(passwordEncoder.encode(passwordRq.getPassword()));
-        personsRepository.save(rescuePerson);
+        if (rescuePerson != null) {
+            rescuePerson.setPassword(passwordEncoder.encode(passwordRq.getPassword()));
+            personsRepository.save(rescuePerson);
+        }
 
         return response;
     }
 
     public RegisterRs getPasswordRecovery(String email) {
         RegisterRs response = new RegisterRs();
-        ComplexRs data = ComplexRs.builder()
-                .id(0)
-                .count(0)
-                .message("OK")
-                .message_id(0L)
-                .build();
+        ComplexRs data = getComplexRs();
         response.setEmail(email);
         response.setTimestamp(0);
         response.setData(data);
 
-        Person person = personsRepository.findPersonByEmail(email).get();
+        Person person = personsRepository.findPersonByEmail(email).orElseThrow();
         String token = UUID.randomUUID().toString().replaceAll("-", "");
-        Person userToRestore = person;
-        userToRestore.setChangePasswordToken(token);
-        personsRepository.save(userToRestore);
+        person.setChangePasswordToken(token);
+        personsRepository.save(person);
 
-        String to = email;
         String subject = "Восстановление пароля";
         String text = basePassUrl + token;
-        eMailService.sendSimpleMessage(to, subject, text);
+        eMailService.sendSimpleMessage(email, subject, text);
 
         return response;
     }
 
+    private static ComplexRs getComplexRs() {
+        return new ComplexRs(0, 0L, "OK", 0L);
+    }
+
     public RegisterRs getEmailRecovery() {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder
-                .getContext().getAuthentication().getName()).get();
+                .getContext().getAuthentication().getName()).orElseThrow();
         RegisterRs response = new RegisterRs();
-        ComplexRs data = ComplexRs.builder()
-                .id(0)
-                .count(0)
-                .message("OK")
-                .message_id(0L)
-                .build();
+        ComplexRs data = getComplexRs();
         response.setEmail(person.getEmail());
         response.setTimestamp(0);
         response.setData(data);
@@ -191,7 +171,7 @@ public class AccountService {
         return settings;
     }
 
-    public CommonResponse<ComplexRs> setPersonSetting(PersonSettingsRequest request) throws PersonNotFoundException, IncorrectRequestTypeException {
+    public CommonRs<ComplexRs> setPersonSetting(PersonSettingsRq request) throws PersonNotFoundException, IncorrectRequestTypeException {
         Person person = personsService.getPersonByContext();
         if (person == null) {
             throw new PersonNotFoundException("Person not found");
@@ -230,13 +210,13 @@ public class AccountService {
                 throw new IncorrectRequestTypeException("Incorrect notification type");
         }
         personSettingsRepository.save(personSettings);
-        return CommonResponse.<ComplexRs>builder()
+        return CommonRs.<ComplexRs>builder()
                 .timestamp(System.currentTimeMillis())
                 .data(new ComplexRs())
                 .build();
     }
 
-    public CommonResponse<List<PersonSettingsResponse>> getPersonSettings() throws PersonNotFoundException {
+    public CommonRs<List<PersonSettingsRs>> getPersonSettings() throws PersonNotFoundException {
         Person person = personsService.getPersonByContext();
         if (person == null) {
             throw new PersonNotFoundException("Person not found");
@@ -246,21 +226,21 @@ public class AccountService {
             person.setPersonSettings(createDefaultNotificationsSettings(person));
             personSettings = personsRepository.save(person).getPersonSettings();
         }
-        PersonSettingsResponse postValue = PersonSettingsResponse.builder()
+        PersonSettingsRs postValue = PersonSettingsRs.builder()
                 .type(String.valueOf(NotificationTypes.POST)).enable(personSettings.getPostNotification()).build();
-        PersonSettingsResponse postCommentValue = PersonSettingsResponse.builder()
+        PersonSettingsRs postCommentValue = PersonSettingsRs.builder()
                 .type(String.valueOf(NotificationTypes.POST_COMMENT)).enable(personSettings.getPostCommentNotification()).build();
-        PersonSettingsResponse commentCommentValue = PersonSettingsResponse.builder()
+        PersonSettingsRs commentCommentValue = PersonSettingsRs.builder()
                 .type(String.valueOf(NotificationTypes.COMMENT_COMMENT)).enable(personSettings.getCommentCommentNotification()).build();
-        PersonSettingsResponse friendRequestValue = PersonSettingsResponse.builder()
+        PersonSettingsRs friendRequestValue = PersonSettingsRs.builder()
                 .type(String.valueOf(NotificationTypes.FRIEND_REQUEST)).enable(personSettings.getFriendRequestNotification()).build();
-        PersonSettingsResponse messageValue = PersonSettingsResponse.builder()
+        PersonSettingsRs messageValue = PersonSettingsRs.builder()
                 .type(String.valueOf(NotificationTypes.MESSAGE)).enable(personSettings.getMessageNotification()).build();
-        PersonSettingsResponse friendsBirthdayValue = PersonSettingsResponse.builder()
+        PersonSettingsRs friendsBirthdayValue = PersonSettingsRs.builder()
                 .type(String.valueOf(NotificationTypes.FRIEND_BIRTHDAY)).enable(personSettings.getFriendBirthdayNotification()).build();
-        PersonSettingsResponse postLikeValue = PersonSettingsResponse.builder()
+        PersonSettingsRs postLikeValue = PersonSettingsRs.builder()
                 .type(String.valueOf(NotificationTypes.POST_LIKE)).enable(personSettings.getLikeNotification()).build();
-        return CommonResponse.<List<PersonSettingsResponse>>builder()
+        return CommonRs.<List<PersonSettingsRs>>builder()
                 .timestamp(System.currentTimeMillis())
                 .data(List.of(
                         postValue,

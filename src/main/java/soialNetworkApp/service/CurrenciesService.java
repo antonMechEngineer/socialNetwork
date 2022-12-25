@@ -1,7 +1,7 @@
 package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
-import soialNetworkApp.api.response.CurrencyResponse;
+import soialNetworkApp.api.response.CurrencyRs;
 import soialNetworkApp.model.entities.Currency;
 import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.repository.CurrenciesRepository;
@@ -51,6 +51,10 @@ public class CurrenciesService {
         CurrencyResponse response = new CurrencyResponse();
         currenciesRepository.findFirstByNameOrderByUpdateTimeDesc(units.get(0)).ifPresent(currency -> response.setUsd(currency.getPrice()));
         currenciesRepository.findFirstByNameOrderByUpdateTimeDesc(units.get(1)).ifPresent(currency -> response.setEuro(currency.getPrice()));
+    public CurrencyRs getCurrencies(Person person) {
+        CurrencyRs response = new CurrencyRs();
+        currenciesRepository.findTopByName(units.get(0)).ifPresent(currency -> response.setUsd(currency.getPrice()));
+        currenciesRepository.findTopByName(units.get(1)).ifPresent(currency -> response.setEuro(currency.getPrice()));
         return response;
     }
 }
