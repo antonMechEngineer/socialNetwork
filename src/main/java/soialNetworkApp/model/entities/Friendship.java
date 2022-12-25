@@ -8,6 +8,7 @@ import soialNetworkApp.model.enums.FriendshipStatusTypes;
 import soialNetworkApp.model.enums.NotificationTypes;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
