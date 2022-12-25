@@ -64,4 +64,7 @@ public interface PersonsRepository extends JpaRepository<Person, Long>, JpaSpeci
     List<RegionStatisticRs> getCountryWithUsersCount();
 
     List<Person> findPersonByFirstNameContainsIgnoreCaseAndLastNameContainsIgnoreCase(String firstName, String lastName);
+
+    @Query(value = "SELECT DISTINCT city FROM Person WHERE country = :country")
+    List<String> getCitiesByCountry(@Param("country") String country);
 }

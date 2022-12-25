@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @Builder
 @ApiModel(description = "info about number and which persons i liked")
-public class LikeResponse {
+public class LikeRs {
 
     @ApiModelProperty(value = "number of my likes", example = "10")
     private Integer likes;

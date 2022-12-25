@@ -45,7 +45,7 @@ class WeatherServiceTest {
     @BeforeEach
     void setUp() {
         city = new City();
-        city.setTitle("city");
+        city.setName("city");
         city.setGismeteoId(1);
         weather = new Weather();
         weather.setWeatherDescription(weatherDescription);
@@ -62,12 +62,13 @@ class WeatherServiceTest {
 
     @Test
     void getWeatherResponse() {
-        when(citiesRepository.findCityByTitle(anyString())).thenReturn(Optional.of(city));
-        when(weatherRepository.findTopByGismeteoId(anyInt())).thenReturn(Optional.of(weather));
+        when(citiesRepository.findCityByNameAndDistrictAndSubDistrict(anyString(), anyString(), anyString()))
+                .thenReturn(Optional.of(city));
+        when(weatherRepository.findFirstByGismeteoIdOrderByTimeDesc(anyInt())).thenReturn(Optional.of(weather));
 
         WeatherRs weatherRs = weatherService.getWeatherResponse("city");
-        verify(citiesRepository).findCityByTitle(anyString());
-        verify(weatherRepository).findTopByGismeteoId(anyInt());
+        verify(citiesRepository).findCityByNameAndDistrictAndSubDistrict(anyString(), anyString(), anyString());
+        verify(weatherRepository).findFirstByGismeteoIdOrderByTimeDesc(anyInt());
         assertEquals(weatherDescription, weatherRs.getClouds());
         assertEquals(String.valueOf(temperature), weatherRs.getTemp());
         assertEquals(time.toString(), weatherRs.getDate());
