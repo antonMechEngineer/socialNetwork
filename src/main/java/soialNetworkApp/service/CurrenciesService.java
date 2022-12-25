@@ -47,14 +47,10 @@ public class CurrenciesService {
     }
 
     @Named("getCurrencies")
-    public CurrencyResponse getCurrencies(Person person) {
-        CurrencyResponse response = new CurrencyResponse();
-        currenciesRepository.findFirstByNameOrderByUpdateTimeDesc(units.get(0)).ifPresent(currency -> response.setUsd(currency.getPrice()));
-        currenciesRepository.findFirstByNameOrderByUpdateTimeDesc(units.get(1)).ifPresent(currency -> response.setEuro(currency.getPrice()));
     public CurrencyRs getCurrencies(Person person) {
         CurrencyRs response = new CurrencyRs();
-        currenciesRepository.findTopByName(units.get(0)).ifPresent(currency -> response.setUsd(currency.getPrice()));
-        currenciesRepository.findTopByName(units.get(1)).ifPresent(currency -> response.setEuro(currency.getPrice()));
+        currenciesRepository.findFirstByNameOrderByUpdateTimeDesc(units.get(0)).ifPresent(currency -> response.setUsd(currency.getPrice()));
+        currenciesRepository.findFirstByNameOrderByUpdateTimeDesc(units.get(1)).ifPresent(currency -> response.setEuro(currency.getPrice()));
         return response;
     }
 }

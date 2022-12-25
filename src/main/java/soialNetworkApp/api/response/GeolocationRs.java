@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class GeolocationResponse {
+public class GeolocationRs {
 
     private String title;
 }

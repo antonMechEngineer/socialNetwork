@@ -109,12 +109,6 @@ public class UsersService {
         if (userRq.getCity() != null) {
             person.setCity(userRq.getCity());
             personRs.setCity(userRq.getCity());
-            if (!citiesRepository.existsCityByTitle(userRq.getCity())) {
-                City city = new City();
-                city.setTitle(userRq.getCity());
-                citiesRepository.save(city);
-            }
-            personResponse.setCity(userRq.getCity());
             geolocationsService.setCityGismeteoId(userRq.getCity());
 //            if (!citiesRepository.existsCityByName(userRq.getCity())) {
 //                City city = new City();
@@ -125,13 +119,6 @@ public class UsersService {
         if (userRq.getCountry() != null) {
             person.setCountry(userRq.getCountry());
             personRs.setCountry(userRq.getCountry());
-            if (!countriesRepository.existsCountryByTitle(userRq.getCountry())) {
-                Country country = new Country();
-                country.setTitle(userRq.getCountry());
-                countriesRepository.save(country);
-                weatherService.setGismeteoCityId(userRq.getCity());
-            }
-            personResponse.setCountry(userRq.getCountry());
 //            if (!countriesRepository.existsCountryByName(userRq.getCountry())) {
 //                Country country = new Country();
 //                country.setName(userRq.getCountry());

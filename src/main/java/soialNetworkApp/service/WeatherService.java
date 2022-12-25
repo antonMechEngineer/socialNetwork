@@ -94,27 +94,18 @@ public class WeatherService {
     }
 
     @Named("getWeatherResponse")
-    public WeatherRs getWeatherResponse(String cityTitle) {
-        WeatherRs weatherRs = new WeatherRs();
-        if (cityTitle != null) {
-            City city = citiesRepository.findCityByTitle(cityTitle).orElse(new City());
-    public WeatherResponse getWeatherResponse(String cityName) {
-        WeatherResponse weatherResponse = new WeatherResponse();
+    public WeatherRs getWeatherResponse(String cityName) {
+                WeatherRs weatherRs = new WeatherRs();
         if (cityName != null) {
             List<String> cityFields = GeolocationsService.getCityFields(cityName);
             City city = citiesRepository.findCityByNameAndDistrictAndSubDistrict(
                     cityFields.get(0), cityFields.get(1), cityFields.get(2)).orElse(new City());
             if (city.getGismeteoId() != null) {
-                weatherRepository.findTopByGismeteoId(city.getGismeteoId()).ifPresent(weather -> {
-                    weatherRs.setCity(cityTitle);
+                weatherRepository.findFirstByGismeteoIdOrderByTimeDesc(city.getGismeteoId()).ifPresent(weather -> {
+                    weatherRs.setCity(cityName);
                     weatherRs.setTemp(String.valueOf(weather.getTemperature()));
                     weatherRs.setClouds(weather.getWeatherDescription());
                     weatherRs.setDate(String.valueOf(weather.getTime()));
-                weatherRepository.findFirstByGismeteoIdOrderByTimeDesc(city.getGismeteoId()).ifPresent(weather -> {
-                    weatherResponse.setCity(cityName);
-                    weatherResponse.setTemp(String.valueOf(weather.getTemperature()));
-                    weatherResponse.setClouds(weather.getWeatherDescription());
-                    weatherResponse.setDate(String.valueOf(weather.getTime()));
                 });
             }
         }

@@ -24,11 +24,6 @@ public class ExceptionHandlerController {
     })
     public ResponseEntity<ErrorRs> handleBadRequest(Exception e) {
         return buildResponseEntity(400, e);
-        return ResponseEntity.status(400).body(ErrorRs.builder()
-                .error(NoSuchEntityException.class.getName())
-                .timestamp(System.currentTimeMillis())
-                .errorDescription(e.getMessage())
-                .build());
     }
 
     //401

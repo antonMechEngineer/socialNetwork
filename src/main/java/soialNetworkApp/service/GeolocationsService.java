@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.cloudinary.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import soialNetworkApp.api.response.GeolocationResponse;
-import soialNetworkApp.api.response.CommonResponse;
+import soialNetworkApp.api.response.GeolocationRs;
+import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.errors.NoSuchEntityException;
 import soialNetworkApp.model.entities.City;
 import soialNetworkApp.model.entities.Country;
@@ -52,7 +52,7 @@ public class GeolocationsService {
         }
     }
 
-    public CommonResponse<List<GeolocationResponse>> getAllCountries() {
+    public CommonRs<List<GeolocationRs>> getAllCountries() {
         List<Country> countries = countriesRepository.findAll();
         if (countries.isEmpty()) {
             countries.addAll(getCountriesFromApi());
@@ -82,7 +82,7 @@ public class GeolocationsService {
         return response;
     }
 
-    public CommonResponse<List<GeolocationResponse>> getCitiesByCountryFromUsers(String countryName) throws Exception {
+    public CommonRs<List<GeolocationRs>> getCitiesByCountryFromUsers(String countryName) throws Exception {
         List<String> citiesNames = personsRepository.getCitiesByCountry(countryName);
         Country country = countriesRepository.findCountryByName(countryName)
                 .orElseThrow(new NoSuchEntityException("Country with " + countryName + " name was not found"));
@@ -95,7 +95,7 @@ public class GeolocationsService {
         return getResponse(cities.stream().map(this::getCityFullName).collect(Collectors.toList()), firstCitiesInResponse);
     }
 
-    public CommonResponse<List<GeolocationResponse>> getAllCitiesByCountryStartsWithFromDb(String countryName, String startsWith) throws Exception {
+    public CommonRs<List<GeolocationRs>> getAllCitiesByCountryStartsWithFromDb(String countryName, String startsWith) throws Exception {
         startsWith = startsWith.isEmpty() ?
                 startsWith : startsWith.substring(0, 1).toUpperCase() + startsWith.substring(1);
         Country country = countriesRepository.findCountryByName(countryName)
@@ -104,10 +104,10 @@ public class GeolocationsService {
         return getResponse(cities.stream().map(this::getCityFullName).collect(Collectors.toList()), firstCitiesInResponse);
     }
 
-    public CommonResponse<List<GeolocationResponse>> getAllCitiesByCountryStartsWithFromApi(String countryName, String startsWith) throws Exception {
+    public CommonRs<List<GeolocationRs>> getAllCitiesByCountryStartsWithFromApi(String countryName, String startsWith) throws Exception {
         Country country = countriesRepository.findCountryByName(countryName)
                 .orElseThrow(new NoSuchEntityException("Country with " + countryName + " name was not found"));
-        List<GeolocationResponse> response = new ArrayList<>();
+        List<GeolocationRs> response = new ArrayList<>();
         try {
             String jsonData = new String(new URL(citiesPath1 + startsWith + citiesPath2 + token).openStream().readAllBytes());
             Set<String> jsonSet = new JSONObject(jsonData).keySet();
@@ -119,28 +119,30 @@ public class GeolocationsService {
                 JSONObject cityData = new JSONObject(jsonData).getJSONObject(key);
                 if (cityData.getString("country").equals(country.getCodeTwoSymbols())) {
                     List<String> cityFields = getCityFields(cityData.getString("full_name"));
-                    City city = citiesRepository.findCityByNameAndDistrictAndSubDistrict(cityFields.get(0), cityFields.get(1), cityFields.get(2)).orElse(
-                            citiesRepository.save(City.builder()
-                                    .country(countriesRepository.findCountryByCodeTwoSymbols(cityData.getString("country")).get())
-                                    .name(cityData.getString("name"))
-                                    .district(cityFields.get(1))
-                                    .subDistrict(cityFields.get(2))
-                                    .build()));
-                    response.add(GeolocationResponse.builder()
+                    City city = citiesRepository.findCityByNameAndDistrictAndSubDistrict(cityFields.get(0), cityFields.get(1), cityFields.get(2)).orElse(null);
+                    if (city == null) {
+                        city = citiesRepository.save(City.builder()
+                                .country(country)
+                                .name(cityFields.get(0))
+                                .district(cityFields.get(1))
+                                .subDistrict(cityFields.get(2))
+                                .build());
+                    }
+                    response.add(GeolocationRs.builder()
                             .title(getCityFullName(city))
                             .build());
                 }
             });
         } catch (IOException ignored) {}
-        return CommonResponse.<List<GeolocationResponse>>builder().total((long) response.size()).data(response).build();
+        return CommonRs.<List<GeolocationRs>>builder().total((long) response.size()).data(response).build();
     }
 
-    private List<GeolocationResponse> setFirstsInResponse(List<GeolocationResponse> geolocationResponses, List<String> firstsInResponse) {
-        List<GeolocationResponse> response = new ArrayList<>(geolocationResponses);
+    private List<GeolocationRs> setFirstsInResponse(List<GeolocationRs> geolocationResponses, List<String> firstsInResponse) {
+        List<GeolocationRs> response = new ArrayList<>(geolocationResponses);
         for (int i = firstsInResponse.size(); i > 0; i--) {
-            int locationPosition = response.indexOf(GeolocationResponse.builder().title(firstsInResponse.get(i - 1)).build());
+            int locationPosition = response.indexOf(GeolocationRs.builder().title(firstsInResponse.get(i - 1)).build());
             if (locationPosition > -1) {
-                GeolocationResponse geolocationResponse = response.get(locationPosition);
+                GeolocationRs geolocationResponse = response.get(locationPosition);
                 response.remove(geolocationResponse);
                 response.add(0, geolocationResponse);
             }
@@ -171,11 +173,11 @@ public class GeolocationsService {
                 (city.getSubDistrict().isEmpty() ? "" : ", " + city.getSubDistrict()) + ")";
     }
 
-    private CommonResponse<List<GeolocationResponse>> getResponse(List<String> titles, List<String> firstsInResponse) {
-        List<GeolocationResponse> response = new ArrayList<>();
-        titles.forEach(title -> response.add(GeolocationResponse.builder().title(title).build()));
-        response.sort(Comparator.comparing(GeolocationResponse::getTitle));
-        return CommonResponse.<List<GeolocationResponse>>builder()
+    private CommonRs<List<GeolocationRs>> getResponse(List<String> titles, List<String> firstsInResponse) {
+        List<GeolocationRs> response = new ArrayList<>();
+        titles.forEach(title -> response.add(GeolocationRs.builder().title(title).build()));
+        response.sort(Comparator.comparing(GeolocationRs::getTitle));
+        return CommonRs.<List<GeolocationRs>>builder()
                 .total((long) response.size())
                 .data(setFirstsInResponse(response, firstsInResponse))
                 .build();

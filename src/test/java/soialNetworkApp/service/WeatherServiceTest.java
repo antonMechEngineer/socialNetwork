@@ -67,16 +67,10 @@ class WeatherServiceTest {
         when(weatherRepository.findFirstByGismeteoIdOrderByTimeDesc(anyInt())).thenReturn(Optional.of(weather));
 
         WeatherRs weatherRs = weatherService.getWeatherResponse("city");
-        verify(citiesRepository).findCityByTitle(anyString());
-        verify(weatherRepository).findTopByGismeteoId(anyInt());
+        verify(citiesRepository).findCityByNameAndDistrictAndSubDistrict(anyString(), anyString(), anyString());
+        verify(weatherRepository).findFirstByGismeteoIdOrderByTimeDesc(anyInt());
         assertEquals(weatherDescription, weatherRs.getClouds());
         assertEquals(String.valueOf(temperature), weatherRs.getTemp());
         assertEquals(time.toString(), weatherRs.getDate());
-        WeatherResponse weatherResponse = weatherService.getWeatherResponse("city");
-        verify(citiesRepository).findCityByNameAndDistrictAndSubDistrict(anyString(), anyString(), anyString());
-        verify(weatherRepository).findFirstByGismeteoIdOrderByTimeDesc(anyInt());
-        assertEquals(weatherDescription, weatherResponse.getClouds());
-        assertEquals(String.valueOf(temperature), weatherResponse.getTemp());
-        assertEquals(time.toString(), weatherResponse.getDate());
     }
 }

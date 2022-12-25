@@ -12,7 +12,7 @@ import soialNetworkApp.aop.annotations.UpdateOnlineTime;
 import soialNetworkApp.api.request.LikeRq;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.ErrorRs;
-import soialNetworkApp.api.response.LikeResponse;
+import soialNetworkApp.api.response.LikeRs;
 import soialNetworkApp.service.LikesService;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +34,7 @@ public class LikesController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonRs<LikeResponse> getLikesList(
+    public CommonRs<LikeRs> getLikesList(
             @RequestParam(name = "item_id") long itemId,
             @RequestParam String type) {
 
@@ -51,7 +51,7 @@ public class LikesController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonRs<LikeResponse> putLike(
+    public CommonRs<LikeRs> putLike(
             @RequestBody LikeRq likeRq) {
 
         return likesService.putLike(likeRq);
@@ -67,7 +67,7 @@ public class LikesController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonRs<LikeResponse> deleteLike(
+    public CommonRs<LikeRs> deleteLike(
             @RequestParam(name = "item_id") long itemId,
             @RequestParam String type) {
 

@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import soialNetworkApp.api.response.CommonResponse;
-import soialNetworkApp.api.response.GeolocationResponse;
+import soialNetworkApp.api.response.CommonRs;
+import soialNetworkApp.api.response.GeolocationRs;
 import soialNetworkApp.service.GeolocationsService;
 
 import java.util.List;
@@ -21,25 +21,25 @@ public class GeolocationsController {
     private final GeolocationsService geolocationsService;
 
     @GetMapping("/countries")
-    public CommonResponse<List<GeolocationResponse>> getCountries() {
+    public CommonRs<List<GeolocationRs>> getCountries() {
 
         return geolocationsService.getAllCountries();
     }
 
     @GetMapping("/cities/uses")
-    public CommonResponse<List<GeolocationResponse>> getCitiesFromPersons(@RequestParam String country) throws Exception {
+    public CommonRs<List<GeolocationRs>> getCitiesFromPersons(@RequestParam String country) throws Exception {
 
         return geolocationsService.getCitiesByCountryFromUsers(country);
     }
 
     @GetMapping("/cities/db")
-    public CommonResponse<List<GeolocationResponse>> getCitiesFromDbStartsWith(@RequestParam String starts, @RequestParam String country) throws Exception {
+    public CommonRs<List<GeolocationRs>> getCitiesFromDbStartsWith(@RequestParam String starts, @RequestParam String country) throws Exception {
 
         return geolocationsService.getAllCitiesByCountryStartsWithFromDb(country, starts);
     }
 
     @GetMapping("/cities/api")
-    public CommonResponse<List<GeolocationResponse>> getCitiesFromApiStartsWith(@RequestParam String starts, @RequestParam String country) throws Exception {
+    public CommonRs<List<GeolocationRs>> getCitiesFromApiStartsWith(@RequestParam String starts, @RequestParam String country) throws Exception {
 
         return geolocationsService.getAllCitiesByCountryStartsWithFromApi(country, starts);
     }

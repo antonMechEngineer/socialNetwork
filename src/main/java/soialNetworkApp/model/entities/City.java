@@ -10,7 +10,8 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "cities")
+@Table(name = "cities",
+        indexes = @Index(name = "full_city_name_index", columnList = "name, district, sub_district", unique = true))
 public class City {
 
     @Id
