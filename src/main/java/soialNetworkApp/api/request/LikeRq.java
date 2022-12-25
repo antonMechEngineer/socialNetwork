@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @ApiModel(description = "data for put or delete like")
-public class LikeRequest {
+public class LikeRq {
 
     @ApiModelProperty(value = "type of item: Post, Comment", example = "Post")
     private String type;

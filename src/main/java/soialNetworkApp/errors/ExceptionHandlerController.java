@@ -19,14 +19,11 @@ public class ExceptionHandlerController {
             PasswordException.class,
             CaptchaException.class,
             FileException.class,
-            WrongEmailException.class
+            WrongEmailException.class,
+            PersonException.class
     })
     public ResponseEntity<ErrorRs> handleBadRequest(Exception e) {
-        return ResponseEntity.status(400).body(ErrorRs.builder()
-                .error(NoPostEntityException.class.getName())
-                .timestamp(System.currentTimeMillis())
-                .errorDescription(e.getMessage())
-                .build());
+        return buildResponseEntity(400, e);
     }
 
     //401
@@ -35,18 +32,24 @@ public class ExceptionHandlerController {
             BadAuthorizationException.class
     })
     public ResponseEntity<ErrorRs> handleUnauthorized(Exception e) {
-        return ResponseEntity.status(401).body(ErrorRs.builder()
-                .error(e.getLocalizedMessage())
-                .timestamp(System.currentTimeMillis())
-                .errorDescription(e.getLocalizedMessage())
-                .build());
+        return buildResponseEntity(401, e);
     }
 
     //204
     @ExceptionHandler(IncorrectRequestTypeException.class)
     public ResponseEntity<ErrorRs> handleIncorrectRequestTypeException(Exception e) {
-        return ResponseEntity.status(204).body(ErrorRs.builder()
-                .error(IncorrectRequestTypeException.class.getSimpleName())
+        return buildResponseEntity(204, e);
+    }
+
+    //403
+    @ExceptionHandler(UserPageBlockedException.class)
+    public ResponseEntity<ErrorRs> handleForbidden(Exception e) {
+        return buildResponseEntity(403, e);
+    }
+
+    private ResponseEntity<ErrorRs> buildResponseEntity(int status, Exception e) {
+        return ResponseEntity.status(status).body(ErrorRs.builder()
+                .error(e.getClass().getSimpleName())
                 .timestamp(System.currentTimeMillis())
                 .errorDescription(e.getMessage())
                 .build());

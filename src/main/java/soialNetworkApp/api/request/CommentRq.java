@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @ApiModel(description = "data for edit or create comment")
-public class CommentRequest {
+public class CommentRq {
 
     @ApiModelProperty(value = "parent comment id", example = "1")
     @JsonProperty("parent_id")

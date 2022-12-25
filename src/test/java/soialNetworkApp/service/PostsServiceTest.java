@@ -11,8 +11,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
-import soialNetworkApp.api.request.PostRequest;
-import soialNetworkApp.api.response.PersonResponse;
+import soialNetworkApp.api.request.PostRq;
+import soialNetworkApp.api.response.PersonRs;
 import soialNetworkApp.errors.PersonNotFoundException;
 import soialNetworkApp.mappers.PersonMapper;
 import soialNetworkApp.model.entities.*;
@@ -61,10 +61,9 @@ class PostsServiceTest {
     @MockBean
     private Authentication authentication;
 
-    private PostRequest postRequest;
+    private PostRq postRq;
     private Person person;
     private Post post;
-    private FriendshipStatus friendshipStatus;
     private Friendship friendship;
     private PersonSettings personSettings;
     private final String postTitle = "postTitle";
@@ -76,17 +75,14 @@ class PostsServiceTest {
     void setUp() {
         when(authentication.getName()).thenReturn(null);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        friendshipStatus = new FriendshipStatus();
-        friendshipStatus.setTime(LocalDateTime.now());
-        friendshipStatus.setCode(FriendshipStatusTypes.FRIEND);
         friendship = new Friendship();
-        friendship.setFriendshipStatus(friendshipStatus);
+        friendship.setFriendshipStatus(FriendshipStatusTypes.FRIEND);
         friendship.setSentTime(LocalDateTime.now());
         friendship.setSrcPerson(new Person());
         friendship.setDstPerson(person);
-        postRequest = new PostRequest();
-        postRequest.setTitle(postTitle);
-        postRequest.setPostText(postText);
+        postRq = new PostRq();
+        postRq.setTitle(postTitle);
+        postRq.setPostText(postText);
         person = new Person();
         person.setId(1L);
         post = new Post();
@@ -104,10 +100,9 @@ class PostsServiceTest {
     @AfterEach
     void tearDown() {
         SecurityContextHolder.clearContext();
-        postRequest = null;
+        postRq = null;
         person = null;
         post = null;
-        friendshipStatus = null;
         friendship = null;
         personSettings = null;
     }
@@ -121,11 +116,11 @@ class PostsServiceTest {
         when(likesService.getLikesCount(any())).thenReturn(0);
         when(likesService.getMyLike(any())).thenReturn(false);
         when(commentsService.embeddedCommentsToResponse(any())).thenReturn(new ArrayList<>());
-        when(personMapper.toPersonResponse(any())).thenReturn(PersonResponse.builder().id(1L).build());
+        when(personMapper.toPersonResponse(any())).thenReturn(PersonRs.builder().id(1L).build());
         when(postsRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(friendshipsRepository.findFriendshipsByDstPerson(any())).thenReturn(List.of(friendship));
 
-        assertEquals(postText, postsService.createPost(postRequest, 1L, null).getData().getPostText());
+        assertEquals(postText, postsService.createPost(postRq, 1L, null).getData().getPostText());
         verify(notificationsService).createNotification(any(), any());
     }
 
@@ -137,7 +132,7 @@ class PostsServiceTest {
         when(likesService.getLikesCount(any())).thenReturn(0);
         when(likesService.getMyLike(any())).thenReturn(false);
         when(commentsService.embeddedCommentsToResponse(any())).thenReturn(new ArrayList<>());
-        when(personMapper.toPersonResponse(any())).thenReturn(PersonResponse.builder().id(1L).build());
+        when(personMapper.toPersonResponse(any())).thenReturn(PersonRs.builder().id(1L).build());
 
         assertEquals(postText, postsService.getFeeds(offset, size).getData().get(0).getPostText());
     }
@@ -150,7 +145,7 @@ class PostsServiceTest {
         when(likesService.getLikesCount(any())).thenReturn(0);
         when(likesService.getMyLike(any())).thenReturn(false);
         when(commentsService.embeddedCommentsToResponse(any())).thenReturn(new ArrayList<>());
-        when(personMapper.toPersonResponse(any())).thenReturn(PersonResponse.builder().id(1L).build());
+        when(personMapper.toPersonResponse(any())).thenReturn(PersonRs.builder().id(1L).build());
 
         assertEquals(postText, postsService.getAllPostsByAuthor(offset, size, person).getData().get(0).getPostText());
     }
@@ -163,7 +158,7 @@ class PostsServiceTest {
         when(likesService.getLikesCount(any())).thenReturn(0);
         when(likesService.getMyLike(any())).thenReturn(false);
         when(commentsService.embeddedCommentsToResponse(any())).thenReturn(new ArrayList<>());
-        when(personMapper.toPersonResponse(any())).thenReturn(PersonResponse.builder().id(1L).build());
+        when(personMapper.toPersonResponse(any())).thenReturn(PersonRs.builder().id(1L).build());
 
         assertEquals(postText, postsService.getPostById(anyLong()).getData().getPostText());
     }
@@ -178,10 +173,10 @@ class PostsServiceTest {
         when(likesService.getLikesCount(any())).thenReturn(0);
         when(likesService.getMyLike(any())).thenReturn(false);
         when(commentsService.embeddedCommentsToResponse(any())).thenReturn(new ArrayList<>());
-        when(personMapper.toPersonResponse(any())).thenReturn(PersonResponse.builder().id(1L).build());
+        when(personMapper.toPersonResponse(any())).thenReturn(PersonRs.builder().id(1L).build());
         when(postsRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        assertEquals(postText, postsService.updatePost(anyLong(), postRequest).getData().getPostText());
+        assertEquals(postText, postsService.updatePost(anyLong(), postRq).getData().getPostText());
     }
 
     @Test
@@ -194,7 +189,7 @@ class PostsServiceTest {
         when(likesService.getLikesCount(any())).thenReturn(0);
         when(likesService.getMyLike(any())).thenReturn(false);
         when(commentsService.embeddedCommentsToResponse(any())).thenReturn(new ArrayList<>());
-        when(personMapper.toPersonResponse(any())).thenReturn(PersonResponse.builder().id(1L).build());
+        when(personMapper.toPersonResponse(any())).thenReturn(PersonRs.builder().id(1L).build());
         when(postsRepository.save(any())).then(invocation -> {
             Post savedPost = invocation.getArgument(0);
             postToDelete.set(savedPost);

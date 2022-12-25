@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @Builder
 @ApiModel(description = "default user representation")
-public class CommentResponse {
+public class CommentRs {
 
     @ApiModelProperty(value = "comment id", example = "1")
     private Long id;
@@ -29,7 +29,7 @@ public class CommentResponse {
     private Long parentId;
 
     @ApiModelProperty(value = "author of comment", example = "Максим Иванов")
-    private PersonResponse author;
+    private PersonRs author;
 
     @ApiModelProperty(value = "text od comment", example = "Some text")
     @JsonProperty("comment_text")
@@ -45,7 +45,7 @@ public class CommentResponse {
 
     @ApiModelProperty(value = "list of embedded comments")
     @JsonProperty("sub_comments")
-    private List<CommentResponse> embeddedComments;
+    private List<CommentRs> embeddedComments;
 
     @ApiModelProperty(value = "number of likes", example = "35")
     private Integer likes;
@@ -56,7 +56,7 @@ public class CommentResponse {
 
     @Override
     public String toString() {
-        return "CommentResponse{" +
+        return "CommentRs{" +
                 "commentId=" + id +
                 ", postId=" + postId +
                 ", parentCommentId=" + parentId +

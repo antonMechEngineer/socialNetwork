@@ -1,14 +1,12 @@
 package soialNetworkApp.service;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
-import soialNetworkApp.api.response.CommonResponse;
-import soialNetworkApp.api.response.PersonResponse;
+import soialNetworkApp.api.response.CommonRs;
+import soialNetworkApp.api.response.PersonRs;
 import soialNetworkApp.mappers.FriendMapper;
 import soialNetworkApp.model.entities.Friendship;
-import soialNetworkApp.model.entities.FriendshipStatus;
 import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.model.entities.PersonSettings;
 import soialNetworkApp.model.enums.FriendshipStatusTypes;
-import soialNetworkApp.repository.FriendshipStatusesRepository;
 import soialNetworkApp.repository.FriendshipsRepository;
 import soialNetworkApp.repository.PersonsRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,8 +48,9 @@ class FriendsServiceTest {
     @MockBean
     private PersonsRepository personsRepository;
 
-    @MockBean
-    private FriendshipStatusesRepository friendshipStatusesRepository;
+    //TODO: данного репозитория больше не существует
+//    @MockBean
+//    private FriendshipStatusesRepository friendshipStatusesRepository;
 
     @MockBean
     private FriendMapper friendMapper;
@@ -75,8 +74,8 @@ class FriendsServiceTest {
     private final static Person REQUESTED_FRIEND = new Person(4L, REQUESTED_FRIEND_MAIL);
     private final static Person UNKNOWN_PERSON = new Person(5L, UNKNOWN_PERSON_MAIL);
 
-    private final static PersonResponse C_FRIEND_DTO = PersonResponse.builder().id(2L).email(C_FRIEND_MAIL).build();
-    private final static PersonResponse RECEIVED_FRIEND_DTO = PersonResponse.builder().id(3L).email(RECEIVED_FRIEND_MAIL).build();
+    private final static PersonRs C_FRIEND_DTO = PersonRs.builder().id(2L).email(C_FRIEND_MAIL).build();
+    private final static PersonRs RECEIVED_FRIEND_DTO = PersonRs.builder().id(3L).email(RECEIVED_FRIEND_MAIL).build();
 
     private static final LocalDateTime TIME = LocalDateTime.now();
     private static final Integer OFFSET = 0;
@@ -111,24 +110,18 @@ class FriendsServiceTest {
     }
 
     private void buildFriendObjects() {  //testDeleteFriend  // getFriends
-        FriendshipStatus fsStatusCurPsFr = new FriendshipStatus(1L, TIME, C_FRIEND.toString(), FRIEND);
-        FriendshipStatus fsStatusFr = new FriendshipStatus(2L, TIME, C_FRIEND.toString(), FRIEND);
-        fsCurPsFr = new Friendship(1L, TIME, CURRENT_PERSON, C_FRIEND, fsStatusCurPsFr);
-        fsFr = new Friendship(2L, TIME, C_FRIEND, CURRENT_PERSON, fsStatusFr);
+        fsCurPsFr = new Friendship(1L, TIME, CURRENT_PERSON, C_FRIEND, FRIEND);
+        fsFr = new Friendship(2L, TIME, C_FRIEND, CURRENT_PERSON, FRIEND);
     }
 
     private void buildReceivedRequestObjects() { //testAddFriend   //getRequests
-        FriendshipStatus fsStatusCurPsRcFr = new FriendshipStatus(3L, TIME, RECEIVED_REQUEST.toString(), RECEIVED_REQUEST);
-        FriendshipStatus fsStatusRcFr = new FriendshipStatus(4L, TIME, REQUEST.toString(), REQUEST);
-        fsCurPsRcFr = new Friendship(3L, TIME, CURRENT_PERSON, RECEIVED_FRIEND, fsStatusCurPsRcFr);
-        fsRcFr = new Friendship(4L, TIME, RECEIVED_FRIEND, CURRENT_PERSON, fsStatusRcFr);
+        fsCurPsRcFr = new Friendship(3L, TIME, CURRENT_PERSON, RECEIVED_FRIEND, RECEIVED_REQUEST);
+        fsRcFr = new Friendship(4L, TIME, RECEIVED_FRIEND, CURRENT_PERSON, REQUEST);
     }
 
     private void buildRequestReceivedObjects() { //testDeleteSentRequest
-        FriendshipStatus fsStatusCurPsRqFr = new FriendshipStatus(5L, TIME, REQUEST.toString(), REQUEST);
-        FriendshipStatus fsStatusRqFr = new FriendshipStatus(6L, TIME, RECEIVED_REQUEST.toString(), RECEIVED_REQUEST);
-        fsCurPsRqFr = new Friendship(5L, TIME, CURRENT_PERSON, REQUESTED_FRIEND, fsStatusCurPsRqFr);
-        fsRqFr = new Friendship(6L, TIME, REQUESTED_FRIEND, CURRENT_PERSON, fsStatusRqFr);
+        fsCurPsRqFr = new Friendship(5L, TIME, CURRENT_PERSON, REQUESTED_FRIEND, REQUEST);
+        fsRqFr = new Friendship(6L, TIME, REQUESTED_FRIEND, CURRENT_PERSON, RECEIVED_REQUEST);
     }
 
     private void mockPersonsRepository() {
@@ -157,16 +150,18 @@ class FriendsServiceTest {
     @Test
     void addFriend() throws Exception {
         friendsService.addFriend(RECEIVED_FRIEND.getId());
-        assertEquals(FRIEND, fsCurPsFr.getFriendshipStatus().getCode());
-        assertEquals(FRIEND, fsCurPsRcFr.getFriendshipStatus().getCode());
-        verify(friendshipStatusesRepository, times(2)).save(any());
+        assertEquals(FRIEND, fsCurPsFr.getFriendshipStatus());
+        assertEquals(FRIEND, fsCurPsRcFr.getFriendshipStatus());
+        //TODO: скорее всего удалить строчку внизу
+        //verify(friendshipStatusesRepository, times(2)).save(any());
     }
 
     @Test
     void sendFriendshipRequest() throws Exception {
         friendsService.sendFriendshipRequest(REQUESTED_FRIEND.getId());
         verify(friendshipsRepository, times(2)).save(any());
-        verify(friendshipStatusesRepository, times(2)).save(any());
+        //TODO: скорее всего удалить строчку внизу
+        //verify(friendshipStatusesRepository, times(2)).save(any());
         verify(notificationsService, times(1)).createNotification(any(), any());
     }
 
@@ -186,8 +181,8 @@ class FriendsServiceTest {
 
     @Test
     void getFriends() throws Exception {
-        CommonResponse<List<PersonResponse>> resFriends = friendsService.getFriends(OFFSET, SIZE);
-        PersonResponse resDto = resFriends.getData().get(0);
+        CommonRs<List<PersonRs>> resFriends = friendsService.getFriends(OFFSET, SIZE);
+        PersonRs resDto = resFriends.getData().get(0);
         assertEquals(FRIENDS.size(), resFriends.getData().size());
         assertEquals(C_FRIEND.getId(), resDto.getId());
         assertEquals(C_FRIEND.getEmail(), resDto.getEmail());
@@ -195,8 +190,8 @@ class FriendsServiceTest {
 
     @Test
     void getRequestedPersons() throws Exception {
-        CommonResponse<List<PersonResponse>> resReceivedFriends = friendsService.getRequestedPersons(OFFSET, SIZE);
-        PersonResponse resDto = resReceivedFriends.getData().get(0);
+        CommonRs<List<PersonRs>> resReceivedFriends = friendsService.getRequestedPersons(OFFSET, SIZE);
+        PersonRs resDto = resReceivedFriends.getData().get(0);
         assertEquals(RECEIVED_FRIENDS.size(), resReceivedFriends.getData().size());
         assertEquals(RECEIVED_FRIEND.getId(), resDto.getId());
         assertEquals(RECEIVED_FRIEND.getEmail(), resDto.getEmail());

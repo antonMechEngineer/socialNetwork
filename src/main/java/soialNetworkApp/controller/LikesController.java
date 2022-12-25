@@ -9,8 +9,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import soialNetworkApp.aop.annotations.UpdateOnlineTime;
-import soialNetworkApp.api.request.LikeRequest;
-import soialNetworkApp.api.response.CommonResponse;
+import soialNetworkApp.api.request.LikeRq;
+import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.ErrorRs;
 import soialNetworkApp.api.response.LikeResponse;
 import soialNetworkApp.service.LikesService;
@@ -34,7 +34,7 @@ public class LikesController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<LikeResponse> getLikesList(
+    public CommonRs<LikeResponse> getLikesList(
             @RequestParam(name = "item_id") long itemId,
             @RequestParam String type) {
 
@@ -51,10 +51,10 @@ public class LikesController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<LikeResponse> putLike(
-            @RequestBody LikeRequest likeRequest) {
+    public CommonRs<LikeResponse> putLike(
+            @RequestBody LikeRq likeRq) {
 
-        return likesService.putLike(likeRequest);
+        return likesService.putLike(likeRq);
     }
 
     @UpdateOnlineTime
@@ -67,7 +67,7 @@ public class LikesController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<LikeResponse> deleteLike(
+    public CommonRs<LikeResponse> deleteLike(
             @RequestParam(name = "item_id") long itemId,
             @RequestParam String type) {
 

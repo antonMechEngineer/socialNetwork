@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 @Builder
 @ApiModel(description = "info about post")
-public class PostResponse {
+public class PostRs {
 
     @ApiModelProperty(value = "post id", example = "1")
     private Long id;
@@ -22,7 +22,7 @@ public class PostResponse {
     private LocalDateTime time;
 
     @ApiModelProperty(value = "info about author of post")
-    private PersonResponse author;
+    private PersonRs author;
 
     @ApiModelProperty(value = "post title", example = "TITLE")
     private String title;
@@ -34,7 +34,7 @@ public class PostResponse {
     private List<String> tags;
 
     @ApiModelProperty(value = "comments under post")
-    private List<CommentResponse> comments;
+    private List<CommentRs> comments;
 
     @ApiModelProperty(value = "post type", example = "POSTED")
     private PostTypes type;
@@ -53,7 +53,7 @@ public class PostResponse {
 
     @Override
     public String toString() {
-        return "PostResponse{" +
+        return "PostRs{" +
                 "postId=" + id +
                 ", authorId=" + author.getId() +
                 ", title='" + (title.length() < 10 ? title : (title.substring(0, 8) + "..")) +

@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @Data
@@ -40,5 +39,5 @@ public class MessageRs {
     private String readStatus;
 
     @ApiModelProperty(value = "info about message recipient")
-    private PersonResponse recipient;
+    private PersonRs recipient;
 }

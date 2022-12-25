@@ -9,9 +9,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import soialNetworkApp.aop.annotations.UpdateOnlineTime;
-import soialNetworkApp.api.request.CommentRequest;
-import soialNetworkApp.api.response.CommentResponse;
-import soialNetworkApp.api.response.CommonResponse;
+import soialNetworkApp.api.request.CommentRq;
+import soialNetworkApp.api.response.CommentRs;
+import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.ErrorRs;
 import soialNetworkApp.service.CommentsService;
 import soialNetworkApp.service.PostsService;
@@ -38,11 +38,11 @@ public class CommentsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<CommentResponse> createComment(
+    public CommonRs<CommentRs> createComment(
             @PathVariable(name = "id") long postId,
-            @RequestBody CommentRequest commentRequest) {
+            @RequestBody CommentRq commentRq) {
 
-        return commentsService.createComment(postsService.findPostById(postId), commentRequest);
+        return commentsService.createComment(postsService.findPostById(postId), commentRq);
     }
 
     @UpdateOnlineTime
@@ -55,7 +55,7 @@ public class CommentsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<List<CommentResponse>> getComments(
+    public CommonRs<List<CommentRs>> getComments(
             @PathVariable(name = "id") long postId,
             @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
             @RequestParam(name = "perPage", required = false, defaultValue = "${socialNetwork.default.size}") int size) {
@@ -73,7 +73,7 @@ public class CommentsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<CommentResponse> deleteComment(
+    public CommonRs<CommentRs> deleteComment(
             @PathVariable(name = "id") long postId,
             @PathVariable(name = "comment_id") long commentId) {
 
@@ -90,7 +90,7 @@ public class CommentsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<CommentResponse> recoverComment(
+    public CommonRs<CommentRs> recoverComment(
             @PathVariable(name = "id") long postId,
             @PathVariable(name = "comment_id") long commentId) {
 
@@ -107,11 +107,11 @@ public class CommentsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<CommentResponse> editComment(
+    public CommonRs<CommentRs> editComment(
             @PathVariable(name = "id") long postId,
             @PathVariable(name = "comment_id") long commentId,
-            @RequestBody CommentRequest commentRequest) {
+            @RequestBody CommentRq commentRq) {
 
-        return commentsService.editComment(commentId, commentRequest);
+        return commentsService.editComment(commentId, commentRq);
     }
 }

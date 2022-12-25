@@ -9,10 +9,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import soialNetworkApp.aop.annotations.UpdateOnlineTime;
-import soialNetworkApp.api.response.CommonResponse;
+import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.ErrorRs;
 import soialNetworkApp.api.response.FriendshipRs;
-import soialNetworkApp.api.response.PersonResponse;
+import soialNetworkApp.api.response.PersonRs;
+import soialNetworkApp.errors.PersonException;
 import soialNetworkApp.service.FriendsRecommendationService;
 import soialNetworkApp.service.FriendsService;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +39,7 @@ public class FriendsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<List<PersonResponse>> getRecommendedFriends() {
+    public CommonRs<List<PersonRs>> getRecommendedFriends() {
         return friendsRecommendationService.getFriendsRecommendation();
     }
 
@@ -108,7 +109,7 @@ public class FriendsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<List<PersonResponse>> getFriends(
+    public CommonRs<List<PersonRs>> getFriends(
             @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
             @RequestParam(name = "perPage", required = false, defaultValue = "${socialNetwork.default.size}") int size
     ) throws Exception {
@@ -125,10 +126,15 @@ public class FriendsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonResponse<List<PersonResponse>> getPotentialFriends(
+    public CommonRs<List<PersonRs>> getPotentialFriends(
             @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
             @RequestParam(name = "perPage", required = false, defaultValue = "${socialNetwork.default.size}") int size
     ) throws Exception {
         return friendsService.getRequestedPersons(offset, size);
+    }
+
+    @PostMapping("/block_unblock")
+    public void userBlocksUser(@RequestParam(value = "block_user_id") Long blockUserId) throws PersonException {
+        friendsService.userBlocksUser(blockUserId);
     }
 }

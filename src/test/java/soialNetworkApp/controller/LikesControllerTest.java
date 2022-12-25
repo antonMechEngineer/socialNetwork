@@ -1,7 +1,7 @@
 package soialNetworkApp.controller;
 
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
-import soialNetworkApp.api.request.LikeRequest;
+import soialNetworkApp.api.request.LikeRq;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -48,7 +48,7 @@ class LikesControllerTest {
 
     @Test
     void putLike() throws Exception {
-        LikeRequest request = new LikeRequest();
+        LikeRq request = new LikeRq();
         request.setType("Post");
         request.setItemId(1);
         ObjectMapper mapper = new ObjectMapper();
@@ -65,7 +65,7 @@ class LikesControllerTest {
 
     @Test
     void deleteLike() throws Exception {
-        LikeRequest request = new LikeRequest();
+        LikeRq request = new LikeRq();
         request.setType("Post");
         request.setItemId(1);
         ObjectMapper mapper = new ObjectMapper();
