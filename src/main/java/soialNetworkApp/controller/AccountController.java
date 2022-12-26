@@ -103,7 +103,7 @@ public class AccountController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public ResponseEntity<RegisterRs> emailRecovery(@RequestBody EmailRq emailRq) {
+    public ResponseEntity<RegisterRs> emailRecovery() {
         return ResponseEntity.ok(accountService.getEmailRecovery());}
 
     @UpdateOnlineTime
