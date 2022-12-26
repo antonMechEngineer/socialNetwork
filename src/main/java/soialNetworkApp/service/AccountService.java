@@ -38,6 +38,7 @@ public class AccountService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService eMailService;
     private final PersonsService personsService;
+    private final PersonCacheService personCacheService;
     @Value("${auth.pass-restore}")
     String basePassUrl;
     @Value("${auth.email-restore}")
@@ -189,7 +190,7 @@ public class AccountService {
     }
 
     public CommonRs<ComplexRs> setPersonSetting(PersonSettingsRq request) throws PersonNotFoundException, IncorrectRequestTypeException {
-        Person person = personsService.getPersonByContext();
+        Person person = personCacheService.getPersonByContext();
         if (person == null) {
             throw new PersonNotFoundException("Person not found");
         }
@@ -234,7 +235,7 @@ public class AccountService {
     }
 
     public CommonRs<List<PersonSettingsRs>> getPersonSettings() throws PersonNotFoundException {
-        Person person = personsService.getPersonByContext();
+        Person person = personCacheService.getPersonByContext();
         if (person == null) {
             throw new PersonNotFoundException("Person not found");
         }

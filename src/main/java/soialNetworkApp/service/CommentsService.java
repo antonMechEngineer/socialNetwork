@@ -31,12 +31,13 @@ public class CommentsService {
     private final PersonsService personsService;
     private final NotificationsService notificationsService;
     private final CommentMapper commentMapper;
+    private final PersonCacheService personCacheService;
 
     @Value("${socialNetwork.timezone}")
     private String timezone;
 
     public CommonRs<CommentRs> createComment(Post post, CommentRq commentRq) {
-        Person person = personsService.getPersonByContext();
+        Person person = personCacheService.getPersonByContext();
         Comment parentComment = getCommentById(commentRq.getParentId());
         post = parentComment == null ? post : null;
         Comment comment = commentRepository.save(commentMapper.commentRequestToNewComment(commentRq, post, person, parentComment));
