@@ -127,7 +127,6 @@ public class DialogsService {
         Person me = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
         List<Friendship> friendships =
                 friendshipsRepository.findFriendshipsByFriendshipStatusAndSrcPersonIdOrDstPersonId(FriendshipStatusTypes.BLOCKED, me.getId(), me.getId());
-        friendships.forEach(x -> System.out.println(x.getId()));
         Set<Long> srcDstPersonsIds =  getSrcDstPersonsIds(friendships, me);
         return dialogs
                 .stream()

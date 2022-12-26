@@ -27,6 +27,6 @@ public interface FriendshipsRepository extends JpaRepository<Friendship, Long> {
 
     @Query("FROM Friendship AS f " +
             "WHERE f.friendshipStatus = :status " +
-            "AND (f.srcPerson = :srcId OR f.dstPerson = :dstId)")
+            "AND (f.srcPerson.id = :srcId OR f.dstPerson.id = :dstId)")
     List<Friendship> findFriendshipsByFriendshipStatusAndSrcPersonIdOrDstPersonId(FriendshipStatusTypes status, Long srcId, Long dstId);
 }
