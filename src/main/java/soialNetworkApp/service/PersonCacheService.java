@@ -17,8 +17,7 @@ public class PersonCacheService {
         return person;
     }
     public Person getPersonById(long personId) {
-        String email = personsRepository.findEmailById(personId);
-        return getPersonByEmail(email);
+        return getPersonByEmail(personsRepository.findPersonById(personId).get().getEmail());
     }
 
     @CachePut(value = "persons")
