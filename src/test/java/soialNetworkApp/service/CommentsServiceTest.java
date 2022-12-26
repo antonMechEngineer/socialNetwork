@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureEmbeddedDatabase
-class CommentsServiceTest {
+class CommentsServiceTest<PersonCacheService> {
 
     @Autowired
     private CommentsService commentsService;
