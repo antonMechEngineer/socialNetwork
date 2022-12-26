@@ -30,7 +30,7 @@ spring:
     properties.mail.smtp.ssl.enable: true
   redis:
     port: 6379
-    host: localhost
+    host: 194.87.244.66
   cache:
     type: redis
     redis:
