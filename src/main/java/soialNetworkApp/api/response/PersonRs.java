@@ -9,6 +9,7 @@ import lombok.Data;
 import soialNetworkApp.model.enums.FriendshipStatusTypes;
 import soialNetworkApp.model.enums.MessagePermissionTypes;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
@@ -17,7 +18,8 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @Builder
 @JsonInclude(NON_NULL)
 @ApiModel(description = "default user representation")
-public class PersonRs {
+public class PersonRs implements Serializable {
+    private static final long serialVersionUID = -4439114469417994311L;
 
     @ApiModelProperty(value = "user id", example = "1")
     private Long id;
