@@ -57,8 +57,8 @@ socialNetwork:
 auth:
   secret: someSecretCode
   time-to-live: 3600000000
-  pass-restore: http://195.133.48.174:8080/change-password?token=
-  email-restore: http://195.133.48.174:8080/shift-email?token=
+  pass-restore: http://194.87.244.66:8080/change-password?token=
+  email-restore: http://194.87.244.66:8080/shift-email?token=
 
 logging:
   file:
