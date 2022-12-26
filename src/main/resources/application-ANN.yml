@@ -18,19 +18,31 @@ spring:
     enabled: true
 auth:
   secret: someSecretCode
-  pass-restore: http://localhost:8080/change-password?token=
-  email-restore: http://localhost:8080/shift-email?token=
 
 #applicationParams
 socialNetwork:
   default:
     page: 0
     size: 5
-
 logging:
   file:
     uploadLogs: false
-redis:
-  host: localhost
+
+management:
+  endpoints:
+    enabled: true
+    web:
+      exposure:
+        include: health, prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        "[http.server.requests]": true
+  endpoint:
+    health:
+      show-details: always
 
 
