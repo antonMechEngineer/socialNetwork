@@ -1,6 +1,5 @@
 package soialNetworkApp.controller;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
-import soialNetworkApp.repository.FriendshipStatusesRepository;
 import soialNetworkApp.repository.FriendshipsRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +27,6 @@ class FriendsControllerTest {
 
     @Autowired
     FriendshipsRepository friendshipsRepository;
-
-    @Autowired
-    FriendshipStatusesRepository friendshipStatusesRepository;
 
     @Autowired
     private MockMvc mockMvc;
@@ -101,7 +97,7 @@ class FriendsControllerTest {
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful());
         Integer actualNumberFriendshipsWithRequest = Math.toIntExact(friendshipsRepository.findAll().
-                stream().filter(fs -> fs.getFriendshipStatus().getCode() == REQUEST).count());
+                stream().filter(fs -> fs.getFriendshipStatus() == REQUEST).count());
         assertEquals(expectedNumberFriendships, friendshipsRepository.findAll().size());
         assertEquals(expectedNumberFriendshipsWithRequest, actualNumberFriendshipsWithRequest);
     }

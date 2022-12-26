@@ -25,7 +25,6 @@ public interface PersonsRepository extends JpaRepository<Person, Long>, JpaSpeci
 
     Page<Person> getPersonByCityAndIdNotIn(Pageable page, String city, List<Long> ids);
 
-
     Page<Person> findPersonByIdIn (List<Long> personIds, Pageable pageable);
 
     Page<Person> getPersonByIdNotInOrderByRegDateDesc(Pageable page, List<Long> ids);
