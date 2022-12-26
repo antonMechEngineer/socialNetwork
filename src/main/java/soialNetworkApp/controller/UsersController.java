@@ -16,6 +16,7 @@ import soialNetworkApp.api.response.*;
 import soialNetworkApp.errors.EmptyFieldException;
 import soialNetworkApp.errors.PersonNotFoundException;
 import soialNetworkApp.errors.UserPageBlockedException;
+import soialNetworkApp.service.PersonCacheService;
 import soialNetworkApp.service.PersonsService;
 import soialNetworkApp.service.PostsService;
 import soialNetworkApp.service.UsersService;
@@ -34,6 +35,7 @@ public class UsersController {
 
     private final PostsService postsService;
     private final PersonsService personsService;
+    private final PersonCacheService personCacheService;
     private final UsersService usersService;
 
     @UpdateOnlineTime
@@ -65,7 +67,7 @@ public class UsersController {
             @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
             @RequestParam(name = "itemPerPage", required = false, defaultValue = "${socialNetwork.default.size}") int size) {
 
-        return postsService.getAllPostsByAuthor(offset, size, personsService.getPersonById(id));
+        return postsService.getAllPostsByAuthor(offset, size, personCacheService.getPersonById(id));
     }
 
     @UpdateOnlineTime
@@ -110,7 +112,7 @@ public class UsersController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    ResponseEntity<UserRs> updateMyData(@RequestBody UserRq userRq) {
+    ResponseEntity<UserRs> updateMyData(@RequestBody UserRq userRq) throws Exception {
         return ResponseEntity
                 .ok(usersService.editProfile(userRq));
     }

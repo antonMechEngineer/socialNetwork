@@ -39,3 +39,6 @@ logging:
     max-history: 1
     path: log
     uploadLogs: false
+
+redis:
+  host: localhost

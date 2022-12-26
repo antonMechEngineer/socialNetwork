@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface WeatherRepository extends JpaRepository<Weather, Integer> {
 
-    Optional<Weather> findTopByGismeteoId(int gesmeteoId);
+    Optional<Weather> findFirstByGismeteoIdOrderByTimeDesc(int gesmeteoId);
 }

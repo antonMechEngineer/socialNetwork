@@ -3,23 +3,21 @@ package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import soialNetworkApp.api.request.FindPersonRq;
-import soialNetworkApp.api.request.UserRq;
-import soialNetworkApp.api.response.*;
-import soialNetworkApp.errors.EmptyFieldException;
-import soialNetworkApp.errors.FileException;
-import soialNetworkApp.mappers.PersonMapper;
-import soialNetworkApp.model.entities.City;
-import soialNetworkApp.model.entities.Country;
-import soialNetworkApp.model.entities.Person;
-import soialNetworkApp.repository.*;
-import soialNetworkApp.service.search.SearchPersons;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import soialNetworkApp.api.request.FindPersonRq;
+import soialNetworkApp.api.request.UserRq;
+import soialNetworkApp.api.response.*;
+import soialNetworkApp.errors.EmptyFieldException;
+import soialNetworkApp.errors.FileException;
+import soialNetworkApp.mappers.PersonMapper;
+import soialNetworkApp.model.entities.Person;
+import soialNetworkApp.repository.*;
+import soialNetworkApp.service.search.SearchPersons;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -49,10 +47,8 @@ public class UsersService {
     private final PostsRepository postsRepository;
     private final PersonsRepository personsRepository;
     private final PersonSettingsRepository personSettingsRepository;
-    private final CitiesRepository citiesRepository;
-    private final CountriesRepository countriesRepository;
     private final CloudinaryService cloudinaryService;
-    private final WeatherService weatherService;
+    private final GeolocationsService geolocationsService;
     private final PersonMapper personMapper;
     private final SearchPersons searchPersons;
 
@@ -98,7 +94,7 @@ public class UsersService {
         return response;
     }
 
-    public UserRs editProfile(UserRq userRq) {
+    public UserRs editProfile(UserRq userRq) throws Exception {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
         UserRs response = new UserRs();
         PersonRs personRs = personMapper.toPersonResponse(person);
@@ -113,21 +109,21 @@ public class UsersService {
         if (userRq.getCity() != null) {
             person.setCity(userRq.getCity());
             personRs.setCity(userRq.getCity());
-            if (!citiesRepository.existsCityByTitle(userRq.getCity())) {
-                City city = new City();
-                city.setTitle(userRq.getCity());
-                citiesRepository.save(city);
-            }
+            geolocationsService.setCityGismeteoId(userRq.getCity());
+//            if (!citiesRepository.existsCityByName(userRq.getCity())) {
+//                City city = new City();
+//                city.setName(userRq.getCity());
+//                citiesRepository.save(city);
+//            }
         }
         if (userRq.getCountry() != null) {
             person.setCountry(userRq.getCountry());
             personRs.setCountry(userRq.getCountry());
-            if (!countriesRepository.existsCountryByTitle(userRq.getCountry())) {
-                Country country = new Country();
-                country.setTitle(userRq.getCountry());
-                countriesRepository.save(country);
-                weatherService.setGismeteoCityId(userRq.getCity());
-            }
+//            if (!countriesRepository.existsCountryByName(userRq.getCountry())) {
+//                Country country = new Country();
+//                country.setName(userRq.getCountry());
+//                countriesRepository.save(country);
+//            }
         }
         if (userRq.getFirst_name() != null) {
             person.setFirstName(userRq.getFirst_name());
@@ -204,7 +200,7 @@ public class UsersService {
 
     @Scheduled(fixedRateString = "${user.time-to-delete}")
     public void executeOldDeletes() {
-        List<Long> idToDelete = personsRepository.findIdtoDelete(timeToDel);
+        List<Long> idToDelete = personsRepository.idToDelete(timeToDel);
         for (long oldId : idToDelete) {
             blockHistoriesRepository.deleteAll(blockHistoriesRepository.findBHtoDelete(oldId));
             friendshipsRepository.deleteAll(friendshipsRepository.findFriendsToDelete(oldId));

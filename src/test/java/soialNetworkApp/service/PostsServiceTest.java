@@ -126,6 +126,7 @@ class PostsServiceTest {
 
     @Test
     void getFeeds() {
+        when(personsRepository.findPersonByEmail(any())).thenReturn(Optional.of(person));
         when(postsRepository.findPostsByTimeBeforeAndIsDeletedFalseOrderByTimeDesc(any(), any())).thenReturn(new PageImpl<>(List.of(post)));
         when(tagsService.tagsToStringsMapper(any())).thenReturn(new ArrayList<>());
         when(tagsService.stringsToTagsMapper(any())).thenReturn(new ArrayList<>());

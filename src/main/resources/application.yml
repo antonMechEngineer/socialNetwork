@@ -20,6 +20,22 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/changelog-master.yaml
     enabled: true
+  mail:
+    protocol: smtps
+    host: smtp.mail.ru
+    port: 465
+    username: testbd@internet.ru
+    password: hvYDUwgKj6fkDkFCkgSN
+    properties.mail.smtp.auth: true
+    properties.mail.smtp.ssl.enable: true
+  redis:
+    port: 6379
+    host: 194.87.244.66
+  cache:
+    type: redis
+    redis:
+      cache-null-values: true
+      time-to-live: 100000
 
 #applicationParams
 socialNetwork:
@@ -43,12 +59,22 @@ socialNetwork:
     token:
       header: X-Gismeteo-Token
       value: 56b30cb255.3443075
+  #cities and countries
+  geolocation:
+    countries-path: https://htmlweb.ru/geo/api.php?location&json&api_key=
+    cities-path:
+      main: http://htmlweb.ru/geo/api.php?city_name=
+      params: "&json&api_key="
+    first-countries-in-response: Россия, Беларусь
+    first-cities-in-response: Москва (Московская область, Центральный федеральный округ); Санкт-Петербург (Ленинградская область, Санкт-Петербург)
+    # 20 запросов в сутки
+    token: aae8395d07c1255b0ca5ab1962268afd
 
 auth:
   secret: someSecretCode
   time-to-live: 3600000000
-  pass-restore: http://195.133.48.174:8080/change-password?token=
-  email-restore: http://195.133.48.174:8080/shift-email?token=
+  pass-restore: http://194.87.244.66:8080/change-password?token=
+  email-restore: http://194.87.244.66:8080/shift-email?token=
 
 logging:
   file:
@@ -62,15 +88,6 @@ yandex:
 
 user:
   time-to-delete: 2592000000
-
-spring.mail.protocol: smtps
-spring.mail.host: smtp.mail.ru
-spring.mail.port: 465
-spring.mail.username:  testbd@internet.ru
-spring.mail.password: hvYDUwgKj6fkDkFCkgSN
-spring.mail.properties.mail.smtp.auth: true
-spring.mail.properties.mail.smtp.ssl.enable: true
-
 
 management:
   endpoints:

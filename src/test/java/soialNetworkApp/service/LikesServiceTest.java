@@ -39,6 +39,9 @@ class LikesServiceTest {
     private PersonsService personsService;
 
     @MockBean
+    private PersonCacheService personCacheService;
+
+    @MockBean
     private LikesRepository likesRepository;
 
     @MockBean
@@ -95,7 +98,7 @@ class LikesServiceTest {
         when(postsRepository.findById(any())).thenReturn(Optional.of(liked1));
         when(commentsRepository.findById(any())).thenReturn(Optional.of(liked2));
         when(likesRepository.findLikesByEntity(any(), any())).thenReturn(likes);
-        when(personsService.getPersonByContext()).thenReturn(person);
+        when(personCacheService.getPersonByContext()).thenReturn(person);
         when(likesRepository.findLikeByPersonAndEntity(any(), any(), any())).thenReturn(Optional.empty());
 
         assertTrue(likesService.putLike(likeRq1).getData().getUsers().contains(person.getId()));
@@ -121,14 +124,14 @@ class LikesServiceTest {
         Like like = new Like();
         like.setAuthor(person);
         likes.add(like);
-        when(personsService.getPersonByContext()).thenReturn(person);
+        when(personCacheService.getPersonByContext()).thenReturn(person);
         when(postsRepository.findById(any())).thenReturn(Optional.of(liked1));
         when(commentsRepository.findById(any())).thenReturn(Optional.of(liked2));
         when(likesRepository.findLikeByPersonAndEntity(any(), any(), any())).thenReturn(Optional.of(like));
         when(likesRepository.findLikesByEntity(any(), any())).thenReturn(likes);
 
         likesService.deleteLike(1L, type1);
-        verify(personsService).getPersonByContext();
+        verify(personCacheService).getPersonByContext();
         verify(likesRepository).findLikeByPersonAndEntity(any(), any(), any());
         verify(likesRepository).delete(like);
     }
@@ -152,7 +155,7 @@ class LikesServiceTest {
     void getMyLike() {
         Like like = new Like();
         like.setAuthor(person);
-        when(personsService.getPersonByContext()).thenReturn(person);
+        when(personCacheService.getPersonByContext()).thenReturn(person);
         when(likesRepository.findLikeByPersonAndEntity(liked1.getType(), liked1, person)).thenReturn(Optional.empty());
         when(likesRepository.findLikeByPersonAndEntity(liked2.getType(), liked2, person)).thenReturn(Optional.of(like));
         assertFalse(likesService.getMyLike(liked1));

@@ -102,6 +102,7 @@ class AccountControllerTest {
     void getEmailSet() throws Exception{//Скорректировать!!!
         EmailRq emailRq = new EmailRq();
         emailRq.setEmail("testbd@internet.ru");
+        emailRq.setSecret("changeword3");
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
         ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();

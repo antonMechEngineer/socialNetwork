@@ -6,6 +6,9 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/changelog-master.yaml
     enabled: true
+  redis:
+    host: localhost
+    port: 6379
 auth:
   secret: someSecretCode
   time-to-live: 3600000000

@@ -25,6 +25,8 @@ public interface PersonsRepository extends JpaRepository<Person, Long>, JpaSpeci
 
     Page<Person> getPersonByCityAndIdNotIn(Pageable page, String city, List<Long> ids);
 
+    String findEmailById(long id);
+
     Page<Person> findPersonByIdIn (List<Long> personIds, Pageable pageable);
 
     Page<Person> getPersonByIdNotInOrderByRegDateDesc(Pageable page, List<Long> ids);
@@ -32,7 +34,7 @@ public interface PersonsRepository extends JpaRepository<Person, Long>, JpaSpeci
     List<Person> findPersonByFirstNameContainsIgnoreCaseOrLastNameContainsIgnoreCase(String firstName, String lastName);
 
     @Query(value = "SELECT id FROM persons WHERE is_deleted = true AND (select(select extract(epoch from now()) - (extract(epoch from(deleted_time)))) * 1000 >  :timeToDel)", nativeQuery = true)
-    List<Long> findIdtoDelete(@Param("timeToDel") long timeToDel);
+    List<Long> idToDelete(@Param("timeToDel") long timeToDel);
 
     @Query(value = "SELECT * FROM persons WHERE is_deleted = true AND (select(select extract(epoch from now()) - (extract(epoch from(deleted_time)))) * 1000 > :timeToDel)", nativeQuery = true)
     List<Person> findOldDeletes(@Param("timeToDel") long timeToDel);
@@ -63,4 +65,7 @@ public interface PersonsRepository extends JpaRepository<Person, Long>, JpaSpeci
     List<RegionStatisticRs> getCountryWithUsersCount();
 
     List<Person> findPersonByFirstNameContainsIgnoreCaseAndLastNameContainsIgnoreCase(String firstName, String lastName);
+
+    @Query(value = "SELECT DISTINCT city FROM Person WHERE country = :country")
+    List<String> getCitiesByCountry(@Param("country") String country);
 }
