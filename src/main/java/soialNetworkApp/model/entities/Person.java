@@ -7,7 +7,6 @@ import soialNetworkApp.model.enums.MessagePermissionTypes;
 import soialNetworkApp.model.enums.NotificationTypes;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.data.redis.core.RedisHash;
 
 import javax.persistence.*;
 import java.io.Serializable;
