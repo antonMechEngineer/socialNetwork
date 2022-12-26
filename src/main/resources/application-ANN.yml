@@ -30,6 +30,7 @@ socialNetwork:
 logging:
   file:
     uploadLogs: false
-
+redis:
+  host: localhost
 
 

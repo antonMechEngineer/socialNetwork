@@ -106,8 +106,6 @@ public class UsersService {
     }
 
 
-
-    //@CachePut(value="Person")//, key = "#email", condition = "#result != null")
     public UserRs editProfile(UserRq userRq) {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
         UserRs response = new UserRs();
