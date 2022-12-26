@@ -90,7 +90,9 @@ public class AccountController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public ResponseEntity<RegisterRs> emailSet(@RequestBody EmailRq emailRq) {return null;}
+    public ResponseEntity<RegisterRs> emailSet(@RequestBody EmailRq emailRq) {
+        return ResponseEntity.ok(accountService.getNewEmail(emailRq));
+    }
 
     @PutMapping("/email/recovery")
     @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")

@@ -157,6 +157,23 @@ public class AccountService {
         eMailService.sendSimpleMessage(to, subject, text);
         return response;
     }
+    public RegisterRs getNewEmail(EmailRq emailRq){
+        Optional<Person> optPerson = personsRepository.checkToken(emailRq.getSecret());
+        Person rescuePerson=null;
+        if (optPerson.isPresent()){rescuePerson = optPerson.get();}
+
+        RegisterRs response = new RegisterRs();
+        ComplexRs data = getComplexRs();
+        response.setEmail(rescuePerson.getEmail());
+        response.setTimestamp(0);
+        response.setData(data);
+
+        rescuePerson.setEmail(emailRq.getEmail());
+        rescuePerson.setChangePasswordToken(null);
+        personsRepository.save(rescuePerson);
+
+        return response;
+    }
 
     private PersonSettings createDefaultNotificationsSettings(Person person) {
         PersonSettings settings = new PersonSettings();
