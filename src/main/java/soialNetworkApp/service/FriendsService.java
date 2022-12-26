@@ -78,7 +78,7 @@ public class FriendsService {
     }
 
     public FriendshipStatusTypes getStatusTwoPersons(Person dstPerson, Person srcPerson) {
-        //TODO: переделать на friendshipsRepository.findFriendshipBySrcPersonAndDstPerson()
+        //TODO: переделать на friendshipsRepository.findFriendshipBySrcPersonAndDstPerson() можно удалить
         List<Friendship> srcFriendships = friendshipsRepository.findFriendshipBySrcPerson(srcPerson);
         Optional<Friendship> optionalSrcFriendship = getFriendshipByDstPerson(srcFriendships, dstPerson);
         FriendshipStatusTypes srcFriendshipStatusType = UNKNOWN;

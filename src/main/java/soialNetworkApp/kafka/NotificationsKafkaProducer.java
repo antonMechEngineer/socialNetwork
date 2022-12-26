@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import soialNetworkApp.kafka.dto.NotificationKafka;
 import soialNetworkApp.model.entities.Notification;
 
+import javax.swing.text.html.parser.Entity;
+
 @Service
 public class NotificationsKafkaProducer {
     private static final Logger LOGGER = LoggerFactory.getLogger(NotificationsKafkaProducer.class);
@@ -25,6 +27,8 @@ public class NotificationsKafkaProducer {
 
     public void sendMessage (Notification notification) {
         LOGGER.info(String.format("Message sent -> %s", notification.toString()));
+
+
         NotificationKafka notificationKafka = new NotificationKafka(
                 notification.getNotificationType(),
                 notification.getSentTime(),
@@ -37,6 +41,6 @@ public class NotificationsKafkaProducer {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        kafkaTemplate.send("notifications", notificationText);
+        kafkaTemplate.send("notification", notificationText);
     }
 }

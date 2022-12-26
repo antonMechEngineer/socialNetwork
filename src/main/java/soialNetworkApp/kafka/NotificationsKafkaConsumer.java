@@ -20,7 +20,9 @@ public class NotificationsKafkaConsumer {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
 
-    @KafkaListener(topics = "notifications", groupId = "myGroup")
+    // TODO: 26.12.2022 имя notifications попало в бан и в этот топие пишется какой-то шлак
+    // TODO: 26.12.2022 перед тем как notification упал туда какая-то строка записалась, а теперь выпадает stack overflow
+    @KafkaListener(topics = "notification", groupId = "myGroup")
     public void consume(ConsumerRecord<String, String> consumerRecord) {
         LOGGER.info(String.format("Json message received -> %s", consumerRecord));
 

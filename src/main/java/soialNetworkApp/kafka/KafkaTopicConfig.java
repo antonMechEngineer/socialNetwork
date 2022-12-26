@@ -10,13 +10,13 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic notificationsTopic(){
-        return TopicBuilder.name("notifications").build();
+        return TopicBuilder.name("notification").build();
     }
 
-    @Bean
-    public NewTopic messagesTopic(){
-        return TopicBuilder.name("messages").build();
-    }
+//    @Bean
+//    public NewTopic messagesTopic(){
+//        return TopicBuilder.name("messages").build();
+//    }
 
 
 }
