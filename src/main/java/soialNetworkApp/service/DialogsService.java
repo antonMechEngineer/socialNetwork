@@ -54,6 +54,7 @@ public class DialogsService {
                 .filter(m -> m.getReadStatus().equals(ReadStatusTypes.SENT))
                 .forEach(m -> {
                     m.setReadStatus(ReadStatusTypes.READ);
+                    // TODO: 26.12.2022 внедрить producer сюда
                     messagesRepository.save(m);
                     readCount[0]++;
                 });

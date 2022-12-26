@@ -25,6 +25,7 @@ public class MessageWsService {
         Message message = dialogMapper.toMessageFromWs(messageWsRq,
                 dialogsRepository.findById(messageWsRq.getDialogId()).orElseThrow(),
                 personsRepository.findPersonById(messageWsRq.getAuthorId()).orElseThrow());
+        // TODO: 26.12.2022 сюда внедрить kafka
         messagesRepository.save(message);
     }
 

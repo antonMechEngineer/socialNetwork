@@ -10,6 +10,7 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
+import soialNetworkApp.kafka.dto.NotificationKafka;
 import soialNetworkApp.model.entities.Notification;
 
 @Service
@@ -22,15 +23,20 @@ public class NotificationsKafkaProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void sendMessage (Notification data) {
-        String message = null;
+    public void sendMessage (Notification notification) {
+        LOGGER.info(String.format("Message sent -> %s", notification.toString()));
+        NotificationKafka notificationKafka = new NotificationKafka(
+                notification.getNotificationType(),
+                notification.getSentTime(),
+                notification.getEntity(),
+                notification.getPerson(),
+                notification.getIsRead());
+        String notificationText = "";
         try {
-            message = objectMapper.writeValueAsString(data);
+            notificationText = objectMapper.writeValueAsString(notificationKafka);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!" + message);
-        LOGGER.info(String.format("Message sent -> %s", message));
-        kafkaTemplate.send("notifications", message);
+        kafkaTemplate.send("notifications", notificationText);
     }
 }
