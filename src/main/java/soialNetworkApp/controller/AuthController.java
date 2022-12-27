@@ -31,7 +31,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CaptchaRs captchaCheck() {
         return captchaService.getCaptchaCode();
@@ -43,7 +43,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<PersonRs> login(@RequestBody LoginRq loginRq) throws PasswordException, WrongEmailException {
             return authService.loginUser(loginRq);
@@ -56,7 +56,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<ComplexRs> logout() {
         return authService.logoutUser();

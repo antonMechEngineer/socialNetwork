@@ -46,7 +46,7 @@ public class UsersController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<PersonRs> getUserById(@PathVariable long id) throws UserPageBlockedException {
         return personsService.getPersonDataById(id);
@@ -60,7 +60,7 @@ public class UsersController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<List<PostRs>> getUsersPosts(
             @PathVariable long id,
@@ -78,7 +78,7 @@ public class UsersController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<PostRs> createPost(
             @PathVariable(name = "id") Long personId,
@@ -96,7 +96,7 @@ public class UsersController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<PersonRs> getMyData() {
         return personsService.getMyData();
@@ -110,7 +110,7 @@ public class UsersController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     ResponseEntity<UserRs> updateMyData(@RequestBody UserRq userRq) throws Exception {
         return ResponseEntity
@@ -124,7 +124,7 @@ public class UsersController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     ResponseEntity<ResponseRsComplexRs> deleteMyData() {
         return ResponseEntity
@@ -137,7 +137,7 @@ public class UsersController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     ResponseEntity<ResponseRsComplexRs> recoverMyData() {
         return ResponseEntity
@@ -152,7 +152,7 @@ public class UsersController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<List<PersonRs>> findPersons(
             FindPersonRq personRq,

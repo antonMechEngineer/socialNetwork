@@ -19,6 +19,8 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+import static soialNetworkApp.service.search.PostSpecification.*;
+
 @Component
 @RequiredArgsConstructor
 public class SearchPosts {
@@ -34,21 +36,20 @@ public class SearchPosts {
     public Page<Post> findPosts(FindPostRq postRq, int offset, int perPage) {
         List<Person> personsWhoBLockedMe = getPersonsWhoBlockedMe();
         Pageable pageable = PageRequest.of(offset, perPage);
-        Specification<Post> specification = PostSpecification.textLike(postRq.getText());
+        Specification<Post> specification = textLike(postRq.getText());
         if (personsWhoBLockedMe.size() != 0) {
-            specification = specification.and(PostSpecification.excludeBlockedPosts(personsWhoBLockedMe));
+            specification = specification.and(excludeBlockedPosts(personsWhoBLockedMe));
         }
         if (postRq.getTags() != null) {
-            specification = specification.and(PostSpecification.tagsContains(postRq.getTags()));
+            specification = specification.and(tagsContains(postRq.getTags()));
         }
         if (postRq.getDate_to() != null || postRq.getDate_from() != null) {
-            specification = specification.and(PostSpecification
-                    .datesBetween(commonSearchMethods.longToLocalDateTime(postRq.getDate_from()),
+            specification = specification.and(datesBetween(commonSearchMethods.longToLocalDateTime(postRq.getDate_from()),
                             commonSearchMethods.longToLocalDateTime(postRq.getDate_to())));
         }
         if (postRq.getAuthor() != null) {
             List<Person> persons = commonSearchMethods.findPersonByNameAndLastNameContains(postRq.getAuthor());
-            specification = specification.and(PostSpecification.postAuthorsIs(persons));
+            specification = specification.and(postAuthorsIs(persons));
         }
         return postsRepository.findAll(specification, pageable);
     }
