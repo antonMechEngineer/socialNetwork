@@ -1,8 +1,6 @@
 package soialNetworkApp.kafka;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -13,34 +11,28 @@ import org.springframework.stereotype.Service;
 import soialNetworkApp.kafka.dto.NotificationKafka;
 import soialNetworkApp.model.entities.Notification;
 
-import javax.swing.text.html.parser.Entity;
 
 @Service
 public class NotificationsKafkaProducer {
     private static final Logger LOGGER = LoggerFactory.getLogger(NotificationsKafkaProducer.class);
-    private KafkaTemplate<String, String> kafkaTemplate;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final KafkaTemplate<String, NotificationKafka> kafkaTemplate;
 
-    public NotificationsKafkaProducer(KafkaTemplate<String, String> kafkaTemplate) {
+    public NotificationsKafkaProducer(KafkaTemplate<String, NotificationKafka> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
     public void sendMessage (Notification notification) {
         LOGGER.info(String.format("Message sent -> %s", notification.toString()));
 
-
         NotificationKafka notificationKafka = new NotificationKafka(
                 notification.getNotificationType(),
                 notification.getSentTime(),
-                notification.getEntity(),
-                notification.getPerson(),
+                notification.getEntity().getId(),
+                notification.getPerson().getId(),
                 notification.getIsRead());
-        String notificationText = "";
-        try {
-            notificationText = objectMapper.writeValueAsString(notificationKafka);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        kafkaTemplate.send("notification", notificationText);
+
+        Message<NotificationKafka> message = MessageBuilder.withPayload(notificationKafka).
+                setHeader(KafkaHeaders.TOPIC, "notifications").build();
+        kafkaTemplate.send(message);
     }
 }

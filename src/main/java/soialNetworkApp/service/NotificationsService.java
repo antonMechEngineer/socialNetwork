@@ -72,7 +72,7 @@ public class NotificationsService {
         if (readAll) {
             notificationsRepository.findAllByPersonAndIsReadIsFalse(person).forEach(notification -> {
                 notification.setIsRead(true);
-                notificationsRepository.save(notification);
+                //notificationsRepository.save(notification);
             });
         } else {
             Notification notification = notificationsRepository.findById(notificationId).get();

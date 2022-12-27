@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +23,14 @@ public interface NotificationsRepository extends JpaRepository<Notification, Lon
     @Transactional
     @Query(value = "DELETE FROM notifications WHERE person_id = :id", nativeQuery = true)
     void notificationDelete(@Param("id") long id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "INSERT INTO notifications (notification_type, entity_id, is_read, sent_time, person_id)" +
+            " VALUES (:notificationType, :entityId, :isRead, :sentTime, :personId)", nativeQuery = true)
+    void save(@Param("notificationType") NotificationTypes notificationType, @Param("entityId") Long entityId,
+              @Param("isRead") Boolean isRead, @Param("sentTime") LocalDateTime sentTime, @Param("personId") Long personId);
+
 
     Page<Notification> findAllByPersonAndIsReadIsFalse(Person person, Pageable pageable);
 
