@@ -6,6 +6,9 @@ import lombok.Getter;
 import soialNetworkApp.model.entities.Dialog;
 import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.model.enums.ReadStatusTypes;
+
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import java.time.ZonedDateTime;
 
 @AllArgsConstructor
@@ -14,17 +17,16 @@ public class MessageKafka {
 
     private ZonedDateTime time;
 
-    @JsonProperty("message_text")
     private String messageText;
 
-    @JsonProperty("read_status")
+    @Enumerated(value = EnumType.STRING)
     private ReadStatusTypes readStatus;
 
     private Boolean isDeleted;
 
-    private Person author;
+    private Long authorId;
 
-    private Person recipient;
+    private Long recipientId;
 
-    private Dialog dialog;
+    private Long dialogId;
 }

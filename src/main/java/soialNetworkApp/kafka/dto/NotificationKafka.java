@@ -8,6 +8,9 @@ import lombok.Setter;
 import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.model.entities.interfaces.Notificationed;
 import soialNetworkApp.model.enums.NotificationTypes;
+
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -16,6 +19,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class NotificationKafka {
 
+    @Enumerated(value = EnumType.STRING)
     private NotificationTypes notificationType;
 
     private LocalDateTime sentTime;

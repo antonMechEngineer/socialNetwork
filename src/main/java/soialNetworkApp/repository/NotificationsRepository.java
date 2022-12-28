@@ -31,7 +31,6 @@ public interface NotificationsRepository extends JpaRepository<Notification, Lon
     void save(@Param("notificationType") NotificationTypes notificationType, @Param("entityId") Long entityId,
               @Param("isRead") Boolean isRead, @Param("sentTime") LocalDateTime sentTime, @Param("personId") Long personId);
 
-
     Page<Notification> findAllByPersonAndIsReadIsFalse(Person person, Pageable pageable);
 
     List<Notification> findAllByPersonAndIsReadIsFalse(Person person);

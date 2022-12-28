@@ -1,6 +1,5 @@
 package soialNetworkApp.kafka;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -14,6 +13,7 @@ import soialNetworkApp.model.entities.Notification;
 
 @Service
 public class NotificationsKafkaProducer {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(NotificationsKafkaProducer.class);
     private final KafkaTemplate<String, NotificationKafka> kafkaTemplate;
 
@@ -23,14 +23,12 @@ public class NotificationsKafkaProducer {
 
     public void sendMessage (Notification notification) {
         LOGGER.info(String.format("Message sent -> %s", notification.toString()));
-
         NotificationKafka notificationKafka = new NotificationKafka(
                 notification.getNotificationType(),
                 notification.getSentTime(),
                 notification.getEntity().getId(),
                 notification.getPerson().getId(),
                 notification.getIsRead());
-
         Message<NotificationKafka> message = MessageBuilder.withPayload(notificationKafka).
                 setHeader(KafkaHeaders.TOPIC, "notifications").build();
         kafkaTemplate.send(message);
