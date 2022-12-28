@@ -12,8 +12,8 @@ import soialNetworkApp.repository.PersonsRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import soialNetworkApp.service.util.CurrentUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +28,10 @@ public class FriendsRecommendationService {
 
     private final PersonMapper personMapper;
 
+    private final CurrentUser currentUser;
+
     public CommonRs<List<PersonRs>> getFriendsRecommendation() {
-        Person me = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
+        Person me = currentUser.getPerson();
         Pageable page = PageRequest.of(0, 8);
         List<Long> excludedPersons = new ArrayList<>();
         excludedPersons.add(me.getId());
