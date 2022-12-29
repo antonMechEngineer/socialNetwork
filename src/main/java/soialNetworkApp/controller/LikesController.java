@@ -32,7 +32,7 @@ public class LikesController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<LikeRs> getLikesList(
             @RequestParam(name = "item_id") long itemId,
@@ -49,7 +49,7 @@ public class LikesController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<LikeRs> putLike(
             @RequestBody LikeRq likeRq) {
@@ -65,7 +65,7 @@ public class LikesController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<LikeRs> deleteLike(
             @RequestParam(name = "item_id") long itemId,

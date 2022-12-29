@@ -16,7 +16,6 @@ import soialNetworkApp.api.response.ErrorRs;
 import soialNetworkApp.api.response.PostRs;
 import soialNetworkApp.errors.EmptyFieldException;
 import soialNetworkApp.errors.PersonNotFoundException;
-import soialNetworkApp.repository.PostsRepository;
 import soialNetworkApp.service.PostsService;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,7 +37,7 @@ public class PostsController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<List<PostRs>> getFeeds(
             @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
@@ -55,7 +54,7 @@ public class PostsController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<PostRs> getPost(
             @PathVariable(name = "id") Long postId) {
@@ -71,7 +70,7 @@ public class PostsController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<PostRs> updatePost(
             @PathVariable int id,
@@ -88,7 +87,7 @@ public class PostsController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<PostRs> deletePost(
             @PathVariable long id) throws PersonNotFoundException {
@@ -104,7 +103,7 @@ public class PostsController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<PostRs> recoverPost(
             @PathVariable long id) throws PersonNotFoundException {
@@ -120,7 +119,7 @@ public class PostsController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<List<PostRs>> findPost(
             FindPostRq postRq,

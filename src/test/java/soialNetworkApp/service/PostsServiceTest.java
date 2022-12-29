@@ -7,12 +7,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
+import soialNetworkApp.api.request.FindPostRq;
 import soialNetworkApp.api.request.PostRq;
 import soialNetworkApp.api.response.PersonRs;
+import soialNetworkApp.errors.EmptyFieldException;
 import soialNetworkApp.errors.PersonNotFoundException;
 import soialNetworkApp.mappers.PersonMapper;
 import soialNetworkApp.model.entities.*;
@@ -20,6 +23,7 @@ import soialNetworkApp.model.enums.FriendshipStatusTypes;
 import soialNetworkApp.repository.FriendshipsRepository;
 import soialNetworkApp.repository.PersonsRepository;
 import soialNetworkApp.repository.PostsRepository;
+import soialNetworkApp.service.search.SearchPosts;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -27,12 +31,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -60,6 +65,9 @@ class PostsServiceTest {
     private PersonMapper personMapper;
     @MockBean
     private Authentication authentication;
+
+    @MockBean
+    private SearchPosts searchPosts;
 
     private PostRq postRq;
     private Person person;
@@ -206,5 +214,22 @@ class PostsServiceTest {
         postsService.getPostById(anyLong());
 
         verify(postsRepository).findById(anyLong());
+    }
+
+    @Test
+    void findPosts() throws EmptyFieldException {
+        FindPostRq postRq = new FindPostRq();
+        postRq.setText("some text");
+        when(searchPosts.findPosts(any(), anyInt(), anyInt())).thenReturn(Page.empty());
+        postsService.findPosts(postRq, 0, 20);
+        verify(searchPosts, times(1)).findPosts(postRq, 0, 20);
+    }
+
+    @Test
+    void findPostException() {
+        FindPostRq postRq = new FindPostRq();
+        Throwable thrown = catchThrowable(() -> postsService.findPosts(postRq, 0, 20));
+        assertThat(thrown).isInstanceOf(EmptyFieldException.class);
+        assertThat(thrown.getMessage()).isNotBlank();
     }
 }

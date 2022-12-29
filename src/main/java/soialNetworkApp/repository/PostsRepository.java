@@ -18,7 +18,6 @@ public interface PostsRepository extends JpaRepository<Post, Long>, JpaSpecifica
 
     Page<Post> findPostsByAuthorOrderByTimeDesc(Pageable pageable, Person author);
 
-    //TODO:зачем параметр time если он всего before now
     Page<Post> findPostsByTimeBeforeAndIsDeletedFalseOrderByTimeDesc(Pageable pageable, LocalDateTime time);
 
     @Query(value = "SELECT * FROM posts WHERE author_id = :id", nativeQuery = true)
