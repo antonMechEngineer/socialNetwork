@@ -80,8 +80,12 @@ public class PersonRs implements Serializable {
     private LocalDateTime lastOnlineTime;
 
     @JsonProperty("is_blocked")
-    @ApiModelProperty(value = "whether the user is locked out for the current user", example = "false")
+    @ApiModelProperty(value = "whether the user is globally locked out", example = "false")
     private Boolean isBlocked;
+
+    @JsonProperty("is_blocked_by_current_user")
+    @ApiModelProperty(value = "whether the user is locked out for the current user", example = "false")
+    private Boolean isBlockedByCurrentUser;
 
     @JsonProperty("friend_status")
     @ApiModelProperty(value = "relationship of user to current user", example = "FRIEND")
