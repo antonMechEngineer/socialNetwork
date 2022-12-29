@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @Data
@@ -16,7 +18,8 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @AllArgsConstructor
 @JsonInclude(NON_NULL)
 @ApiModel(description = "default response from server")
-public class CommonRs<T> {
+public class CommonRs<T> implements Serializable {
+    private static final long serialVersionUID = -4439114469417994311L;
 
     @ApiModelProperty(value = "operation time in timestamp", required = true, example = "1670773804")
     private Long timestamp = System.currentTimeMillis();

@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 
 import static soialNetworkApp.model.enums.FriendshipStatusTypes.*;
 
-
 @RequiredArgsConstructor
 @Service
 public class FriendsService {
@@ -111,6 +110,7 @@ public class FriendsService {
         }
     }
 
+    //TODO: косяк если в таблице только одна запись (user1 - user2 - FRIEND, а user2 - user1 - FRIEND не существует)
     private void deleteFriendships(Person srcPerson, Person dstPerson) {
         Friendship srcFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(srcPerson, dstPerson).orElseThrow();
         Friendship dstFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(dstPerson, srcPerson).orElseThrow();
@@ -173,11 +173,12 @@ public class FriendsService {
     }
 
     private void blockPerson(Friendship meDstFriendship, Friendship meSrcFriendship, Person me, Person dstPerson) {
-        if (meDstFriendship != null) {
+        if (meDstFriendship != null && meDstFriendship.getFriendshipStatus() != BLOCKED) {
             friendshipsRepository.delete(meDstFriendship);
         }
         if (meSrcFriendship != null) {
             meSrcFriendship.setFriendshipStatus(BLOCKED);
+            meSrcFriendship.setSentTime(LocalDateTime.now());
         } else {
             meSrcFriendship = new Friendship(LocalDateTime.now(), me, dstPerson, BLOCKED);
         }

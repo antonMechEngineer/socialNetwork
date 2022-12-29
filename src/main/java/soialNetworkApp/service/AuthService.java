@@ -19,15 +19,13 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final PersonsService personsService;
-
+    private final PersonCacheService personCacheService;
     private final PasswordEncoder passwordEncoder;
-
     private final PersonMapper personMapper;
-
     private final JWTUtil jwtUtil;
 
     public CommonRs<PersonRs> loginUser(LoginRq loginRq) throws PasswordException, WrongEmailException {
-        Person person = personsService.getPersonByEmail(loginRq.getEmail());
+        Person person = personCacheService.getPersonByEmail(loginRq.getEmail());
         if (person != null) {
             if (!passwordEncoder.matches(loginRq.getPassword(), person.getPassword())) {
                 throw new PasswordException("Wrong password for email: '" + loginRq.getEmail() + "'");

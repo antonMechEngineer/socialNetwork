@@ -200,7 +200,7 @@ public class UsersService {
 
     @Scheduled(fixedRateString = "${user.time-to-delete}")
     public void executeOldDeletes() {
-        List<Long> idToDelete = personsRepository.findIdtoDelete(timeToDel);
+        List<Long> idToDelete = personsRepository.idToDelete(timeToDel);
         for (long oldId : idToDelete) {
             blockHistoriesRepository.deleteAll(blockHistoriesRepository.findBHtoDelete(oldId));
             friendshipsRepository.deleteAll(friendshipsRepository.findFriendsToDelete(oldId));

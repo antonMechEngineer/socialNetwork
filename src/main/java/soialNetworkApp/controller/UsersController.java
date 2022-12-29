@@ -16,6 +16,7 @@ import soialNetworkApp.api.response.*;
 import soialNetworkApp.errors.EmptyFieldException;
 import soialNetworkApp.errors.PersonNotFoundException;
 import soialNetworkApp.errors.UserPageBlockedException;
+import soialNetworkApp.service.PersonCacheService;
 import soialNetworkApp.service.PersonsService;
 import soialNetworkApp.service.PostsService;
 import soialNetworkApp.service.UsersService;
@@ -34,6 +35,7 @@ public class UsersController {
 
     private final PostsService postsService;
     private final PersonsService personsService;
+    private final PersonCacheService personCacheService;
     private final UsersService usersService;
 
     @UpdateOnlineTime
@@ -44,7 +46,7 @@ public class UsersController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<PersonRs> getUserById(@PathVariable long id) throws UserPageBlockedException {
         return personsService.getPersonDataById(id);
@@ -58,14 +60,14 @@ public class UsersController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<List<PostRs>> getUsersPosts(
             @PathVariable long id,
             @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
             @RequestParam(name = "itemPerPage", required = false, defaultValue = "${socialNetwork.default.size}") int size) {
 
-        return postsService.getAllPostsByAuthor(offset, size, personsService.getPersonById(id));
+        return postsService.getAllPostsByAuthor(offset, size, personCacheService.getPersonById(id));
     }
 
     @UpdateOnlineTime
@@ -76,7 +78,7 @@ public class UsersController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<PostRs> createPost(
             @PathVariable(name = "id") Long personId,
@@ -94,7 +96,7 @@ public class UsersController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<PersonRs> getMyData() {
         return personsService.getMyData();
@@ -108,7 +110,7 @@ public class UsersController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     ResponseEntity<UserRs> updateMyData(@RequestBody UserRq userRq) throws Exception {
         return ResponseEntity
@@ -122,7 +124,7 @@ public class UsersController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     ResponseEntity<ResponseRsComplexRs> deleteMyData() {
         return ResponseEntity
@@ -135,7 +137,7 @@ public class UsersController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     ResponseEntity<ResponseRsComplexRs> recoverMyData() {
         return ResponseEntity
@@ -150,7 +152,7 @@ public class UsersController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<List<PersonRs>> findPersons(
             FindPersonRq personRq,

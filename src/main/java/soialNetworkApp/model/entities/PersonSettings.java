@@ -3,11 +3,13 @@ package soialNetworkApp.model.entities;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Data
 @Table(name = "person_settings")
-public class PersonSettings {
+public class PersonSettings implements Serializable {
+    private static final long serialVersionUID = -4439114469417994311L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

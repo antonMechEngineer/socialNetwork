@@ -97,7 +97,8 @@ class PostsControllerTest {
                         .param("text", "e")
                         .param("date_from", "1638883747478")
                         .param("date_to", "1670419731981")
-                        .param("tags", "funny"))
+                        .param("author", "Gretchen Contreras")
+                        .param("tags", "funny, summer"))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.total").value(4))
@@ -105,6 +106,35 @@ class PostsControllerTest {
                 .andExpect(jsonPath("$.perPage").value(20))
                 .andExpect(jsonPath("$.data").isArray());
 
+        findPostDateTest("1638883747478", "1670419731981", url);
+        findPostOneParamTest("author", "Gretchen Contreras", url);
+        findPostOneParamTest("tags", "funny, summer", url);
+
         tokenCheck.wrongOrExpiredTokenCheck(mockMvc, HttpMethod.GET, url);
+    }
+
+    void findPostOneParamTest(String paramName, String param, String url) throws Exception {
+        mockMvc.perform(get(url)
+                        .param("text", "e")
+                        .param(paramName, param))
+                .andDo(print())
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.total").value(4))
+                .andExpect(jsonPath("$.offset").value(0))
+                .andExpect(jsonPath("$.perPage").value(20))
+                .andExpect(jsonPath("$.data").isArray());
+    }
+
+    void findPostDateTest(String dateFrom, String dateTo, String url) throws Exception {
+        mockMvc.perform(get(url)
+                        .param("text", "e")
+                        .param("date_from", dateFrom)
+                        .param("date_to", dateTo))
+                .andDo(print())
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.total").value(4))
+                .andExpect(jsonPath("$.offset").value(0))
+                .andExpect(jsonPath("$.perPage").value(20))
+                .andExpect(jsonPath("$.data").isArray());
     }
 }

@@ -110,7 +110,7 @@ class FriendsControllerTest {
         mockMvc.perform(get(url))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.total").value(8))
+                .andExpect(jsonPath("$.total").value(7))
                 .andExpect(jsonPath("$.offset").value(0))
                 .andExpect(jsonPath("$.perPage").value(8))
                 .andExpect(jsonPath("$.data").isArray());

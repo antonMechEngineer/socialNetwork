@@ -10,4 +10,5 @@ public class EmailRq {
 
     @ApiModelProperty(value = "string representation of email", example = "fullName@gmail.com", required = true)
     private String email;
+    private String secret;
 }

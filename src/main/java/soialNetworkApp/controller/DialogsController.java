@@ -31,7 +31,7 @@ public class DialogsController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<List<DialogRs>> dialogs() {
         return dialogsService.getAllDialogs();
@@ -44,7 +44,7 @@ public class DialogsController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<ComplexRs> dialogsStart(@RequestBody DialogUserShortListDto dialogUserShortListDto) {
         return dialogsService.beginDialog(dialogUserShortListDto);
@@ -57,7 +57,7 @@ public class DialogsController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<List<MessageRs>> messages(@PathVariable Long dialogId) {
         return dialogsService.getMessages(dialogId);
@@ -70,7 +70,7 @@ public class DialogsController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<ComplexRs> unread() {
         return dialogsService.getUnreadMessages();
@@ -83,7 +83,7 @@ public class DialogsController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<ComplexRs> read(@RequestBody MessageRq messageRq) {
         return dialogsService.setReadMessages(messageRq.getDialogId());
