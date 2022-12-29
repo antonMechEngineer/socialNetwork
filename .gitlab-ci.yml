@@ -29,7 +29,11 @@ sonarqube-check:
     paths:
       - .sonar/cache
   script:
-    - sonar-scanner
+    - sonar-scanner -Dsonar.qualitygate.wait=true
+#    - sonar-sonar
+#    -Dsonar:projectKey: JavaproTeams30Backend \
+#    -Dsonar:host:url: http://194.87.244.66:9000 \
+#    -Dsonar:login: sqp_0ba0fbe7c80c856eb111f80784e8316a15f5f0cf
   allow_failure: true
   only:
     - dev
