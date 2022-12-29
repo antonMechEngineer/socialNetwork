@@ -18,19 +18,18 @@ deploy-job:
   only:
     - dev
 sonarqube-check:
-  image: maven:3.6.3-jdk-11
+  image:
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
   variables:
-    SONAR_HOST_URL: "http://localhost:9000"
-    LOGIN: "admin" # логин sonarqube
-    PASSWORD: "Upvel123" # пароль sonarqube
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
-    GIT_DEPTH: 0  # Tells git to fetch all the branches of the project, required by the analysis task
+    GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
   cache:
     key: "${CI_JOB_NAME}"
     paths:
       - .sonar/cache
   script:
-    - mvn verify sonar:sonar -Dsonar.projectKey=javapro_team30_javaproTeams30Backend_AYVXgNyHrRs_75bwnfJ8
+    - sonar-scanner
   allow_failure: true
   only:
     - dev
