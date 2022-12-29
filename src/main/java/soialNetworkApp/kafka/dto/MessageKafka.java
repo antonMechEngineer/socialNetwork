@@ -19,7 +19,6 @@ public class MessageKafka {
 
     private String messageText;
 
-    @Enumerated(value = EnumType.STRING)
     private ReadStatusTypes readStatus;
 
     private Boolean isDeleted;

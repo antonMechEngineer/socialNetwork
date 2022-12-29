@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class NotificationKafka {
 
-    @Enumerated(value = EnumType.STRING)
     private NotificationTypes notificationType;
 
     private LocalDateTime sentTime;

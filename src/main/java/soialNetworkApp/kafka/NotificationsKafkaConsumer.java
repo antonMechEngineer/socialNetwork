@@ -22,7 +22,6 @@ public class NotificationsKafkaConsumer {
         LOGGER.info(String.format("Json message received -> %s", notificationKafka.toString()));
 
         NotificationTypes notificationTypes = NotificationTypes.valueOf(notificationKafka.getNotificationType().toString());
-        System.out.println(notificationTypes);
         notificationsRepository.save(notificationTypes.toString(), notificationKafka.getNotificationedId(),
                 notificationKafka.getIsRead(), notificationKafka.getSentTime(), notificationKafka.getPersonId());
     }

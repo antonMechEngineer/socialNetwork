@@ -48,10 +48,6 @@ class FriendsServiceTest {
     @MockBean
     private PersonsRepository personsRepository;
 
-    //TODO: данного репозитория больше не существует
-//    @MockBean
-//    private FriendshipStatusesRepository friendshipStatusesRepository;
-
     @MockBean
     private FriendMapper friendMapper;
 
@@ -152,16 +148,12 @@ class FriendsServiceTest {
         friendsService.addFriend(RECEIVED_FRIEND.getId());
         assertEquals(FRIEND, fsCurPsFr.getFriendshipStatus());
         assertEquals(FRIEND, fsCurPsRcFr.getFriendshipStatus());
-        //TODO: скорее всего удалить строчку внизу
-        //verify(friendshipStatusesRepository, times(2)).save(any());
     }
 
     @Test
     void sendFriendshipRequest() throws Exception {
         friendsService.sendFriendshipRequest(REQUESTED_FRIEND.getId());
         verify(friendshipsRepository, times(2)).save(any());
-        //TODO: скорее всего удалить строчку внизу
-        //verify(friendshipStatusesRepository, times(2)).save(any());
         verify(notificationsService, times(1)).createNotification(any(), any());
     }
 

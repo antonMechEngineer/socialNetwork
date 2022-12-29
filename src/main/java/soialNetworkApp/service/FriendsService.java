@@ -47,7 +47,7 @@ public class FriendsService {
     public FriendshipRs sendFriendshipRequest(Long requestedFriendId) throws Exception {
         Person srcPerson = getSrcPerson();
         Person dstPerson = getDstPerson(requestedFriendId);
-        createFriendshipObjects(srcPerson, dstPerson);
+        createFriendshipRequest(srcPerson, dstPerson);
         return new FriendshipRs(LocalDateTime.now().toString(), ComplexRs.builder().build());
     }
 
@@ -78,9 +78,7 @@ public class FriendsService {
     }
 
     public FriendshipStatusTypes getStatusTwoPersons(Person dstPerson, Person srcPerson) {
-        //TODO: переделать на friendshipsRepository.findFriendshipBySrcPersonAndDstPerson() можно удалить
-        List<Friendship> srcFriendships = friendshipsRepository.findFriendshipBySrcPerson(srcPerson);
-        Optional<Friendship> optionalSrcFriendship = getFriendshipByDstPerson(srcFriendships, dstPerson);
+        Optional<Friendship> optionalSrcFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(srcPerson, dstPerson);
         FriendshipStatusTypes srcFriendshipStatusType = UNKNOWN;
         if (optionalSrcFriendship.isPresent()) {
             srcFriendshipStatusType = optionalSrcFriendship.get().getFriendshipStatus();
@@ -103,8 +101,7 @@ public class FriendsService {
         }
     }
 
-    //TODO:переименовать в createFriendshipRequest или сделать метод общеиспользуемым добавив в параметры FriendshipsStatusTypes. Добавить возвращаемое значение, удалить сохранение из метода
-    private void createFriendshipObjects(Person srcPerson, Person dstPerson) {
+    private void createFriendshipRequest(Person srcPerson, Person dstPerson) {
         Friendship srcFriendship = new Friendship(LocalDateTime.now(), srcPerson, dstPerson, REQUEST);
         Friendship dstFriendship = new Friendship(LocalDateTime.now(), dstPerson, srcPerson, RECEIVED_REQUEST);
         friendshipsRepository.save(srcFriendship);
@@ -115,11 +112,8 @@ public class FriendsService {
     }
 
     private void deleteFriendships(Person srcPerson, Person dstPerson) {
-        //TODO: переделать на friendshipsRepository.findFriendshipBySrcPersonAndDstPerson()
-        List<Friendship> srcFriendships = friendshipsRepository.findFriendshipBySrcPerson(srcPerson);
-        List<Friendship> dstFriendships = friendshipsRepository.findFriendshipBySrcPerson(dstPerson);
-        Friendship srcFriendship = getFriendshipByDstPerson(srcFriendships, dstPerson).orElseThrow();
-        Friendship dstFriendship = getFriendshipByDstPerson(dstFriendships, srcPerson).orElseThrow();
+        Friendship srcFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(srcPerson, dstPerson).orElseThrow();
+        Friendship dstFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(dstPerson, srcPerson).orElseThrow();
         notificationsService.deleteNotification(dstFriendship);
         friendshipsRepository.delete(srcFriendship);
         friendshipsRepository.delete(dstFriendship);
@@ -134,9 +128,7 @@ public class FriendsService {
     }
 
     private void modifyFriendShipStatus(Person srcPerson, Person dstPerson) {
-        //TODO: переделать на friendshipsRepository.findFriendshipBySrcPersonAndDstPerson()
-        List<Friendship> srcFriendships = friendshipsRepository.findFriendshipBySrcPerson(srcPerson);
-        Optional<Friendship> optionalSrcFriendship = getFriendshipByDstPerson(srcFriendships, dstPerson);
+        Optional<Friendship> optionalSrcFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(srcPerson, dstPerson);
         if (optionalSrcFriendship.isPresent()) {
             Friendship friendship = optionalSrcFriendship.get();
             friendship.setFriendshipStatus(FRIEND);
@@ -162,16 +154,11 @@ public class FriendsService {
     }
 
     private List<PersonRs> personsToPersonResponses(List<Person> persons, Person srcPerson) {
-        List<PersonRs> personRespons = new ArrayList<>();
+        List<PersonRs> personResponse = new ArrayList<>();
         for (Person person : persons) {
-            personRespons.add(friendMapper.toFriendResponse(person, getStatusTwoPersons(person, srcPerson)));
+            personResponse.add(friendMapper.toFriendResponse(person, getStatusTwoPersons(person, srcPerson)));
         }
-        return personRespons;
-    }
-
-    //TODO:удалить данный метод
-    private Optional<Friendship> getFriendshipByDstPerson(List<Friendship> friendships, Person dstPerson) {
-        return friendships.stream().filter(fs -> fs.getDstPerson() == dstPerson).findFirst();
+        return personResponse;
     }
 
     private Person getSrcPerson() throws Exception {

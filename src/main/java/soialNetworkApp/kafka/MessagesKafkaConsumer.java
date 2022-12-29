@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import soialNetworkApp.kafka.dto.MessageKafka;
 import soialNetworkApp.repository.MessagesRepository;
 
+
 @Service
 @RequiredArgsConstructor
 public class MessagesKafkaConsumer {
