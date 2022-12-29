@@ -18,7 +18,6 @@ deploy-job:
   only:
     - dev
 sonarqube-check:
-  stage: sonarqube-check
   image:
     name: sonarsource/sonar-scanner-cli:latest
     entrypoint: [""]
