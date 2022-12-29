@@ -18,6 +18,7 @@ deploy-job:
   only:
     - dev
 sonarqube-check:
+  stage: codequality
   image: maven:3.6.3-jdk-11
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
@@ -27,7 +28,8 @@ sonarqube-check:
     paths:
       - .sonar/cache
   script:
-    - mvn install
+    - mvn clean:clean
+    - mvn install:install
     - mvn verify sonar:sonar -Dsonar.projectKey=javapro_team30_javaproTeams30Backend_AYVdFMU_Upj4aDoqNHLE  -Dsonar.host:url=http://194.87.244.66:9000 \ -Dsonar.login=sqp_0ba0fbe7c80c856eb111f80784e8316a15f5f0cf
   allow_failure: true
   only:
