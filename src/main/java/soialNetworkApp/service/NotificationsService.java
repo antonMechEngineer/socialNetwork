@@ -72,12 +72,12 @@ public class NotificationsService {
         if (readAll) {
             notificationsRepository.findAllByPersonAndIsReadIsFalse(person).forEach(notification -> {
                 notification.setIsRead(true);
-                //notificationsRepository.save(notification);
+                notificationsKafkaProducer.sendMessage(notification);
             });
         } else {
             Notification notification = notificationsRepository.findById(notificationId).get();
             notification.setIsRead(true);
-            notificationsRepository.save(notification);
+            notificationsKafkaProducer.sendMessage(notification);
         }
         return getAllNotificationsByPerson(offset, size, person);
     }
@@ -89,7 +89,6 @@ public class NotificationsService {
         notification.setNotificationType(entity.getNotificationType());
         notification.setEntity(entity);
         notification.setSentTime(LocalDateTime.now(ZoneId.of(timezone)));
-        //notificationsRepository.save(notification);
         notificationsKafkaProducer.sendMessage(notification);
         template.convertAndSend(String.format("/user/%s/queue/notifications", person.getId()),
                 getAllNotificationsByPerson(offset, size, person));

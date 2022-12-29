@@ -19,7 +19,7 @@ public class MessagesKafkaConsumer {
     @KafkaListener(topics = "messages", groupId = "myGroup")
     public void consume(MessageKafka messageKafka){
         LOGGER.info(String.format("Json message received -> %s", messageKafka));
-        messagesRepository.save(messageKafka.getTime(), messageKafka.getMessageText(), messageKafka.getReadStatus(),
+        messagesRepository.save(messageKafka.getTime(), messageKafka.getMessageText(), messageKafka.getReadStatus().toString(),
                 messageKafka.getIsDeleted(), messageKafka.getAuthorId(), messageKafka.getRecipientId(), messageKafka.getDialogId());
 
     }

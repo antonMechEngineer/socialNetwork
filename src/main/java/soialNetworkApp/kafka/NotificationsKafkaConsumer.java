@@ -21,26 +21,9 @@ public class NotificationsKafkaConsumer {
     public void consume(NotificationKafka notificationKafka) {
         LOGGER.info(String.format("Json message received -> %s", notificationKafka.toString()));
 
-        Notificationed notificationed = new Notificationed() {
-
-            @Override
-            public NotificationTypes getNotificationType() {
-                return notificationKafka.getNotificationType();
-            }
-
-            @Override
-            public Person getAuthor() {
-                return null;
-            }
-
-            @Override
-            public Long getId() {
-                return notificationKafka.getNotificationedId();
-            }
-        };
         NotificationTypes notificationTypes = NotificationTypes.valueOf(notificationKafka.getNotificationType().toString());
         System.out.println(notificationTypes);
-        notificationsRepository.save(notificationTypes, notificationKafka.getNotificationedId(),
+        notificationsRepository.save(notificationTypes.toString(), notificationKafka.getNotificationedId(),
                 notificationKafka.getIsRead(), notificationKafka.getSentTime(), notificationKafka.getPersonId());
     }
 }
