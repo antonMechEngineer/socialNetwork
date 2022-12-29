@@ -3,7 +3,6 @@ package soialNetworkApp.service;
 import lombok.RequiredArgsConstructor;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.PersonRs;
-import soialNetworkApp.errors.UserPageBlockedException;
 import soialNetworkApp.mappers.PersonMapper;
 import soialNetworkApp.model.entities.Friendship;
 import soialNetworkApp.model.entities.Person;
@@ -27,11 +26,13 @@ public class PersonsService {
     private final FriendsService friendsService;
     private final PersonCacheService personCacheService;
 
-    public CommonRs<PersonRs> getPersonDataById(Long id) throws UserPageBlockedException {
+    public CommonRs<PersonRs> getPersonDataById(Long id) {
         Person srcPerson = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow();
-        blockUserPage(srcPerson, id);
         Person person = personCacheService.getPersonById(id);
         person.setFriendStatus(friendsService.getStatusTwoPersons(person, srcPerson));
+        if (blockUserPage(srcPerson, id)) {
+            return buildCommoRsForBlockedPage(person);
+        }
         return getCommonPersonResponse(person);
     }
 
@@ -63,17 +64,28 @@ public class PersonsService {
                 .build();
     }
 
-    private void blockUserPage(Person me, Long userWhoBlocked) throws UserPageBlockedException {
+    private boolean blockUserPage(Person me, Long userWhoBlocked) {
         List<Friendship> friendships = friendshipsRepository.findFriendshipsByDstPersonIdAndFriendshipStatus(me.getId(), FriendshipStatusTypes.BLOCKED);
         List<Long> srcPersonsIds = getSrcPersons(friendships);
-        if (srcPersonsIds.contains(userWhoBlocked)) {
-            throw new UserPageBlockedException("User page with id: '" + userWhoBlocked + "' blocked for person with id: '" + me.getId() + "'");
-        }
+        return srcPersonsIds.contains(userWhoBlocked);
     }
 
     private List<Long> getSrcPersons (List<Friendship> friendships) {
         List<Long> ids = new ArrayList<>();
         friendships.forEach(friendship -> ids.add(friendship.getSrcPerson().getId()));
         return ids;
+    }
+
+    private CommonRs<PersonRs> buildCommoRsForBlockedPage(Person person) {
+        PersonRs personWhoBlockedMe = personMapper.toPersonResponse(new Person());
+        personWhoBlockedMe.setIsBlockedByCurrentUser(true);
+        personWhoBlockedMe.setId(person.getId());
+        personWhoBlockedMe.setFirstName(person.getFirstName());
+        personWhoBlockedMe.setLastName(person.getLastName());
+        personWhoBlockedMe.setFriendStatus(person.getFriendStatus());
+        return CommonRs.<PersonRs>builder()
+                .timestamp(System.currentTimeMillis())
+                .data(personWhoBlockedMe)
+                .build();
     }
 }

@@ -115,6 +115,7 @@ public class FriendsService {
 
     private void deleteFriendships(Person srcPerson, Person dstPerson) {
         //TODO: переделать на friendshipsRepository.findFriendshipBySrcPersonAndDstPerson()
+        //TODO: косяк если в таблице только одна запись (user1 - user2 - FRIEND, а user2 - user1 - FRIEND не существует)
         List<Friendship> srcFriendships = friendshipsRepository.findFriendshipBySrcPerson(srcPerson);
         List<Friendship> dstFriendships = friendshipsRepository.findFriendshipBySrcPerson(dstPerson);
         Friendship srcFriendship = getFriendshipByDstPerson(srcFriendships, dstPerson).orElseThrow();
@@ -185,11 +186,12 @@ public class FriendsService {
     }
 
     private void blockPerson(Friendship meDstFriendship, Friendship meSrcFriendship, Person me, Person dstPerson) {
-        if (meDstFriendship != null) {
+        if (meDstFriendship != null && meDstFriendship.getFriendshipStatus() != BLOCKED) {
             friendshipsRepository.delete(meDstFriendship);
         }
         if (meSrcFriendship != null) {
             meSrcFriendship.setFriendshipStatus(BLOCKED);
+            meSrcFriendship.setSentTime(LocalDateTime.now());
         } else {
             meSrcFriendship = new Friendship(LocalDateTime.now(), me, dstPerson, BLOCKED);
         }

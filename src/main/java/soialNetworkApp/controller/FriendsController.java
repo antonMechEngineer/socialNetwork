@@ -133,7 +133,7 @@ public class FriendsController {
         return friendsService.getRequestedPersons(offset, size);
     }
 
-    @PostMapping("/block_unblock")
+    @PostMapping("/block_unblock/{id}")
     @ApiOperation(value = "block or unblock (if user in block) user by user")
     @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
     @ApiResponses(value = {
@@ -142,7 +142,7 @@ public class FriendsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public void userBlocksUser(@RequestParam(value = "block_user_id") Long blockUserId) throws PersonException {
+    public void userBlocksUser(@PathVariable(name = "id") Long blockUserId) throws PersonException {
         friendsService.userBlocksUser(blockUserId);
     }
 }

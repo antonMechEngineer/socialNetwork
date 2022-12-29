@@ -17,6 +17,7 @@ import soialNetworkApp.repository.FriendshipsRepository;
 import soialNetworkApp.repository.PersonsRepository;
 import soialNetworkApp.repository.PostsRepository;
 import soialNetworkApp.service.search.SearchPosts;
+import soialNetworkApp.service.util.CurrentUser;
 import soialNetworkApp.service.util.NetworkPageRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -29,7 +30,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static soialNetworkApp.model.enums.FriendshipStatusTypes.BLOCKED;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +46,7 @@ public class PostsService {
     private final NotificationsService notificationsService;
     private final PostMapper postMapper;
     private final SearchPosts searchPosts;
+    private final CurrentUser currentUser;
 
     @Value("${socialNetwork.timezone}")
     private String timezone;
@@ -73,8 +78,11 @@ public class PostsService {
     }
 
     public CommonRs<List<PostRs>> getAllPostsByAuthor(int offset, int size, Person postsAuthor) {
+        if (blockPostsByAuthor(postsAuthor)) {
+            return buildCommonResponse(offset, size, new ArrayList<>(), 0L);
+        }
         Pageable pageable = NetworkPageRequest.of(offset, size);
-        Page<Post> postPage = postsRepository.findPostsByAuthorOrderByTimeDesc(pageable, postsAuthor);
+        Page<Post> postPage= postsRepository.findPostsByAuthorOrderByTimeDesc(pageable, postsAuthor);
         return buildCommonResponse(offset, size, postPage.getContent(), postPage.getTotalElements());
     }
 
@@ -172,7 +180,7 @@ public class PostsService {
 
     private Page<Post> blockPosts(Pageable pageable) {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
-        List<Friendship> friendships = friendshipsRepository.findFriendshipsByDstPersonIdAndFriendshipStatus(person.getId(), FriendshipStatusTypes.BLOCKED);
+        List<Friendship> friendships = friendshipsRepository.findFriendshipsByDstPersonIdAndFriendshipStatus(person.getId(), BLOCKED);
         if (friendships.size() != 0) {
             List<Person> srcPersons = new ArrayList<>();
             friendships.forEach(friendship -> srcPersons.add(friendship.getSrcPerson()));
@@ -180,5 +188,11 @@ public class PostsService {
         } else {
             return Page.empty();
         }
+    }
+
+    private boolean blockPostsByAuthor(Person author) {
+        Person me = currentUser.getPerson();
+        Optional<Friendship> friendship = friendshipsRepository.findFriendshipByFriendshipStatusAndSrcPersonIdAndDstPersonId(BLOCKED, author.getId(), me.getId());
+        return friendship.isPresent();
     }
 }
