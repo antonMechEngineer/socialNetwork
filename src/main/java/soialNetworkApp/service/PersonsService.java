@@ -1,10 +1,8 @@
 package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.PersonRs;
-import soialNetworkApp.errors.UserPageBlockedException;
 import soialNetworkApp.mappers.PersonMapper;
 import soialNetworkApp.model.entities.Friendship;
 import soialNetworkApp.model.entities.Person;
@@ -14,7 +12,6 @@ import soialNetworkApp.repository.PersonsRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +26,7 @@ public class PersonsService {
     private final FriendsService friendsService;
     private final PersonCacheService personCacheService;
 
-    public CommonRs<PersonRs> getPersonDataById(Long id) throws UserPageBlockedException {
+    public CommonRs<PersonRs> getPersonDataById(Long id) {
         Person srcPerson = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow();
         Person person = personCacheService.getPersonById(id);
         person.setFriendStatus(friendsService.getStatusTwoPersons(person, srcPerson));
@@ -67,7 +64,7 @@ public class PersonsService {
                 .build();
     }
 
-    private boolean blockUserPage(Person me, Long userWhoBlocked) throws UserPageBlockedException {
+    private boolean blockUserPage(Person me, Long userWhoBlocked) {
         List<Friendship> friendships = friendshipsRepository.findFriendshipsByDstPersonIdAndFriendshipStatus(me.getId(), FriendshipStatusTypes.BLOCKED);
         List<Long> srcPersonsIds = getSrcPersons(friendships);
         return srcPersonsIds.contains(userWhoBlocked);
@@ -85,6 +82,7 @@ public class PersonsService {
         personWhoBlockedMe.setId(person.getId());
         personWhoBlockedMe.setFirstName(person.getFirstName());
         personWhoBlockedMe.setLastName(person.getLastName());
+        personWhoBlockedMe.setFriendStatus(person.getFriendStatus());
         return CommonRs.<PersonRs>builder()
                 .timestamp(System.currentTimeMillis())
                 .data(personWhoBlockedMe)

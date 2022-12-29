@@ -186,7 +186,7 @@ public class FriendsService {
     }
 
     private void blockPerson(Friendship meDstFriendship, Friendship meSrcFriendship, Person me, Person dstPerson) {
-        if (meDstFriendship != null) {
+        if (meDstFriendship != null && meDstFriendship.getFriendshipStatus() != BLOCKED) {
             friendshipsRepository.delete(meDstFriendship);
         }
         if (meSrcFriendship != null) {
