@@ -18,9 +18,7 @@ deploy-job:
   only:
     - dev
 sonarqube-check:
-  image:
-    name: sonarsource/sonar-scanner-cli:latest
-    entrypoint: [""]
+  image: maven:3.6.3-jdk-11
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
     GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
@@ -29,8 +27,8 @@ sonarqube-check:
     paths:
       - .sonar/cache
   script:
-    - sonar-scanner -Dsonar.qualitygate.wait=true
-    - mvn sonar-sonar -Dsonar.projectKey=JavaproTeams30Backend \ -Dsonar.host:url=http://194.87.244.66:9000 \ -Dsonar.login=sqp_0ba0fbe7c80c856eb111f80784e8316a15f5f0cf
+    - mvn sonar:scanner -Dsonar.qualitygate.wait=true
+    - mvn verify sonar:sonar -Dsonar.projectKey=javapro_team30_javaproTeams30Backend_AYVdFMU_Upj4aDoqNHLE \ -Dsonar.host:url=http://194.87.244.66:9000 \ -Dsonar.login=sqp_0ba0fbe7c80c856eb111f80784e8316a15f5f0cf
   allow_failure: true
   only:
     - dev
