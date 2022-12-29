@@ -1,6 +1,5 @@
 package soialNetworkApp.kafka;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -10,8 +9,8 @@ import org.springframework.stereotype.Service;
 import soialNetworkApp.kafka.dto.MessageKafka;
 import soialNetworkApp.model.entities.Message;
 
+// TODO: 29.12.2022 log by self4j
 @Service
-
 public class MessagesKafkaProducer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessagesKafkaProducer.class);
     private KafkaTemplate<String, MessageKafka> kafkaTemplate;

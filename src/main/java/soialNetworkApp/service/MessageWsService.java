@@ -27,7 +27,8 @@ public class MessageWsService {
         Message message = dialogMapper.toMessageFromWs(messageWsRq,
                 dialogsRepository.findById(messageWsRq.getDialogId()).orElseThrow(),
                 personsRepository.findPersonById(messageWsRq.getAuthorId()).orElseThrow());
-        messagesKafkaProducer.sendMessage(message);
+        //messagesKafkaProducer.sendMessage(message);
+        messagesRepository.save(message);
     }
 
     public void messageTypingFromWs(Long dialogId, Long userId, MessageWsRq messageWsRq) {
