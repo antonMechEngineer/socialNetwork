@@ -27,8 +27,8 @@ sonarqube-check:
     paths:
       - .sonar/cache
   script:
-#    - mvn clean:clean
-#    - mvn install:install
+    - mvn clean:clean
+    - mvn install:install
     - mvn sonar:sonar
       -Dsonar.projectKey=javapro_team30_javaproTeams30Backend_AYVdFMU_Upj4aDoqNHLE
       -Dsonar.host:url=http://194.87.244.66:9000
