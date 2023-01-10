@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
 import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.repository.PersonsRepository;
-import soialNetworkApp.service.util.CurrentUser;
+import soialNetworkApp.service.util.CurrentUserExtractor;
 
 import java.util.Optional;
 
@@ -28,7 +28,7 @@ class FriendsRecommendationServiceTest {
     private PersonsRepository personsRepository;
 
     @MockBean
-    private CurrentUser currentUser;
+    private CurrentUserExtractor currentUserExtractor;
 
     @Test
     void getFriendsRecommendation(){
@@ -36,7 +36,7 @@ class FriendsRecommendationServiceTest {
         when(personsRepository.findPersonByEmail(any())).thenReturn(Optional.of(person));
         when(personsRepository.getPersonByCityAndIdNotIn(any(), any(), any())).thenReturn(Page.empty());
         when(personsRepository.getPersonByIdNotInOrderByRegDateDesc(any(), any())).thenReturn(Page.empty());
-        when(currentUser.getPerson()).thenReturn(person);
+        when(currentUserExtractor.getPerson()).thenReturn(person);
 
         friendsRecommendationService.getFriendsRecommendation();
 
