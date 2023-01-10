@@ -37,7 +37,7 @@ public class AccountService {
     private final PersonSettingsRepository personSettingsRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService eMailService;
-    private final PersonsService personsService;
+    private final PersonCacheService personCacheService;
     @Value("${auth.pass-restore}")
     String basePassUrl;
     @Value("${auth.email-restore}")
@@ -59,6 +59,9 @@ public class AccountService {
             if (!optionalCaptcha.get().getCode().equals(captcha)) {
                 throw new CaptchaException("Invalid captcha entered");
             }
+        } else {
+            //TODO: Переписать сообщение об ошибке на более понятное для пользователя
+            throw new CaptchaException("Сaptcha not found in repository");
         }
         registerRs.setEmail(regRequest.getEmail());
         registerRs.setData(data);
@@ -157,6 +160,23 @@ public class AccountService {
         eMailService.sendSimpleMessage(to, subject, text);
         return response;
     }
+    public RegisterRs getNewEmail(EmailRq emailRq){
+        Optional<Person> optPerson = personsRepository.checkToken(emailRq.getSecret());
+        Person rescuePerson=null;
+        if (optPerson.isPresent()){rescuePerson = optPerson.get();}
+
+        RegisterRs response = new RegisterRs();
+        ComplexRs data = getComplexRs();
+        response.setEmail(rescuePerson.getEmail());
+        response.setTimestamp(0);
+        response.setData(data);
+
+        rescuePerson.setEmail(emailRq.getEmail());
+        rescuePerson.setChangePasswordToken(null);
+        personsRepository.save(rescuePerson);
+
+        return response;
+    }
 
     private PersonSettings createDefaultNotificationsSettings(Person person) {
         PersonSettings settings = new PersonSettings();
@@ -172,7 +192,7 @@ public class AccountService {
     }
 
     public CommonRs<ComplexRs> setPersonSetting(PersonSettingsRq request) throws PersonNotFoundException, IncorrectRequestTypeException {
-        Person person = personsService.getPersonByContext();
+        Person person = personCacheService.getPersonByContext();
         if (person == null) {
             throw new PersonNotFoundException("Person not found");
         }
@@ -217,7 +237,7 @@ public class AccountService {
     }
 
     public CommonRs<List<PersonSettingsRs>> getPersonSettings() throws PersonNotFoundException {
-        Person person = personsService.getPersonByContext();
+        Person person = personCacheService.getPersonByContext();
         if (person == null) {
             throw new PersonNotFoundException("Person not found");
         }

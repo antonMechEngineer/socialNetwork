@@ -39,7 +39,7 @@ public class AccountController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public ResponseEntity<RegisterRs> register(@RequestBody RegisterRq regRequest) throws PasswordException, CaptchaException {
         return ResponseEntity.ok(accountService.getRegResponse(regRequest));
@@ -52,7 +52,7 @@ public class AccountController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public ResponseEntity<RegisterRs> passwordSet(@RequestBody PasswordSetRq passwordSetRq){
         return ResponseEntity.ok(accountService.getPasswordSet(passwordSetRq));}
@@ -64,7 +64,7 @@ public class AccountController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public ResponseEntity<RegisterRs> passwordReSet(@RequestBody PasswordRq passwordRq){
         return ResponseEntity.ok(accountService.getPasswordReSet(passwordRq));}
@@ -76,7 +76,7 @@ public class AccountController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public ResponseEntity<RegisterRs> passwordRecovery(@RequestBody LinkedHashMap email){
         return ResponseEntity.ok(accountService.getPasswordRecovery(email.get("email").toString()));}
@@ -88,9 +88,11 @@ public class AccountController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public ResponseEntity<RegisterRs> emailSet(@RequestBody EmailRq emailRq) {return null;}
+    public ResponseEntity<RegisterRs> emailSet(@RequestBody EmailRq emailRq) {
+        return ResponseEntity.ok(accountService.getNewEmail(emailRq));
+    }
 
     @PutMapping("/email/recovery")
     @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
@@ -99,9 +101,9 @@ public class AccountController {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public ResponseEntity<RegisterRs> emailRecovery(@RequestBody EmailRq emailRq) {
+    public ResponseEntity<RegisterRs> emailRecovery() {
         return ResponseEntity.ok(accountService.getEmailRecovery());}
 
     @UpdateOnlineTime

@@ -3,7 +3,14 @@ spring:
     url: jdbc:postgresql://localhost:5432/network
     username: postgres
     password: 123
+  redis:
+    host: localhost
 
 logging:
   file:
     uploadLogs: false
+
+auth:
+  pass-restore: http://localhost:8080/change-password?token=
+  email-restore: http://localhost:8080/shift-email?token=
+

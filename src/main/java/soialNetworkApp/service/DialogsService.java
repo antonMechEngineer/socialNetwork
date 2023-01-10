@@ -127,7 +127,7 @@ public class DialogsService {
     private List<DialogRs> blockDialogs(List<DialogRs> dialogs) {
         Person me = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
         List<Friendship> friendships =
-                friendshipsRepository.findFriendshipsBySrcPersonIdOrDstPersonIdAndFriendshipStatus(me.getId(), me.getId(), FriendshipStatusTypes.BLOCKED);
+                friendshipsRepository.findFriendshipsByFriendshipStatusAndSrcPersonIdOrDstPersonId(FriendshipStatusTypes.BLOCKED, me.getId(), me.getId());
         Set<Long> srcDstPersonsIds =  getSrcDstPersonsIds(friendships, me);
         return dialogs
                 .stream()

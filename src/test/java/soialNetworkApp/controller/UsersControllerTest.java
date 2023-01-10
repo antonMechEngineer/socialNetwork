@@ -125,7 +125,9 @@ class UsersControllerTest {
                         .param("first_name", "Jescie")
                         .param("last_name", "Logan")
                         .param("age_from", "5")
-                        .param("date_to", "80"))
+                        .param("date_to", "80")
+                        .param("country", "France")
+                        .param("city", "Paris"))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.total").value(1))
@@ -133,6 +135,24 @@ class UsersControllerTest {
                 .andExpect(jsonPath("$.perPage").value(20))
                 .andExpect(jsonPath("$.data").isArray());
 
+        findPersonOneParamTest("first_name", "Jescie", url);
+        findPersonOneParamTest("last_name", "Logan", url);
+        findPersonOneParamTest("age_from", "5", url);
+        findPersonOneParamTest("age_to", "80", url);
+        findPersonOneParamTest("country", "France", url);
+        findPersonOneParamTest("city", "Paris", url);
+
         tokenCheck.wrongOrExpiredTokenCheck(mockMvc, HttpMethod.GET, url);
+    }
+
+    void findPersonOneParamTest(String paramName, String param, String url) throws Exception {
+        mockMvc.perform(get(url)
+                        .param(paramName, param))
+                .andDo(print())
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.total").value(1))
+                .andExpect(jsonPath("$.offset").value(0))
+                .andExpect(jsonPath("$.perPage").value(20))
+                .andExpect(jsonPath("$.data").isArray());
     }
 }

@@ -27,12 +27,13 @@ public class LikesService {
     private final CommentsRepository commentsRepository;
     private final PersonsService personsService;
     private final NotificationsService notificationsService;
+    private  final PersonCacheService personCacheService;
 
     @Value("${socialNetwork.timezone}")
     private String timezone;
 
     public CommonRs<LikeRs> putLike(LikeRq likeRq) {
-        Person person = personsService.getPersonByContext();
+        Person person = personCacheService.getPersonByContext();
         Liked liked = getLikedEntity(likeRq.getItemId(), likeRq.getType());
         if (getLikeFromCurrentPerson(person, liked) == null) {
             Like like = new Like();
@@ -62,7 +63,7 @@ public class LikesService {
     }
 
     public CommonRs<LikeRs> deleteLike(long entityId, String type) {
-        Person person = personsService.getPersonByContext();
+        Person person = personCacheService.getPersonByContext();
         Liked liked = getLikedEntity(entityId, type);
         Like like = getLikeFromCurrentPerson(person, liked);
         if (like != null) {
@@ -99,7 +100,7 @@ public class LikesService {
 
     @Named("getMyLike")
     public Boolean getMyLike(Liked liked) {
-        Person person = personsService.getPersonByContext();
+        Person person = personCacheService.getPersonByContext();
         Like like = likesRepository.findLikeByPersonAndEntity(liked.getType(), liked, person).orElse(null);
         return like != null && person.getId().equals(like.getAuthor().getId());
     }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import soialNetworkApp.model.enums.FriendshipStatusTypes;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface FriendshipsRepository extends JpaRepository<Friendship, Long> {
@@ -25,5 +26,11 @@ public interface FriendshipsRepository extends JpaRepository<Friendship, Long> {
 
     List<Friendship> findFriendshipsByDstPersonIdAndFriendshipStatus(Long id, FriendshipStatusTypes status);
 
-    List<Friendship> findFriendshipsBySrcPersonIdOrDstPersonIdAndFriendshipStatus(Long srcId, Long dstId, FriendshipStatusTypes status);
+    @Query("FROM Friendship AS f " +
+            "WHERE f.friendshipStatus = :status " +
+            "AND (f.srcPerson.id = :srcId OR f.dstPerson.id = :dstId)")
+    List<Friendship> findFriendshipsByFriendshipStatusAndSrcPersonIdOrDstPersonId(@Param(value = "status") FriendshipStatusTypes status,
+                                                                                  @Param(value = "srcId") Long srcId,
+                                                                                  @Param(value = "dstId") Long dstId);
+    Optional<Friendship> findFriendshipByFriendshipStatusAndSrcPersonIdAndDstPersonId(FriendshipStatusTypes status, Long srcId, Long dstId);
 }
