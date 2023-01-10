@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import soialNetworkApp.api.request.DialogUserShortListDto;
 import soialNetworkApp.api.response.*;
+import soialNetworkApp.kafka.MessagesKafkaProducer;
 import soialNetworkApp.mappers.DialogMapper;
 import soialNetworkApp.mappers.PersonMapper;
 import soialNetworkApp.model.entities.Dialog;
@@ -36,6 +37,7 @@ public class DialogsService {
     private final DialogMapService dialogMapService;
     private final CurrentUser currentUser;
     private final PersonMapper personMapper;
+    private final MessagesKafkaProducer messagesKafkaProducer;
 
 
     public CommonRs<ComplexRs> getUnreadMessages() {
@@ -55,6 +57,7 @@ public class DialogsService {
                 .forEach(m -> {
                     m.setReadStatus(ReadStatusTypes.READ);
                     messagesRepository.save(m);
+                    //messagesKafkaProducer.sendMessage(message);
                     readCount[0]++;
                 });
         return new CommonRs<>(new ComplexRs(readCount[0]));
