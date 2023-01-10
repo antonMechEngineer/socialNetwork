@@ -8,7 +8,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
 import soialNetworkApp.api.request.FindPersonRq;
+import soialNetworkApp.api.request.UserRq;
+import soialNetworkApp.api.response.UserRs;
 import soialNetworkApp.errors.EmptyFieldException;
+import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.service.search.SearchPersons;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,5 +46,20 @@ public class UsersServiceTest {
         Throwable thrown = catchThrowable(() -> usersService.findPersons(personRq, 0, 20));
         assertThat(thrown).isInstanceOf(EmptyFieldException.class);
         assertThat(thrown.getMessage()).isNotBlank();
+    }
+
+    @Test
+    void testEditProfile() throws Exception {
+        UserRq userRq = new UserRq();
+        userRq.setAbout("about");
+        userRq.setPhone("+79991112233");
+        userRq.setCity("NewYork");
+        userRq.setCountry("Antarctica");
+        userRq.setFirst_name("Peter");
+        userRq.setLast_name("TheFirst");
+        userRq.setBirth_date("2000-12-25 00:00:00");
+        userRq.setPhoto_id("001");
+        Person person = new Person();
+  //      when(usersService.editProfile(userRq).getData().getAbout()).thenReturn("about");
     }
 }
