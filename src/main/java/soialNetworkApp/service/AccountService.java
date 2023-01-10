@@ -37,7 +37,6 @@ public class AccountService {
     private final PersonSettingsRepository personSettingsRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService eMailService;
-    private final PersonsService personsService;
     private final PersonCacheService personCacheService;
     @Value("${auth.pass-restore}")
     String basePassUrl;
@@ -60,6 +59,9 @@ public class AccountService {
             if (!optionalCaptcha.get().getCode().equals(captcha)) {
                 throw new CaptchaException("Invalid captcha entered");
             }
+        } else {
+            //TODO: Переписать сообщение об ошибке на более понятное для пользователя
+            throw new CaptchaException("Сaptcha not found in repository");
         }
         registerRs.setEmail(regRequest.getEmail());
         registerRs.setData(data);

@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface CaptchaRepository extends JpaRepository<Captcha, Long> {
-    @Query(value = "SELECT * FROM captcha WHERE secret_code =:secretCode", nativeQuery = true)
+    @Query(value = "SELECT * FROM captcha WHERE secret_code = :secretCode", nativeQuery = true)
     Optional<Captcha> findCaptchaBySecretCode(@Param("secretCode") String secretCode);
 
     @Query(value = "SELECT * FROM captcha WHERE time < (NOW() - INTERVAL '1 HOUR')", nativeQuery = true)
