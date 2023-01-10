@@ -16,6 +16,8 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/changelog-master.yaml
     enabled: true
+  redis:
+    host: localhost
 auth:
   secret: someSecretCode
   pass-restore: http://localhost:8080/change-password?token=
@@ -47,7 +49,6 @@ management:
     health:
       show-details: always
 
-redis:
-  host: localhost
+
 
 
