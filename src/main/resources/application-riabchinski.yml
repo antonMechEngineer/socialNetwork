@@ -1,34 +1,13 @@
 spring:
-#  jpa:
-#    hibernate:
-#      ddl-auto: validate
-#    database: postgresql
-#    open-in-view: true
-#    database-platform: org.hibernate.dialect.PostgreSQLDialect
-#    properties:hibernate:jdbc:lob:non_contextual_creation: true
-#    show-sql: false
+  redis:
+    host: localhost
 
   datasource:
 #    driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5434/postgres?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&serverTimezone=UTC&useUnicode=true&characterEncoding=utf8
     username: postgres
     password: test
-#    initialization-mode: always
-#    data: classpath:/db/changelog/data.sql
-#  liquibase:
-#    change-log: classpath:db/changelog/changelog-master.yaml
-#    enabled: true
 
-#applicationParams
-#socialNetwork:
-#  default:
-#    page: 0
-#    size: 20
-#
-#server:
-#  port: 8086
-#  servlet:
-#    context-path: "/"
 
 auth:
   pass-restore: http://localhost:8080/change-password?token=
@@ -40,5 +19,3 @@ logging:
     path: log
     uploadLogs: false
 
-redis:
-  host: localhost
