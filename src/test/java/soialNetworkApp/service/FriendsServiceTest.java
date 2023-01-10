@@ -2,7 +2,7 @@ package soialNetworkApp.service;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.PersonRs;
-import soialNetworkApp.mappers.FriendMapper;
+import soialNetworkApp.mappers.PersonMapper;
 import soialNetworkApp.model.entities.Friendship;
 import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.model.entities.PersonSettings;
@@ -53,7 +53,7 @@ class FriendsServiceTest {
 //    private FriendshipStatusesRepository friendshipStatusesRepository;
 
     @MockBean
-    private FriendMapper friendMapper;
+    private PersonMapper personMapper;
 
     private Friendship fsCurPsRcFr;
     private Friendship fsRcFr;
@@ -95,7 +95,7 @@ class FriendsServiceTest {
         buildRequestReceivedObjects();
         mockPersonsRepository();
         mockFriendshipsRepository();
-        mockFriendMapper();
+        mockPersonMapper();
         personSettings = new PersonSettings();
         personSettings.setFriendRequestNotification(true);
         REQUESTED_FRIEND.setPersonSettings(personSettings);
@@ -142,9 +142,9 @@ class FriendsServiceTest {
         when(friendshipsRepository.findFriendshipBySrcPerson(REQUESTED_FRIEND)).thenReturn(List.of(fsRqFr));
     }
 
-    private void mockFriendMapper() {
-        when(friendMapper.toFriendResponse(C_FRIEND, FRIEND)).thenReturn(C_FRIEND_DTO);
-        when(friendMapper.toFriendResponse(RECEIVED_FRIEND, RECEIVED_REQUEST)).thenReturn(RECEIVED_FRIEND_DTO);
+    private void mockPersonMapper() {
+        when(personMapper.toPersonResponse(C_FRIEND)).thenReturn(C_FRIEND_DTO);
+        when(personMapper.toPersonResponse(RECEIVED_FRIEND)).thenReturn(RECEIVED_FRIEND_DTO);
     }
 
     @Test

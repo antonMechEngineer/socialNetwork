@@ -9,10 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import soialNetworkApp.aop.annotations.UpdateOnlineTime;
-import soialNetworkApp.api.response.CommonRs;
-import soialNetworkApp.api.response.ErrorRs;
-import soialNetworkApp.api.response.FriendshipRs;
-import soialNetworkApp.api.response.PersonRs;
+import soialNetworkApp.api.response.*;
 import soialNetworkApp.errors.PersonException;
 import soialNetworkApp.service.FriendsRecommendationService;
 import soialNetworkApp.service.FriendsService;
@@ -53,7 +50,7 @@ public class FriendsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public FriendshipRs sendFriendshipRequest (@PathVariable Long id) throws Exception {
+    public CommonRs<ComplexRs> sendFriendshipRequest (@PathVariable Long id) throws Exception {
         return friendsService.sendFriendshipRequest(id);
     }
 
@@ -67,7 +64,7 @@ public class FriendsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public FriendshipRs addFriend (@PathVariable Long id) throws Exception {
+    public CommonRs<ComplexRs> addFriend (@PathVariable Long id) throws Exception {
         return friendsService.addFriend(id);
     }
 
@@ -81,7 +78,7 @@ public class FriendsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public FriendshipRs deleteFriend(@PathVariable Long id) throws Exception {
+    public CommonRs<ComplexRs> deleteFriend(@PathVariable Long id) throws Exception {
         return friendsService.deleteFriend(id);
     }
 
@@ -95,7 +92,7 @@ public class FriendsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public FriendshipRs deleteSentFriendshipRequest (@PathVariable Long id) throws Exception {
+    public CommonRs<ComplexRs> deleteSentFriendshipRequest (@PathVariable Long id) throws Exception {
         return friendsService.deleteSentFriendshipRequest(id);
     }
 

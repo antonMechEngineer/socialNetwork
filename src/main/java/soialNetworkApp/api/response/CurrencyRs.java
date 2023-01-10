@@ -17,9 +17,9 @@ import java.io.Serializable;
 public class CurrencyRs implements Serializable {
     private static final long serialVersionUID = -4439114469417994311L;
 
-    @ApiModelProperty(value = "info about USD in current city", example = "60")
+    @ApiModelProperty(value = "info about USD exchange rate in roubles", example = "60.4312")
     private String usd = "No data available";
 
-    @ApiModelProperty(value = "info about EUR in current city", example = "65")
+    @ApiModelProperty(value = "info about EUR exchange rate in roubles", example = "65.8432")
     private String euro = "No data available";
 }

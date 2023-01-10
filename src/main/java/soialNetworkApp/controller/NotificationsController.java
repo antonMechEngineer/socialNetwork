@@ -8,12 +8,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 import soialNetworkApp.aop.annotations.UpdateOnlineTime;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.ErrorRs;
 import soialNetworkApp.api.response.NotificationRs;
 import soialNetworkApp.service.NotificationsService;
-import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class NotificationsController {
     })
     public CommonRs<List<NotificationRs>> getNotifications(
             @RequestParam(required = false, defaultValue = "${socialNetwork.default.page}") int offset,
-            @RequestParam(required = false, defaultValue = "${socialNetwork.default.noteSize}") int itemPerPage) {
+            @RequestParam(required = false, defaultValue = "${socialNetwork.default.noteSize}") int itemPerPage) throws Exception {
 
         return notificationsService.getAllNotificationsByPerson(offset, itemPerPage);
     }
@@ -54,7 +54,7 @@ public class NotificationsController {
     })
     public CommonRs<List<NotificationRs>> markAsReadNotification(
             @RequestParam(required = false) Long id,
-            @RequestParam(required = false, defaultValue = "false") boolean all) {
+            @RequestParam(required = false, defaultValue = "false") boolean all) throws Exception {
 
         return notificationsService.markNotificationStatusAsRead(id, all);
     }

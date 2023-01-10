@@ -100,7 +100,7 @@ class NotificationsServiceTest {
     }
 
     @Test
-    void getAllNotificationsByPerson() {
+    void getAllNotificationsByPerson() throws Exception {
         when(personsRepository.findPersonByEmail(any())).thenReturn(Optional.of(person));
         when(notificationsRepository.findAllByPersonAndIsReadIsFalse(any(), any())).thenReturn(new PageImpl<>(List.of(notification1)));
         when(personMapper.toPersonResponse(any())).thenReturn(PersonRs.builder().id(1L).build());
@@ -110,7 +110,7 @@ class NotificationsServiceTest {
     }
 
     @Test
-    void markAllNotificationsStatusAsRead() {
+    void markAllNotificationsStatusAsRead() throws Exception {
         List<Notification> notifications = new ArrayList<>();
         when(personsRepository.findPersonByEmail(any())).thenReturn(Optional.of(person));
         when(notificationsRepository.findAllByPersonAndIsReadIsFalse(any(), any())).thenReturn(new PageImpl<>(List.of(notification1, notification2)));
@@ -129,7 +129,7 @@ class NotificationsServiceTest {
     }
 
     @Test
-    void markNotificationStatusAsRead() {
+    void markNotificationStatusAsRead() throws Exception {
         List<Notification> notifications = new ArrayList<>();
         when(personsRepository.findPersonByEmail(any())).thenReturn(Optional.of(person));
         when(notificationsRepository.findAllByPersonAndIsReadIsFalse(any(), any())).thenReturn(new PageImpl<>(List.of(notification1, notification2)));

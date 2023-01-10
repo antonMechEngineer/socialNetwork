@@ -10,19 +10,19 @@ import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.model.enums.ReadStatusTypes;
 import soialNetworkApp.repository.DialogsRepository;
 import soialNetworkApp.repository.MessagesRepository;
-import soialNetworkApp.service.util.CurrentUser;
+import soialNetworkApp.service.util.CurrentUserExtractor;
 
 @Service
 @RequiredArgsConstructor
 public class DialogMapService {
 
     private final MessagesRepository messagesRepository;
-    private final CurrentUser currentUser;
+    private final CurrentUserExtractor currentUserExtractor;
     private final DialogsRepository dialogsRepository;
 
     @Named("getUnreadMessagesCountForDialog")
     public Long getUnreadMessagesCountForDialog (Dialog dialog) {
-        return messagesRepository.findAllByRecipientAndIsDeletedFalse(currentUser.getPerson()).stream()
+        return messagesRepository.findAllByRecipientAndIsDeletedFalse(currentUserExtractor.getPerson()).stream()
                 .filter(m -> m.getDialog().getId().equals(dialog.getId()) &&
                         m.getReadStatus().equals(ReadStatusTypes.SENT))
                 .count();
@@ -42,7 +42,7 @@ public class DialogMapService {
 
     @Named("isAuthor")
     public Boolean isAuthor(Message message) {
-        return message.getAuthor().getId().equals(currentUser.getPerson().getId());
+        return message.getAuthor().getId().equals(currentUserExtractor.getPerson().getId());
     }
 
     public Person getRecipientForLastMessage(Message message) {

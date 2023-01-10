@@ -52,10 +52,9 @@ public class UsersService {
     private final PersonMapper personMapper;
     private final SearchPersons searchPersons;
 
-    public StorageRs storeImage(MultipartFile photo) throws IOException, FileException {
+    public CommonRs<StorageDataRs> storeImage(MultipartFile photo) throws IOException, FileException {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
         long personId = person.getId();
-        StorageRs response = new StorageRs();
         StorageDataRs dataRs = new StorageDataRs();
 
         String originFileName = photo.getOriginalFilename();
@@ -70,7 +69,6 @@ public class UsersService {
             throw new FileException("The maximum file size must not exceed 0.5 MB");
         }
 
-        response.setTimestamp(0);
         dataRs.setBytes(0);
         dataRs.setCreatedAt(0);
 
@@ -87,16 +85,17 @@ public class UsersService {
         dataRs.setRelativeFilePath(relativePath);
         dataRs.setFileFormat(photo.getContentType());
         dataRs.setFileType(extension);
-        response.setData(dataRs);
 
         person.setPhoto(relativePath);
         personsRepository.save(person);
-        return response;
+        return CommonRs.<StorageDataRs>builder()
+                .timestamp(System.currentTimeMillis())
+                .data(dataRs)
+                .build();
     }
 
-    public UserRs editProfile(UserRq userRq) throws Exception {
+    public CommonRs<PersonRs> editProfile(UserRq userRq) throws Exception {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
-        UserRs response = new UserRs();
         PersonRs personRs = personMapper.toPersonResponse(person);
         if (userRq.getAbout() != null) {
             person.setAbout(userRq.getAbout());
@@ -110,20 +109,10 @@ public class UsersService {
             person.setCity(userRq.getCity());
             personRs.setCity(userRq.getCity());
             geolocationsService.setCityGismeteoId(userRq.getCity());
-//            if (!citiesRepository.existsCityByName(userRq.getCity())) {
-//                City city = new City();
-//                city.setName(userRq.getCity());
-//                citiesRepository.save(city);
-//            }
         }
         if (userRq.getCountry() != null) {
             person.setCountry(userRq.getCountry());
             personRs.setCountry(userRq.getCountry());
-//            if (!countriesRepository.existsCountryByName(userRq.getCountry())) {
-//                Country country = new Country();
-//                country.setName(userRq.getCountry());
-//                countriesRepository.save(country);
-//            }
         }
         if (userRq.getFirst_name() != null) {
             person.setFirstName(userRq.getFirst_name());
@@ -143,8 +132,10 @@ public class UsersService {
         }
 
         personsRepository.save(person);
-        response.setData(personRs);
-        return response;
+        return CommonRs.<PersonRs>builder()
+                .timestamp(System.currentTimeMillis())
+                .data(personRs)
+                .build();
     }
 
     public CommonRs<List<PersonRs>> findPersons(FindPersonRq personRq, int offset, int perPage) throws EmptyFieldException {
@@ -166,36 +157,28 @@ public class UsersService {
                 .build();
     }
 
-    public ResponseRsComplexRs deleteProfile() {
+    public CommonRs<ComplexRs> deleteProfile() {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
-        ResponseRsComplexRs response = new ResponseRsComplexRs();
-        ComplexRs data = new ComplexRs(0, 0L, "OK", 0L);
-        response.setData(data);
-        response.setTimestamp(0);
-        response.setOffset(0);
-        response.setPerPage(0);
-
         person.setIsDeleted(true);
         person.setDeletedTime(LocalDateTime.now());
         personsRepository.save(person);
 
-        return response;
+        return CommonRs.<ComplexRs>builder()
+                .timestamp(System.currentTimeMillis())
+                .data(ComplexRs.builder().build())
+                .build();
     }
 
-    public ResponseRsComplexRs recoverProfile() {
+    public CommonRs<ComplexRs> recoverProfile() {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
-        ResponseRsComplexRs response = new ResponseRsComplexRs();
-        ComplexRs data = new ComplexRs(0, 0L, "OK", 0L);
-        response.setData(data);
-        response.setTimestamp(0);
-        response.setOffset(0);
-        response.setPerPage(0);
-
         person.setIsDeleted(false);
         person.setDeletedTime(null);
         personsRepository.save(person);
 
-        return response;
+        return CommonRs.<ComplexRs>builder()
+                .timestamp(System.currentTimeMillis())
+                .data(ComplexRs.builder().build())
+                .build();
     }
 
     @Scheduled(fixedRateString = "${user.time-to-delete}")
