@@ -23,7 +23,10 @@ public class UpdatePersonOnlineTimeAspect {
 
     @Before("@annotation(soialNetworkApp.aop.annotations.UpdateOnlineTime)")
     public void updateOnlineTime() {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        String email = null;
+        if (SecurityContextHolder.getContext() != null && SecurityContextHolder.getContext().getAuthentication() != null) {
+            email = SecurityContextHolder.getContext().getAuthentication().getName();
+        }
         if (email != null) {
             personsRepository.updateOnlineTime(email, LocalDateTime.now(ZoneId.of(timezone)));
         }

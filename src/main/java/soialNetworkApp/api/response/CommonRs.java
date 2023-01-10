@@ -33,7 +33,7 @@ public class CommonRs<T> {
     @ApiModelProperty(value = "total number of items found", example = "500")
     private Long total;
 
-    @ApiModelProperty(value = "any type. The data we are looking for", example = "List of objects or just object")
+    @ApiModelProperty(value = "any type. The data we are looking for", example = "Collection of objects or just object")
     private T data;
 
     @Override

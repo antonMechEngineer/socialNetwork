@@ -1,6 +1,7 @@
 package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.cloudinary.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GeolocationsService {
 
     private final CitiesRepository citiesRepository;
@@ -113,7 +115,7 @@ public class GeolocationsService {
             Set<String> jsonSet = new JSONObject(jsonData).keySet();
             jsonSet.forEach(key -> {
                 if (key.matches("\\D+")){
-                    System.out.println(key + " - " + new JSONObject(jsonData).get(key));
+                    log.info(key + " - " + new JSONObject(jsonData).get(key));
                     return;
                 }
                 JSONObject cityData = new JSONObject(jsonData).getJSONObject(key);

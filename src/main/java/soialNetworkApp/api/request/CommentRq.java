@@ -16,6 +16,4 @@ public class CommentRq {
     @ApiModelProperty(value = "text of comment", example = "some text")
     @JsonProperty("comment_text")
     private String commentText;
-//    @JsonProperty("get_deleted")
-//    private boolean getDeleted;
 }

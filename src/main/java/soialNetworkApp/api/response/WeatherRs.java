@@ -18,15 +18,15 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @ApiModel(description = "weather in city")
 public class WeatherRs {
 
-    @ApiModelProperty(value = "cloudiness in current city", example = "clouds")
+    @ApiModelProperty(value = "Current city's weather description", example = "clouds")
     private String clouds;
 
-    @ApiModelProperty(value = "temperature in current city", example = "9")
+    @ApiModelProperty(value = "Temperature in current city", example = "9")
     private String temp;
 
-    @ApiModelProperty(value = "name of current city", example = "Paris")
+    @ApiModelProperty(value = "Current city name", example = "Paris")
     private String city;
 
-    @ApiModelProperty(value = "weather update time", example = "2022-12-10T12:00:00")
+    @ApiModelProperty(value = "Weather last update time", example = "2022-12-10T12:00:00")
     private String date;
 }

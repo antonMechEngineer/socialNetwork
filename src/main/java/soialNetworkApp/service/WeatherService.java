@@ -1,6 +1,7 @@
 package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
+import org.cloudinary.json.JSONArray;
 import soialNetworkApp.api.response.WeatherRs;
 import soialNetworkApp.model.entities.Weather;
 import soialNetworkApp.model.entities.City;
@@ -44,21 +45,29 @@ public class WeatherService {
 //        String jsonData = new String(new URL(cityIdPath + "киров").openStream());
 //        System.out.println("><>< " + qwe);
 
-//        URLConnection connection = new URL("https://www.cbr-xml-daily.ru/daily_json.js").openConnection();
-//        connection.addRequestProperty(header, token);
-//        String jsonData = new String(connection.getInputStream().readAllBytes());
-//        System.out.println("><>< " + jsonData);
 
-
-       String cityQuery = city.getName() + " " + city.getDistrict() +
-               (city.getSubDistrict().isEmpty() ? "" : " " + city.getSubDistrict());
         Integer cityId = null;
         try {
-            URLConnection connection = new URL(cityIdPath + cityQuery).openConnection();
+            URLConnection connection = new URL(cityIdPath + city.getName()).openConnection();
             connection.addRequestProperty(header, token);
             String jsonData = new String(connection.getInputStream().readAllBytes());
+
+            JSONArray citiesItems = new JSONObject(jsonData).getJSONObject("response").getJSONArray("items");
+            for (int i = 0; i < citiesItems.length(); i++) {
+                JSONObject currentCity = new JSONObject(citiesItems.getJSONObject(i));
+                if (!currentCity.getJSONObject("country").getString("code")
+                        .equals(city.getCountry().getCodeTwoSymbols()) ||
+                        !currentCity.getString("name").equals(city.getName())) {
+                    continue;
+                }
+                if (cityId != null && !currentCity.getJSONObject("district").getString("name")
+                        .equals(city.getDistrict())) {
+                    continue;
+                }
+                cityId = currentCity.getInt("id");
+            }
+
             cityId = new JSONObject(jsonData).getInt("id");
-            System.out.println("><>< " + jsonData);
         } catch (IOException ignored) {}
         return cityId;
 
@@ -88,7 +97,6 @@ public class WeatherService {
             weather.setTemperature(new JSONObject(
                     new JSONObject(jsonData).getString("temperature")).getDouble("air"));
 
-            System.out.println("><>< " + jsonData);
             } catch (IOException ignored) {}
         });
     }

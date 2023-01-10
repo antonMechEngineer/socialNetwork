@@ -1,4 +1,4 @@
-package soialNetworkApp.controller;
+package soialNetworkApp.controllerV2;
 
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -8,27 +8,77 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import soialNetworkApp.aop.annotations.UpdateOnlineTime;
-import soialNetworkApp.api.response.*;
-import soialNetworkApp.errors.PersonException;
-import soialNetworkApp.service.FriendsRecommendationService;
-import soialNetworkApp.service.FriendsService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import soialNetworkApp.aop.annotations.UpdateOnlineTime;
+import soialNetworkApp.api.request.*;
+import soialNetworkApp.api.response.*;
+import soialNetworkApp.errors.CaptchaException;
+import soialNetworkApp.errors.IncorrectRequestTypeException;
+import soialNetworkApp.errors.PasswordException;
+import soialNetworkApp.errors.PersonNotFoundException;
+import soialNetworkApp.service.AccountService;
+
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/friends")
+@RequestMapping("/api/v2/account")
 @RequiredArgsConstructor
-@Tag(name = "friends-controller",
-        description = "Get recommended or potential friends. Add, delete, get friends. Send, delete friendship request")
-public class FriendsController {
+@Tag(name = "account-controller", description = "Working with password, email and registration")
+public class AccountControllerV2 {
+    private final AccountService accountService;
 
-    private final FriendsService friendsService;
-    private final FriendsRecommendationService friendsRecommendationService;
+    @PostMapping("/register")
+    @ApiOperation(value = "user registration")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "\"Name of error\"",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "forbidden")
+    })
+    public ResponseEntity<RegisterRs> register(@RequestBody RegisterRq regRequest) throws PasswordException, CaptchaException {
+        return ResponseEntity.ok(accountService.getRegResponse(regRequest));
+    }
 
-    @UpdateOnlineTime
-    @GetMapping("/recommendations")
-    @ApiOperation(value = "get recommendation friends")
+    @PutMapping("/password/set")
+    @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
+    @ApiOperation(value = "set user password")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "\"Name of error\"",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "forbidden")
+    })
+    public ResponseEntity<RegisterRs> passwordSet(@RequestBody PasswordSetRq passwordSetRq){
+        return ResponseEntity.ok(accountService.getPasswordSet(passwordSetRq));}
+
+    @PutMapping("/password/reset")
+    @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
+    @ApiOperation(value = "user password reset")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "\"Name of error\"",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "forbidden")
+    })
+    public ResponseEntity<RegisterRs> passwordReSet(@RequestBody PasswordRq passwordRq){
+        return ResponseEntity.ok(accountService.getPasswordReSet(passwordRq));}
+
+    @PutMapping("/password/recovery")
+    @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
+    @ApiOperation(value = "user password recovery")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "\"Name of error\"",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "forbidden")
+    })
+    public ResponseEntity<RegisterRs> passwordRecovery(@RequestBody LinkedHashMap email){
+        return ResponseEntity.ok(accountService.getPasswordRecovery(email.get("email").toString()));}
+
+    @PutMapping("/email")
+    @ApiOperation(value = "set email")
     @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
@@ -36,102 +86,32 @@ public class FriendsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonRs<List<PersonRs>> getRecommendedFriends() {
-        return friendsRecommendationService.getFriendsRecommendation();
-    }
+    public ResponseEntity<RegisterRs> emailSet(@RequestBody EmailRq emailRq) {return null;}
 
-    @UpdateOnlineTime
-    @PostMapping("/{id}")
-    @ApiOperation(value = "send friendship request by id of another user")
+    @PutMapping("/email/recovery")
     @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
+    @ApiOperation("user email recovery")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonRs<ComplexRs> sendFriendshipRequest (@PathVariable Long id) throws Exception {
-        return friendsService.sendFriendshipRequest(id);
+    public ResponseEntity<RegisterRs> emailRecovery(@RequestBody EmailRq emailRq) {
+        return ResponseEntity.ok(accountService.getEmailRecovery());}
+
+    @UpdateOnlineTime
+    @GetMapping("/notifications")
+    public CommonRs<List<PersonSettingsRs>> getPersonSettings() throws PersonNotFoundException {
+
+        return accountService.getPersonSettings();
     }
 
     @UpdateOnlineTime
-    @PostMapping("/request/{id}")
-    @ApiOperation(value = "add friend by id")
-    @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "\"Name of error\"",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
-    })
-    public CommonRs<ComplexRs> addFriend (@PathVariable Long id) throws Exception {
-        return friendsService.addFriend(id);
-    }
+    @PutMapping("/notifications")
+    public CommonRs<ComplexRs> editPersonSettings(
+            @RequestBody PersonSettingsRq request) throws PersonNotFoundException, IncorrectRequestTypeException {
 
-    @UpdateOnlineTime
-    @DeleteMapping("/{id}")
-    @ApiOperation(value = "delete friend by id")
-    @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "\"Name of error\"",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
-    })
-    public CommonRs<ComplexRs> deleteFriend(@PathVariable Long id) throws Exception {
-        return friendsService.deleteFriend(id);
-    }
-
-    @UpdateOnlineTime
-    @DeleteMapping("request/{id}")
-    @ApiOperation(value = "decline friendship request by id")
-    @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "\"Name of error\"",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
-    })
-    public CommonRs<ComplexRs> deleteSentFriendshipRequest (@PathVariable Long id) throws Exception {
-        return friendsService.deleteSentFriendshipRequest(id);
-    }
-
-    @UpdateOnlineTime
-    @GetMapping()
-    @ApiOperation(value = "get friends of current user")
-    @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "\"Name of error\"",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
-    })
-    public CommonRs<List<PersonRs>> getFriends(
-            @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
-            @RequestParam(name = "perPage", required = false, defaultValue = "${socialNetwork.default.size}") int size
-    ) throws Exception {
-        return friendsService.getFriends(offset, size);
-    }
-
-    @UpdateOnlineTime
-    @GetMapping("/request")
-    @ApiOperation(value = "get potential friends of current user")
-    @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "\"Name of error\"",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
-    })
-    public CommonRs<List<PersonRs>> getPotentialFriends(
-            @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
-            @RequestParam(name = "perPage", required = false, defaultValue = "${socialNetwork.default.size}") int size
-    ) throws Exception {
-        return friendsService.getRequestedPersons(offset, size);
-    }
-
-    @PostMapping("/block_unblock")
-    public void userBlocksUser(@RequestParam(value = "block_user_id") Long blockUserId) throws PersonException {
-        friendsService.userBlocksUser(blockUserId);
+        return accountService.setPersonSetting(request);
     }
 }

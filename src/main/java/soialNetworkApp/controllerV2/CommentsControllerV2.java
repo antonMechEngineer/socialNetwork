@@ -1,31 +1,87 @@
-package soialNetworkApp.controller;
+package soialNetworkApp.controllerV2;
 
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import soialNetworkApp.aop.annotations.UpdateOnlineTime;
-import soialNetworkApp.api.request.DialogUserShortListDto;
-import soialNetworkApp.api.request.MessageRq;
-import soialNetworkApp.api.response.*;
-import soialNetworkApp.service.DialogsService;
 import org.springframework.web.bind.annotation.*;
+import soialNetworkApp.aop.annotations.UpdateOnlineTime;
+import soialNetworkApp.api.request.CommentRq;
+import soialNetworkApp.api.response.CommentRs;
+import soialNetworkApp.api.response.CommonRs;
+import soialNetworkApp.api.response.ErrorRs;
+import soialNetworkApp.service.CommentsService;
+import soialNetworkApp.service.PostsService;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/dialogs")
+@RequestMapping("/api/v2/comments/{id}")
 @RequiredArgsConstructor
-@Tag(name = "dialogs-controller", description = "Get dialogs, start dialog, get read and unread messages")
-public class DialogsController {
+@Tag(name = "comments-controller", description = "Create, delete, read, edit and recover comments")
+public class CommentsControllerV2 {
 
-    private final DialogsService dialogsService;
+    private final CommentsService commentsService;
+    private final PostsService postsService;
 
+    @UpdateOnlineTime
+    @PostMapping
+    @ApiOperation(value = "create comment")
+    @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "\"Name of error\"",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "forbidden")
+    })
+    public CommonRs<CommentRs> createComment(
+            @ApiParam(value = "Parent post id") @PathVariable(name = "id") long postId,
+            @RequestBody CommentRq commentRq) {
+
+        return commentsService.createComment(postsService.findPostById(postId), commentRq);
+    }
+
+    @UpdateOnlineTime
     @GetMapping
+    @ApiOperation(value = "get all comments by post")
+    @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "\"Name of error\"",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "forbidden")
+    })
+    public CommonRs<List<CommentRs>> getComments(
+            @ApiParam(value = "Parent post id") @PathVariable(name = "id") long postId,
+            @RequestParam(required = false, defaultValue = "${socialNetwork.default.page}") int page,
+            @RequestParam(required = false, defaultValue = "${socialNetwork.default.size}") int size) {
+
+        return commentsService.getPostComments(postsService.findPostById(postId), page, size);
+    }
+
+    @UpdateOnlineTime
+    @DeleteMapping
+    @ApiOperation(value = "delete comment by id")
+    @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "\"Name of error\"",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "forbidden")
+    })
+    public CommonRs<CommentRs> deleteComment(
+            @ApiParam(value = "Deleting comment id") @PathVariable(name = "id") long commentId) {
+
+        return commentsService.changeCommentDeleteStatus(commentId, true);
+    }
+
+    @UpdateOnlineTime
+    @PatchMapping
     @ApiOperation(value = "recover comment by id")
     @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
     @ApiResponses(value = {
@@ -34,13 +90,15 @@ public class DialogsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    @UpdateOnlineTime
-    public CommonRs<List<DialogRs>> dialogs() {
-        return dialogsService.getAllDialogs();
+    public CommonRs<CommentRs> recoverComment(
+            @ApiParam(value = "Recovering comment id") @PathVariable(name = "id") long commentId) {
+
+        return commentsService.changeCommentDeleteStatus(commentId, false);
     }
 
-    @PostMapping
-    @ApiOperation(value = "start dialog with user")
+    @UpdateOnlineTime
+    @PutMapping
+    @ApiOperation(value = "edit comment by id")
     @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
@@ -48,50 +106,10 @@ public class DialogsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    @UpdateOnlineTime
-    public CommonRs<ComplexRs> dialogsStart(@RequestBody DialogUserShortListDto dialogUserShortListDto) {
-        return dialogsService.beginDialog(dialogUserShortListDto);
-    }
+    public CommonRs<CommentRs> editComment(
+            @ApiParam(value = "Editing comment id") @PathVariable(name = "id") long commentId,
+            @RequestBody CommentRq commentRq) {
 
-    @GetMapping("/{dialogId}/messages")
-    @ApiOperation(value = "get messages from dialog")
-    @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "\"Name of error\"",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
-    })
-    @UpdateOnlineTime
-    public CommonRs<List<MessageRs>> messages(@PathVariable Long dialogId) {
-        return dialogsService.getMessages(dialogId);
-    }
-
-    @GetMapping("/unreaded")
-    @ApiOperation(value = "get count of unread messages")
-    @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "\"Name of error\"",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
-    })
-    @UpdateOnlineTime
-    public CommonRs<ComplexRs> unread() {
-        return dialogsService.getUnreadMessages();
-    }
-
-    @PutMapping("/{dialogId}/read")
-    @ApiOperation(value = "read messages in dialog")
-    @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "\"Name of error\"",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
-    })
-    @UpdateOnlineTime
-    public CommonRs<ComplexRs> read(@RequestBody MessageRq messageRq) {
-        return dialogsService.setReadMessages(messageRq.getDialogId());
+        return commentsService.editComment(commentId, commentRq);
     }
 }
