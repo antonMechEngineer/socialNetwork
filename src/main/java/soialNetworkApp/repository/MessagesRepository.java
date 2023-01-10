@@ -31,7 +31,7 @@ public interface MessagesRepository extends JpaRepository<Message, Long> {
 
     @Modifying
     @Transactional
-    @Query(value = "INSERT INTO messages (time, message_text, read_status, is_deleted, autor_id, recipient_id, dialog_id)" +
+    @Query(value = "INSERT INTO messages (time, message_text, read_status, is_deleted, author_id, recipient_id, dialog_id)" +
             " VALUES (:time, :messageText, :readStatus, :isDeleted, :authorId, :recipientId, :dialogId)", nativeQuery = true)
     void save(@Param("time") ZonedDateTime time, @Param("messageText") String messageText,
               @Param("readStatus") String readStatus, @Param("isDeleted") Boolean isDeleted,

@@ -19,7 +19,6 @@ public class MessageWsService {
     private final DialogMapper dialogMapper;
     private final DialogsRepository dialogsRepository;
     private final PersonsRepository personsRepository;
-    private final MessagesRepository messagesRepository;
     private final MessagesKafkaProducer messagesKafkaProducer;
 
     public void getMessageFromWs(MessageWsRq messageWsRq) {
@@ -27,8 +26,7 @@ public class MessageWsService {
         Message message = dialogMapper.toMessageFromWs(messageWsRq,
                 dialogsRepository.findById(messageWsRq.getDialogId()).orElseThrow(),
                 personsRepository.findPersonById(messageWsRq.getAuthorId()).orElseThrow());
-        //messagesKafkaProducer.sendMessage(message);
-        messagesRepository.save(message);
+        messagesKafkaProducer.sendMessage(message);
     }
 
     public void messageTypingFromWs(Long dialogId, Long userId, MessageWsRq messageWsRq) {

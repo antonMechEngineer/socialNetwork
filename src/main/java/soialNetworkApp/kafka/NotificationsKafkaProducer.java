@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import soialNetworkApp.kafka.dto.NotificationKafka;
 import soialNetworkApp.model.entities.Notification;
 
-
 @Service
 public class NotificationsKafkaProducer {
     private static final Logger LOGGER = LoggerFactory.getLogger(NotificationsKafkaProducer.class);
@@ -20,7 +19,7 @@ public class NotificationsKafkaProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
     public void sendMessage (Notification notification) {
-        LOGGER.info(String.format("Message sent -> %s", notification.toString()));
+        LOGGER.info(String.format("Sent -> %s", notification.toString()));
 
         NotificationKafka notificationKafka = new NotificationKafka(
                 notification.getNotificationType(),
@@ -28,9 +27,6 @@ public class NotificationsKafkaProducer {
                 notification.getEntity().getId(),
                 notification.getPerson().getId(),
                 notification.getIsRead());
-
-        Message<NotificationKafka> message = MessageBuilder.withPayload(notificationKafka).
-                setHeader(KafkaHeaders.TOPIC, "notifications").build();
-        kafkaTemplate.send(message);
+        kafkaTemplate.send("notifications", notificationKafka);
     }
 }

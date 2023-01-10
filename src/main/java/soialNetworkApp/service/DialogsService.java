@@ -56,8 +56,7 @@ public class DialogsService {
                 .filter(m -> m.getReadStatus().equals(ReadStatusTypes.SENT))
                 .forEach(m -> {
                     m.setReadStatus(ReadStatusTypes.READ);
-                    messagesRepository.save(m);
-                    //messagesKafkaProducer.sendMessage(message);
+                    messagesKafkaProducer.sendMessage(m);
                     readCount[0]++;
                 });
         return new CommonRs<>(new ComplexRs(readCount[0]));
