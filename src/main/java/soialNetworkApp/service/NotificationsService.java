@@ -2,9 +2,18 @@ package soialNetworkApp.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.NotificationRs;
 import soialNetworkApp.kafka.NotificationsKafkaProducer;
+import soialNetworkApp.errors.NoSuchEntityException;
+import soialNetworkApp.errors.PersonNotFoundException;
 import soialNetworkApp.mappers.NotificationMapper;
 import soialNetworkApp.model.entities.Friendship;
 import soialNetworkApp.model.entities.Notification;
@@ -16,13 +25,6 @@ import soialNetworkApp.repository.FriendshipsRepository;
 import soialNetworkApp.repository.NotificationsRepository;
 import soialNetworkApp.repository.PersonsRepository;
 import soialNetworkApp.service.util.NetworkPageRequest;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -47,9 +49,9 @@ public class NotificationsService {
     @Value("${socialNetwork.timezone}")
     private String timezone;
 
-    public CommonRs<List<NotificationRs>> getAllNotificationsByPerson(int offset, int perPage) {
+    public CommonRs<List<NotificationRs>> getAllNotificationsByPerson(int offset, int perPage) throws Exception {
         Person person = personsRepository.findPersonByEmail(
-                SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+                SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(new PersonNotFoundException("Person is not available"));
         return getAllNotificationsByPerson(offset, perPage, person);
     }
 
@@ -66,16 +68,18 @@ public class NotificationsService {
                 .build();
     }
 
-    public CommonRs<List<NotificationRs>> markNotificationStatusAsRead(Long notificationId, boolean readAll) {
+    public CommonRs<List<NotificationRs>> markNotificationStatusAsRead(Long notificationId, boolean readAll) throws Exception {
         Person person = personsRepository.findPersonByEmail(
-                SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+                SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(new PersonNotFoundException("Person is not available"));
         if (readAll) {
             notificationsRepository.findAllByPersonAndIsReadIsFalse(person).forEach(notification -> {
                 notification.setIsRead(true);
                 notificationsKafkaProducer.sendMessage(notification);
             });
         } else {
-            Notification notification = notificationsRepository.findById(notificationId).get();
+            Notification notification = notificationsRepository.findById(notificationId)
+                    .orElseThrow(new NoSuchEntityException("Notification with id " + notificationId + "was not found"));
             notification.setIsRead(true);
             notificationsKafkaProducer.sendMessage(notification);
         }
@@ -108,6 +112,7 @@ public class NotificationsService {
     }
 
     public void deleteNotification(Notificationed entity) {
-        notificationsRepository.findNotificationByEntity(entity.getNotificationType(), entity).ifPresent(notificationsRepository::delete);
+        notificationsRepository.findNotificationByEntity(entity.getNotificationType(), entity)
+                .ifPresent(notificationsRepository::delete);
     }
 }

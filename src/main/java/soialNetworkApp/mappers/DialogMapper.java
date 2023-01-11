@@ -16,7 +16,7 @@ import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-@Mapper(componentModel = "spring", uses = {DialogMapService.class, PersonMapper.class}, imports = {ZonedDateTime.class, ReadStatusTypes.class})
+@Mapper(componentModel = "spring", uses = {DialogMapService.class, PersonMapper.class})
 public interface DialogMapper {
 
     @Mapping(target = "id", source = "dialog.id")
@@ -26,7 +26,7 @@ public interface DialogMapper {
 
     @Mapping(target = "isSentByMe", source="message", qualifiedByName = "isAuthor")
     @Mapping(target = "recipientId", source="message", qualifiedByName = "getRecipientIdForLastMessage")
-    @Mapping(target = "recipient", source = "person", qualifiedByName = "toPersonRs")
+    @Mapping(target = "recipient", source = "person")
     @Mapping(target = "authorId", source = "message.author.id")
     @Mapping(target = "readStatus", expression = "java(message.getReadStatus().name())")
     @Mapping(target = "id", source = "message.id")

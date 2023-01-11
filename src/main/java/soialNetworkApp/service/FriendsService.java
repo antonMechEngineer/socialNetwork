@@ -1,23 +1,22 @@
 package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
-import soialNetworkApp.api.response.CommonRs;
-import soialNetworkApp.api.response.ComplexRs;
-import soialNetworkApp.api.response.FriendshipRs;
-import soialNetworkApp.api.response.PersonRs;
-import soialNetworkApp.errors.PersonException;
-import soialNetworkApp.errors.PersonNotFoundException;
-import soialNetworkApp.mappers.FriendMapper;
-import soialNetworkApp.model.entities.Friendship;
-import soialNetworkApp.model.entities.Person;
-import soialNetworkApp.model.enums.FriendshipStatusTypes;
-import soialNetworkApp.repository.FriendshipsRepository;
-import soialNetworkApp.repository.PersonsRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import soialNetworkApp.api.response.CommonRs;
+import soialNetworkApp.api.response.ComplexRs;
+import soialNetworkApp.api.response.PersonRs;
+import soialNetworkApp.errors.PersonException;
+import soialNetworkApp.errors.PersonNotFoundException;
+import soialNetworkApp.mappers.PersonMapper;
+import soialNetworkApp.model.entities.Friendship;
+import soialNetworkApp.model.entities.Person;
+import soialNetworkApp.model.enums.FriendshipStatusTypes;
+import soialNetworkApp.repository.FriendshipsRepository;
+import soialNetworkApp.repository.PersonsRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,36 +31,48 @@ import static soialNetworkApp.model.enums.FriendshipStatusTypes.*;
 public class FriendsService {
     private final FriendshipsRepository friendshipsRepository;
     private final PersonsRepository personsRepository;
-    private final FriendMapper friendMapper;
+    private final PersonMapper personMapper;
     private final NotificationsService notificationsService;
 
-    public FriendshipRs addFriend(Long receivedFriendId) throws Exception {
+    public CommonRs<ComplexRs> addFriend(Long receivedFriendId) throws Exception {
         Person srcPerson = getSrcPerson();
         Person dstPerson = getDstPerson(receivedFriendId);
         modifyFriendShipStatus(srcPerson, dstPerson);
         modifyFriendShipStatus(dstPerson, srcPerson);
-        return new FriendshipRs(LocalDateTime.now().toString(), ComplexRs.builder().build());
+        return CommonRs.<ComplexRs>builder()
+                .timestamp(System.currentTimeMillis())
+                .data(ComplexRs.builder().build())
+                .build();
     }
 
-    public FriendshipRs sendFriendshipRequest(Long requestedFriendId) throws Exception {
+    public CommonRs<ComplexRs> sendFriendshipRequest(Long requestedFriendId) throws Exception {
         Person srcPerson = getSrcPerson();
         Person dstPerson = getDstPerson(requestedFriendId);
         createFriendshipRequest(srcPerson, dstPerson);
-        return new FriendshipRs(LocalDateTime.now().toString(), ComplexRs.builder().build());
+        return CommonRs.<ComplexRs>builder()
+                .timestamp(System.currentTimeMillis())
+                .data(ComplexRs.builder().build())
+                .build();
     }
 
-    public FriendshipRs deleteFriend(Long idDeletableFriend) throws Exception {
+    public CommonRs<ComplexRs> deleteFriend(Long idDeletableFriend) throws Exception {
         Person srcPerson = getSrcPerson();
         Person dstPerson = getDstPerson(idDeletableFriend);
         deleteFriendships(srcPerson, dstPerson);
-        return new FriendshipRs(LocalDateTime.now().toString(), ComplexRs.builder().build());
+        return CommonRs.<ComplexRs>builder()
+                .timestamp(System.currentTimeMillis())
+                .data(ComplexRs.builder().build())
+                .build();
     }
 
-    public FriendshipRs deleteSentFriendshipRequest(Long idRequestedFriend) throws Exception {
+    public CommonRs<ComplexRs> deleteSentFriendshipRequest(Long idRequestedFriend) throws Exception {
         Person srcPerson = getSrcPerson();
         Person dstPerson = getDstPerson(idRequestedFriend);
         deleteFriendships(srcPerson, dstPerson);
-        return new FriendshipRs(LocalDateTime.now().toString(), ComplexRs.builder().build());
+        return CommonRs.<ComplexRs>builder()
+                .timestamp(System.currentTimeMillis())
+                .data(ComplexRs.builder().build())
+                .build();
     }
 
     public CommonRs<List<PersonRs>> getFriends(Integer offset, Integer size) throws Exception {
@@ -156,7 +167,8 @@ public class FriendsService {
     private List<PersonRs> personsToPersonResponses(List<Person> persons, Person srcPerson) {
         List<PersonRs> personResponse = new ArrayList<>();
         for (Person person : persons) {
-            personResponse.add(friendMapper.toFriendResponse(person, getStatusTwoPersons(person, srcPerson)));
+            person.setFriendStatus(getStatusTwoPersons(person, srcPerson));
+            personResponse.add(personMapper.toPersonResponse(person));
         }
         return personResponse;
     }

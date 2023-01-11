@@ -1,10 +1,9 @@
 package soialNetworkApp.mappers;
 
-import org.mapstruct.Named;
-import soialNetworkApp.api.response.PersonRs;
-import soialNetworkApp.model.entities.Person;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import soialNetworkApp.api.response.PersonRs;
+import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.service.CurrenciesService;
 import soialNetworkApp.service.WeatherService;
 
@@ -15,7 +14,6 @@ import java.time.temporal.ChronoUnit;
 @Mapper(componentModel = "spring", uses = {CurrenciesService.class, WeatherService.class})
 public interface PersonMapper {
 
-    @Named("toPersonRs")
     @Mapping(target = "weather", source = "city", qualifiedByName = "getWeatherResponse")
     @Mapping(target = "currency", source = "person", qualifiedByName = "getCurrencies")
     @Mapping(target = "online", source = "person")

@@ -1,6 +1,11 @@
 package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 import soialNetworkApp.api.request.FindPostRq;
 import soialNetworkApp.api.request.PostRq;
 import soialNetworkApp.api.response.CommonRs;
@@ -17,13 +22,8 @@ import soialNetworkApp.repository.FriendshipsRepository;
 import soialNetworkApp.repository.PersonsRepository;
 import soialNetworkApp.repository.PostsRepository;
 import soialNetworkApp.service.search.SearchPosts;
-import soialNetworkApp.service.util.CurrentUser;
+import soialNetworkApp.service.util.CurrentUserExtractor;
 import soialNetworkApp.service.util.NetworkPageRequest;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -46,7 +46,7 @@ public class PostsService {
     private final NotificationsService notificationsService;
     private final PostMapper postMapper;
     private final SearchPosts searchPosts;
-    private final CurrentUser currentUser;
+    private final CurrentUserExtractor currentUserExtractor;
 
     @Value("${socialNetwork.timezone}")
     private String timezone;
@@ -191,7 +191,7 @@ public class PostsService {
     }
 
     private boolean blockPostsByAuthor(Person author) {
-        Person me = currentUser.getPerson();
+        Person me = currentUserExtractor.getPerson();
         Optional<Friendship> friendship = friendshipsRepository.findFriendshipByFriendshipStatusAndSrcPersonIdAndDstPersonId(BLOCKED, author.getId(), me.getId());
         return friendship.isPresent();
     }
