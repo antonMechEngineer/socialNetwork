@@ -28,6 +28,7 @@ public class MessageWsService {
         messagesRepository.save(message);
     }
 
+
     public void messageTypingFromWs(Long dialogId, Long userId, MessageWsRq messageWsRq) {
         messagingTemplate.convertAndSendToUser(dialogId.toString(), "/queue/messages",
                 dialogMapper.toMessageTypingWsRs(userId, dialogId, messageWsRq.getTyping()));
