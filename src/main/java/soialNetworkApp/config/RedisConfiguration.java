@@ -17,7 +17,7 @@ import soialNetworkApp.model.entities.Person;
 @EnableRedisRepositories
 @ConfigurationProperties(prefix = "spring.redis")
 @Setter
-public class RedisConfig {
+public class RedisConfiguration {
 
     private String host;
     private String password;
@@ -48,13 +48,13 @@ public class RedisConfig {
         return new RedisProperties();
     }
 
-    @Bean
-    @Primary
-    public ReactiveRedisConnectionFactory reactiveRedisConnectionFactory(RedisConfiguration defaultRedisConfig) {
-        LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
-                .useSsl().build();
-        return new LettuceConnectionFactory(defaultRedisConfig, clientConfig);
-    }
+//    @Bean
+//    @Primary
+//    public ReactiveRedisConnectionFactory reactiveRedisConnectionFactory(org.springframework.data.redis.connection.RedisConfiguration defaultRedisConfig) {
+//        LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
+//                .useSsl().build();
+//        return new LettuceConnectionFactory(defaultRedisConfig, clientConfig);
+//    }
 
 //    @Bean
 //    public RedisConfiguration defaultRedisConfig() {

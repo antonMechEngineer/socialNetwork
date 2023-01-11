@@ -32,10 +32,10 @@ spring:
     port: 6379
     host: 194.87.244.66
   cache:
-    type: none
+    type: redis
     redis:
       cache-null-values: true
-      time-to-live: 100000
+      time-to-live: 1000000
 
 #applicationParams
 socialNetwork:
