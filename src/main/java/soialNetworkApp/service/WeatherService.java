@@ -1,6 +1,7 @@
 package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.cloudinary.json.JSONArray;
 import soialNetworkApp.api.response.WeatherRs;
 import soialNetworkApp.model.entities.Weather;
@@ -22,6 +23,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WeatherService {
 
     private final CitiesRepository citiesRepository;
@@ -48,9 +50,11 @@ public class WeatherService {
 
         Integer cityId = null;
         try {
+            log.info("getGismeteoCityId");
             URLConnection connection = new URL(cityIdPath + city.getName()).openConnection();
             connection.addRequestProperty(header, token);
             String jsonData = new String(connection.getInputStream().readAllBytes());
+            log.info(jsonData);
 
             JSONArray citiesItems = new JSONObject(jsonData).getJSONObject("response").getJSONArray("items");
             for (int i = 0; i < citiesItems.length(); i++) {
