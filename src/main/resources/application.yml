@@ -35,7 +35,7 @@ spring:
     type: none
     redis:
       cache-null-values: true
-      time-to-live: 100000
+      time-to-live: 1000000
 
 #applicationParams
 socialNetwork:

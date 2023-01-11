@@ -1,6 +1,8 @@
 spring:
   redis:
     host: localhost
+  cache:
+    type: redis
 
   datasource:
 #    driver-class-name: org.postgresql.Driver
