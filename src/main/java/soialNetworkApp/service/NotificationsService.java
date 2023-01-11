@@ -1,5 +1,6 @@
 package soialNetworkApp.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -10,13 +11,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.NotificationRs;
+import soialNetworkApp.kafka.NotificationsKafkaProducer;
 import soialNetworkApp.errors.NoSuchEntityException;
 import soialNetworkApp.errors.PersonNotFoundException;
 import soialNetworkApp.mappers.NotificationMapper;
+import soialNetworkApp.model.entities.Friendship;
 import soialNetworkApp.model.entities.Notification;
 import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.model.entities.interfaces.Notificationed;
 import soialNetworkApp.model.enums.FriendshipStatusTypes;
+import soialNetworkApp.model.enums.NotificationTypes;
 import soialNetworkApp.repository.FriendshipsRepository;
 import soialNetworkApp.repository.NotificationsRepository;
 import soialNetworkApp.repository.PersonsRepository;
@@ -36,6 +40,7 @@ public class NotificationsService {
     private final FriendshipsRepository friendshipsRepository;
     private final NotificationMapper notificationMapper;
     private final SimpMessagingTemplate template;
+    private final NotificationsKafkaProducer notificationsKafkaProducer;
 
     @Value("${socialNetwork.default.page}")
     private int offset;
@@ -70,25 +75,25 @@ public class NotificationsService {
         if (readAll) {
             notificationsRepository.findAllByPersonAndIsReadIsFalse(person).forEach(notification -> {
                 notification.setIsRead(true);
-                notificationsRepository.save(notification);
+                notificationsKafkaProducer.sendMessage(notification);
             });
         } else {
             Notification notification = notificationsRepository.findById(notificationId)
                     .orElseThrow(new NoSuchEntityException("Notification with id " + notificationId + "was not found"));
             notification.setIsRead(true);
-            notificationsRepository.save(notification);
+            notificationsKafkaProducer.sendMessage(notification);
         }
         return getAllNotificationsByPerson(offset, size, person);
     }
 
-    public void createNotification(Notificationed entity, Person person) {
+    public void createNotification(Notificationed entity, Person person)  {
         Notification notification = new Notification();
         notification.setIsRead(false);
         notification.setPerson(person);
         notification.setNotificationType(entity.getNotificationType());
         notification.setEntity(entity);
         notification.setSentTime(LocalDateTime.now(ZoneId.of(timezone)));
-        notificationsRepository.save(notification);
+        notificationsKafkaProducer.sendMessage(notification);
         template.convertAndSend(String.format("/user/%s/queue/notifications", person.getId()),
                 getAllNotificationsByPerson(offset, size, person));
     }
