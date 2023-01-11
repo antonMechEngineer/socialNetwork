@@ -3,6 +3,7 @@ package soialNetworkApp.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.cloudinary.json.JSONArray;
+import org.springframework.web.client.RestTemplate;
 import soialNetworkApp.api.response.WeatherRs;
 import soialNetworkApp.model.entities.Weather;
 import soialNetworkApp.model.entities.City;
@@ -16,10 +17,12 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.*;
+import java.net.http.HttpRequest;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -49,30 +52,29 @@ public class WeatherService {
 
 
         Integer cityId = null;
-        try {
-            log.info("getGismeteoCityId");
-            URLConnection connection = new URL(cityIdPath + city.getName()).openConnection();
-            connection.addRequestProperty(header, token);
-            String jsonData = new String(connection.getInputStream().readAllBytes());
-            log.info(jsonData);
+        log.info("getGismeteoCityId");
+//            URLConnection connection = new URL(cityIdPath + city.getName()).openConnection();
+//            connection.setRequestProperty(header, token);
+//            String jsonData = new String(connection.getInputStream().readAllBytes());
+        String jsonData = new RestTemplate().getForObject(cityIdPath + city.getName(), String.class, Map.of(header, token));
+        log.info(jsonData);
 
-            JSONArray citiesItems = new JSONObject(jsonData).getJSONObject("response").getJSONArray("items");
-            for (int i = 0; i < citiesItems.length(); i++) {
-                JSONObject currentCity = new JSONObject(citiesItems.getJSONObject(i));
-                if (!currentCity.getJSONObject("country").getString("code")
-                        .equals(city.getCountry().getCodeTwoSymbols()) ||
-                        !currentCity.getString("name").equals(city.getName())) {
-                    continue;
-                }
-                if (cityId != null && !currentCity.getJSONObject("district").getString("name")
-                        .equals(city.getDistrict())) {
-                    continue;
-                }
-                cityId = currentCity.getInt("id");
+        JSONArray citiesItems = new JSONObject(jsonData).getJSONObject("response").getJSONArray("items");
+        for (int i = 0; i < citiesItems.length(); i++) {
+            JSONObject currentCity = new JSONObject(citiesItems.getJSONObject(i));
+            if (!currentCity.getJSONObject("country").getString("code")
+                    .equals(city.getCountry().getCodeTwoSymbols()) ||
+                    !currentCity.getString("name").equals(city.getName())) {
+                continue;
             }
+            if (cityId != null && !currentCity.getJSONObject("district").getString("name")
+                    .equals(city.getDistrict())) {
+                continue;
+            }
+            cityId = currentCity.getInt("id");
+        }
 
-            cityId = new JSONObject(jsonData).getInt("id");
-        } catch (IOException ignored) {}
+        cityId = new JSONObject(jsonData).getInt("id");
         return cityId;
 
 //        String result = Request.Get("https://www.cbr-xml-daily.ru/daily_json.js")
