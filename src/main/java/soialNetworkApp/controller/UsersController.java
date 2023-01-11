@@ -112,9 +112,8 @@ public class UsersController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    ResponseEntity<UserRs> updateMyData(@RequestBody UserRq userRq) throws Exception {
-        return ResponseEntity
-                .ok(usersService.editProfile(userRq));
+    public CommonRs<PersonRs> updateMyData(@RequestBody UserRq userRq) throws Exception {
+        return usersService.editProfile(userRq);
     }
 
     @DeleteMapping("/me")
@@ -126,9 +125,8 @@ public class UsersController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    ResponseEntity<ResponseRsComplexRs> deleteMyData() {
-        return ResponseEntity
-                .ok(usersService.deleteProfile());
+    public CommonRs<ComplexRs> deleteMyData() {
+        return usersService.deleteProfile();
     }
     @PostMapping("/me/recover")
     @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
@@ -139,9 +137,8 @@ public class UsersController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    ResponseEntity<ResponseRsComplexRs> recoverMyData() {
-        return ResponseEntity
-                .ok(usersService.recoverProfile());
+    public CommonRs<ComplexRs> recoverMyData() {
+        return usersService.recoverProfile();
     }
 
     @UpdateOnlineTime

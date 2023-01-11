@@ -8,7 +8,7 @@ import soialNetworkApp.repository.PersonsRepository;
 
 @Component
 @RequiredArgsConstructor
-public class CurrentUser {
+public class CurrentUserExtractor {
     private final PersonsRepository personsRepository;
 
     public Person getPerson() {

@@ -34,7 +34,6 @@ public class RegisterRq {
     private String code;
 
     @ApiModelProperty(value = "captcha decryption secret", required = true, example = "uuid")
-    //@JsonProperty("secret_code")
     private String codeSecret;
 
     @Min(PASSWORD_LENGTH)

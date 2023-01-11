@@ -20,6 +20,4 @@ public class PostRq {
     @ApiModelProperty(value = "new post text", example = "some new text")
     @JsonProperty("post_text")
     private String postText;
-//    @JsonProperty("get_deleted")
-//    private boolean getDeleted;
 }

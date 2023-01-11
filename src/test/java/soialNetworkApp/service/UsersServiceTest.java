@@ -9,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
 import soialNetworkApp.api.request.FindPersonRq;
 import soialNetworkApp.api.request.UserRq;
-import soialNetworkApp.api.response.UserRs;
 import soialNetworkApp.errors.EmptyFieldException;
 import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.service.search.SearchPersons;

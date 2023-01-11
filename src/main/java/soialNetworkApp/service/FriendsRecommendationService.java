@@ -1,6 +1,10 @@
 package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.PersonRs;
 import soialNetworkApp.mappers.PersonMapper;
@@ -9,11 +13,7 @@ import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.model.enums.FriendshipStatusTypes;
 import soialNetworkApp.repository.FriendshipsRepository;
 import soialNetworkApp.repository.PersonsRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import soialNetworkApp.service.util.CurrentUser;
+import soialNetworkApp.service.util.CurrentUserExtractor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,10 +28,10 @@ public class FriendsRecommendationService {
 
     private final PersonMapper personMapper;
 
-    private final CurrentUser currentUser;
+    private final CurrentUserExtractor currentUserExtractor;
 
     public CommonRs<List<PersonRs>> getFriendsRecommendation() {
-        Person me = currentUser.getPerson();
+        Person me = currentUserExtractor.getPerson();
         Pageable page = PageRequest.of(0, 8);
         List<Long> excludedPersons = new ArrayList<>();
         excludedPersons.add(me.getId());
