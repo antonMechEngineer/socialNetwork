@@ -18,19 +18,13 @@ spring:
     enabled: true
   redis:
     host: localhost
+  cache:
+    type: none
 auth:
   secret: someSecretCode
   time-to-live: 3600000000
   pass-restore: http://localhost:8080/change-password?token=
   email-restore: http://localhost:8080/shift-email?token=
-
-#applicationParams
-socialNetwork:
-  default:
-    page: 0
-    size: 20
-    noteSize: 10
-
 logging:
   file:
     uploadLogs: false
