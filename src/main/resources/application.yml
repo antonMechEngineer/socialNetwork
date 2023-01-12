@@ -32,7 +32,7 @@ spring:
     port: 6379
     host: 194.87.244.66
   cache:
-    type: none
+    type: redis
     redis:
       cache-null-values: true
       time-to-live: 100000
@@ -63,7 +63,7 @@ socialNetwork:
   scheduling:
     currencies: 0 1 16 * * MON-FRI
     birthdays: 0 0 8 * * *
-    weather: 0 * 7,12,17,22 * * *
+    weather: 0 0 7,12,17,22 * * *
   #Банк России
   currency:
     data-path: https://www.cbr-xml-daily.ru/daily_json.js
@@ -74,7 +74,7 @@ socialNetwork:
     city-id-path: https://api.gismeteo.net/v2/search/cities/?query=
     token:
       header: X-Gismeteo-Token
-      value: 56b30cb255.3443075
+      value: 63623dcd39d633.86405201
   #cities and countries
   geolocation:
     countries-path: https://htmlweb.ru/geo/api.php?location&json&api_key=
