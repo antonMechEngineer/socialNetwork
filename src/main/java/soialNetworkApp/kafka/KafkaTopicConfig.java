@@ -9,13 +9,12 @@ import org.springframework.kafka.config.TopicBuilder;
 @Configuration
 public class KafkaTopicConfig {
 
-    @Value("${kafka.topic}")
     @Bean
     public NewTopic notificationsTopic(){
         return TopicBuilder.name("notifications").build();
     }
 
-    @Value("${kafka.topic}")
+
     @Bean
     public NewTopic messagesTopic(){
         return TopicBuilder.name("messages").build();
