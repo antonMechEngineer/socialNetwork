@@ -74,7 +74,7 @@ socialNetwork:
     city-id-path: https://api.gismeteo.net/v2/search/cities/?query=
     token:
       header: X-Gismeteo-Token
-      value: 56b30cb255.3443075
+      value: 63623dcd39d633.86405201
   #cities and countries
   geolocation:
     countries-path: https://htmlweb.ru/geo/api.php?location&json&api_key=
