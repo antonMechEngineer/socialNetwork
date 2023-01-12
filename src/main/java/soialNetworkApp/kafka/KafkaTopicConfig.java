@@ -14,7 +14,6 @@ public class KafkaTopicConfig {
         return TopicBuilder.name("notifications").build();
     }
 
-
     @Bean
     public NewTopic messagesTopic(){
         return TopicBuilder.name("messages").build();
