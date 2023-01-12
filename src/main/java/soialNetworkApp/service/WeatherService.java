@@ -41,21 +41,11 @@ public class WeatherService {
     private String timezone;
 
     public Integer getGismeteoCityId(City city) {
-//        RestTemplate template = new RestTemplate();
-//        String qwe = new RestTemplate().getForObject(cityIdPath, String.class, Map.of(header, token));
-//        HttpRequest request = HttpRequest.newBuilder().header(header, token).uri(new URI(cityIdPath + "киров")).build();
-//        String jsonData = new String(new URL(cityIdPath + "киров").openStream());
-//        System.out.println("><>< " + qwe);
-
-
         Integer cityId = null;
         try {
-            log.info("getGismeteoCityId");
             URLConnection connection = new URL(cityIdPath + city.getName()).openConnection();
             connection.addRequestProperty(header, token);
             String jsonData = new String(connection.getInputStream().readAllBytes());
-            log.info(jsonData);
-
             JSONArray citiesItems = new JSONObject(jsonData).getJSONObject("response").getJSONArray("items");
             log.info("citiesItems length = " + citiesItems.length());
             log.info(citiesItems.toString());
@@ -73,16 +63,8 @@ public class WeatherService {
                 }
                 cityId = currentCity.getInt("id");
             }
-
-            cityId = new JSONObject(jsonData).getInt("id");
         } catch (IOException ignored) {}
         return cityId;
-
-//        String result = Request.Get("https://www.cbr-xml-daily.ru/daily_json.js")
-////                .setHeader("Authorization", token)
-//                .execute()
-//                .returnContent().toString();
-//        System.out.println("><><" + result);
     }
 
     @Scheduled(cron = "${socialNetwork.scheduling.weather}", zone = "${socialNetwork.timezone}")
