@@ -80,7 +80,7 @@ public class WeatherService {
                     ZoneId.of(timezone)));
             weather.setWeatherDescription(weatherInfo.getJSONObject("description").getString("full"));
             weather.setTemperature(weatherInfo.getJSONObject("temperature").getJSONObject("air").getDouble("C"));
-
+            weatherRepository.save(weather);
             } catch (IOException ignored) {}
         });
     }
