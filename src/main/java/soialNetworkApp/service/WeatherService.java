@@ -60,7 +60,7 @@ public class WeatherService {
             log.info("citiesItems length = " + citiesItems.length());
             log.info(citiesItems.toString());
             for (int i = 0; i < citiesItems.length(); i++) {
-                JSONObject currentCity = new JSONObject(citiesItems.getJSONObject(i));
+                JSONObject currentCity = citiesItems.getJSONObject(i);
                 log.info(currentCity.toString());
                 if (!currentCity.getJSONObject("country").getString("code")
                         .equals(city.getCountry().getCodeTwoSymbols()) ||
