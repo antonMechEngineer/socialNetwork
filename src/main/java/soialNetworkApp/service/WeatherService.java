@@ -71,7 +71,6 @@ public class WeatherService {
             URLConnection connection = new URL(dataPath + id + "/").openConnection();
             connection.addRequestProperty(header, token);
             String jsonData = new String(connection.getInputStream().readAllBytes());
-            log.info(jsonData);
             JSONObject weatherInfo = new JSONObject(jsonData).getJSONObject("response");
             Weather weather = new Weather();
             weather.setGismeteoId(id);
