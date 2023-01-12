@@ -59,6 +59,7 @@ public class WeatherService {
             JSONArray citiesItems = new JSONObject(jsonData).getJSONObject("response").getJSONArray("items");
             for (int i = 0; i < citiesItems.length(); i++) {
                 JSONObject currentCity = new JSONObject(citiesItems.getJSONObject(i));
+                log.info(currentCity.toString());
                 if (!currentCity.getJSONObject("country").getString("code")
                         .equals(city.getCountry().getCodeTwoSymbols()) ||
                         !currentCity.getString("name").equals(city.getName())) {
