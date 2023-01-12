@@ -38,8 +38,8 @@ spring:
       time-to-live: 100000
   kafka:
     bootstrap-servers: 194.87.244.66:9092
-    properties:
-      ssl.endpoint.identification.algorithm:
+#    properties:
+#      ssl.endpoint.identification.algorithm:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -63,7 +63,7 @@ socialNetwork:
   scheduling:
     currencies: 0 1 16 * * MON-FRI
     birthdays: 0 0 8 * * *
-    weather: 0 * 7,12,17,22 * * *
+    weather: 0 0 7,12,17,22 * * *
   #Банк России
   currency:
     data-path: https://www.cbr-xml-daily.ru/daily_json.js
