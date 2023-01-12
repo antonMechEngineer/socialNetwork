@@ -17,7 +17,7 @@ spring:
     change-log: classpath:db/changelog/changelog-master.yaml
     enabled: true
   kafka:
-    bootstrap-servers: 127.0.0.1:9092
+    bootstrap-servers: 194.87.244.66:9092
     properties:
       ssl.endpoint.identification.algorithm:
     producer:
