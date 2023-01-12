@@ -75,13 +75,11 @@ public class WeatherService {
             JSONObject weatherInfo = new JSONObject(jsonData).getJSONObject("response");
             Weather weather = new Weather();
             weather.setGismeteoId(id);
-//            weather.setTime(ZonedDateTime.parse(new JSONObject(
-//                    new JSONObject(jsonData).getString("date")).getString("UTC")).toLocalDateTime());
             weather.setTime(LocalDateTime.ofInstant(Instant.ofEpochSecond(
                     weatherInfo.getJSONObject("date").getLong("unix")),
                     ZoneId.of(timezone)));
             weather.setWeatherDescription(weatherInfo.getJSONObject("description").getString("full"));
-            weather.setTemperature(weatherInfo.getJSONObject("temperature").getDouble("air"));
+            weather.setTemperature(weatherInfo.getJSONObject("temperature").getJSONObject("air").getDouble("C"));
 
             } catch (IOException ignored) {}
         });
