@@ -47,11 +47,8 @@ public class WeatherService {
             connection.addRequestProperty(header, token);
             String jsonData = new String(connection.getInputStream().readAllBytes());
             JSONArray citiesItems = new JSONObject(jsonData).getJSONObject("response").getJSONArray("items");
-            log.info("citiesItems length = " + citiesItems.length());
-            log.info(citiesItems.toString());
             for (int i = 0; i < citiesItems.length(); i++) {
                 JSONObject currentCity = citiesItems.getJSONObject(i);
-                log.info(currentCity.toString());
                 if (!currentCity.getJSONObject("country").getString("code")
                         .equals(city.getCountry().getCodeTwoSymbols()) ||
                         !currentCity.getString("name").equals(city.getName())) {
@@ -74,6 +71,7 @@ public class WeatherService {
             URLConnection connection = new URL(dataPath + id + "/").openConnection();
             connection.addRequestProperty(header, token);
             String jsonData = new String(connection.getInputStream().readAllBytes());
+            log.info(jsonData);
             Weather weather = new Weather();
             weather.setGismeteoId(id);
 //            weather.setTime(ZonedDateTime.parse(new JSONObject(
