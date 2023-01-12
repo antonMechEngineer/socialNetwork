@@ -63,7 +63,7 @@ socialNetwork:
   scheduling:
     currencies: 0 1 16 * * MON-FRI
     birthdays: 0 0 8 * * *
-    weather: 0 * 7,12,17,22 * * *
+    weather: 0 0,5,10,15,20,25,30,35,40,45,50,55 * * * *
   #Банк России
   currency:
     data-path: https://www.cbr-xml-daily.ru/daily_json.js
