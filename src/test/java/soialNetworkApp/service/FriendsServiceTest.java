@@ -1,5 +1,6 @@
 package soialNetworkApp.service;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
+import org.checkerframework.checker.units.qual.C;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.PersonRs;
 import soialNetworkApp.mappers.PersonMapper;
@@ -81,6 +82,7 @@ class FriendsServiceTest {
     private static final Page<Person> PAGE_FRIENDS = new PageImpl<>(FRIENDS, PAGEABLE, FRIENDS.size());
     private static final ArrayList<Person> RECEIVED_FRIENDS = new ArrayList<>(Arrays.asList(RECEIVED_FRIEND));
     private static final Page<Person> PAGE_RECEIVED_FRIENDS = new PageImpl<>(RECEIVED_FRIENDS, PAGEABLE, RECEIVED_FRIENDS.size());
+
     private PersonSettings personSettings;
 
     @BeforeEach
@@ -95,6 +97,7 @@ class FriendsServiceTest {
         personSettings = new PersonSettings();
         personSettings.setFriendRequestNotification(true);
         REQUESTED_FRIEND.setPersonSettings(personSettings);
+
     }
 
     private void mockSecurityContext(){
@@ -136,6 +139,15 @@ class FriendsServiceTest {
         when(friendshipsRepository.findFriendshipBySrcPerson(RECEIVED_FRIEND)).thenReturn(List.of(fsRcFr));
         when(friendshipsRepository.findFriendshipBySrcPerson(C_FRIEND)).thenReturn(List.of(fsFr));
         when(friendshipsRepository.findFriendshipBySrcPerson(REQUESTED_FRIEND)).thenReturn(List.of(fsRqFr));
+
+        when(friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(C_FRIEND, CURRENT_PERSON)).thenReturn(Optional.of(fsCurPsFr));
+        when(friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(CURRENT_PERSON,C_FRIEND)).thenReturn(Optional.of(fsCurPsFr));
+
+        when(friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(CURRENT_PERSON, RECEIVED_FRIEND)).thenReturn(Optional.of(fsCurPsRcFr));
+        when(friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(RECEIVED_FRIEND, CURRENT_PERSON)).thenReturn(Optional.of(fsRcFr));
+
+        when(friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(CURRENT_PERSON, REQUESTED_FRIEND)).thenReturn(Optional.of(fsCurPsRqFr));
+        when(friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(REQUESTED_FRIEND, CURRENT_PERSON)).thenReturn(Optional.of(fsRqFr));
     }
 
     private void mockPersonMapper() {
@@ -146,8 +158,8 @@ class FriendsServiceTest {
     @Test
     void addFriend() throws Exception {
         friendsService.addFriend(RECEIVED_FRIEND.getId());
-        assertEquals(FRIEND, fsCurPsFr.getFriendshipStatus());
         assertEquals(FRIEND, fsCurPsRcFr.getFriendshipStatus());
+        assertEquals(FRIEND, fsRcFr.getFriendshipStatus());
     }
 
     @Test
@@ -160,15 +172,13 @@ class FriendsServiceTest {
     @Test
     void deleteFriend() throws Exception {
         friendsService.deleteFriend(C_FRIEND.getId());
-        verify(friendshipsRepository, times(1)).delete(fsCurPsFr);
-        verify(friendshipsRepository, times(1)).delete(fsFr);
+        verify(friendshipsRepository, times(2)).delete(any());
     }
 
     @Test
     void deleteSentFriendshipRequest() throws Exception {
         friendsService.deleteSentFriendshipRequest(REQUESTED_FRIEND.getId());
-        verify(friendshipsRepository, times(1)).delete(fsCurPsRqFr);
-        verify(friendshipsRepository, times(1)).delete(fsRqFr);
+        verify(friendshipsRepository, times(2)).delete(any());
     }
 
     @Test

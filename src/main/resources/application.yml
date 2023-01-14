@@ -38,8 +38,6 @@ spring:
       time-to-live: 100000
   kafka:
     bootstrap-servers: 194.87.244.66:9092
-    properties:
-      ssl.endpoint.identification.algorithm:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
