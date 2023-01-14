@@ -6,26 +6,16 @@ VALUES
     (4, 'Jes','Log','2022-04-18 23:14:12','1979-01-03 15:07:47','mol@yahoo.edu','+7 (965) 698-46-45','UbQ85uuS8Lu','molestie arcu. Sed eu nibh vulputate mauris sagittis placerat. Cras dictum ultricies ligula. Nullam enim. Sed nulla ante,'),
     (5, 'J','L','2022-04-18 23:14:12','1979-01-03 15:07:47','m@yahoo.edu','+7 (965) 698-46-45','UbQ85uuS8Lu','molestie arcu. Sed eu nibh vulputate mauris sagittis placerat. Cras dictum ultricies ligula. Nullam enim. Sed nulla ante,');
 
-INSERT INTO friendship_statuses(time, name, code)
+
+INSERT INTO friendships (sent_time, src_person_id, dst_person_id, status_name)
 VALUES
-    ('2022-09-29 21:49:07', 'FRIEND', 'FRIEND'),
-    ('2022-09-29 21:49:07', 'FRIEND', 'FRIEND'),
+    ('2022-09-29 21:49:07', 1, 2, 'FRIEND'),
+    ('2022-09-29 21:49:07', 2, 1, 'FRIEND'),
 
-    ('2022-09-29 21:49:07', 'RECEIVED_REQUEST', 'RECEIVED_REQUEST'),
-    ('2022-09-29 21:49:07', 'REQUEST', 'REQUEST'),
+    ('2022-09-29 21:49:07', 1, 3, 'RECEIVED_REQUEST'),
+    ('2022-09-29 21:49:07', 3, 1, 'REQUEST'),
 
-    ('2022-09-29 21:49:07', 'REQUEST', 'REQUEST'),
-    ('2022-09-29 21:49:07', 'RECEIVED_REQUEST', 'RECEIVED_REQUEST');
-
-INSERT INTO friendships (sent_time, src_person_id, dst_person_id, status_id)
-VALUES
-    ('2022-09-29 21:49:07', 1, 2, 1),
-    ('2022-09-29 21:49:07', 2, 1, 2),
-
-    ('2022-09-29 21:49:07', 1, 3, 3),
-    ('2022-09-29 21:49:07', 3, 1, 4),
-
-    ('2022-09-29 21:49:07', 1, 4, 5),
-    ('2022-09-29 21:49:07', 4, 1, 6);
+    ('2022-09-29 21:49:07', 1, 4, 'REQUEST'),
+    ('2022-09-29 21:49:07', 4, 1, 'RECEIVED_REQUEST');
 
 
