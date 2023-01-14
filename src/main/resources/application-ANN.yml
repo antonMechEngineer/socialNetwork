@@ -16,8 +16,17 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/changelog-master.yaml
     enabled: true
+#  kafka:
+#    bootstrap-servers: localhost:9092
   redis:
-    host: localhost
+    port: 6379
+    host: 127.0.0.1
+  cache:
+    type: redis
+    redis:
+      cache-null-values: true
+      time-to-live: 100000
+
 auth:
   secret: someSecretCode
   pass-restore: http://localhost:8080/change-password?token=
@@ -49,6 +58,7 @@ management:
     health:
       show-details: always
 
-
+redis:
+  host: localhost
 
 

@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @EnableScheduling
 public class UsersService {
-    private final static int MAX_IMAGE_LENGTH = 512000;
+    private final static int MAX_IMAGE_LENGTH = 1024000;
     @Value("${user.time-to-delete}")
     long timeToDel;
 
@@ -66,7 +66,7 @@ public class UsersService {
         }
         long fileLength = photo.getSize();
         if (fileLength > MAX_IMAGE_LENGTH) {
-            throw new FileException("The maximum file size must not exceed 0.5 MB");
+            throw new FileException("The maximum file size must not exceed 1 MB");
         }
 
         dataRs.setBytes(0);
