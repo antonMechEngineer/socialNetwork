@@ -111,6 +111,12 @@ public class FriendsService {
         }
     }
 
+    public CommonRs<List<PersonRs>> getOutgoingRequests(Integer offset, Integer size) throws Exception {
+        Person srcPerson = getSrcPerson();
+        Page<Person> requestedPersons = getPersons(srcPerson, offset, size, REQUEST);
+        return buildCommonResponse(requestedPersons, srcPerson, offset);
+    }
+
     private void createFriendshipRequest(Person srcPerson, Person dstPerson) {
         Friendship srcFriendship = new Friendship(LocalDateTime.now(), srcPerson, dstPerson, REQUEST);
         Friendship dstFriendship = new Friendship(LocalDateTime.now(), dstPerson, srcPerson, RECEIVED_REQUEST);
@@ -121,7 +127,6 @@ public class FriendsService {
         }
     }
 
-    //TODO: косяк если в таблице только одна запись (user1 - user2 - FRIEND, а user2 - user1 - FRIEND не существует)
     private void deleteFriendships(Person srcPerson, Person dstPerson) {
         Friendship srcFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(srcPerson, dstPerson).orElseThrow();
         Friendship dstFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(dstPerson, srcPerson).orElseThrow();
