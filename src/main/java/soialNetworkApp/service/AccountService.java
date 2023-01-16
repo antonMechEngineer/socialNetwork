@@ -50,18 +50,17 @@ public class AccountService {
         ComplexRs data = ComplexRs.builder().message("OK").build();
 
         if (!regRequest.getPasswd1().equals(regRequest.getPasswd2())) {
-            throw new PasswordException("Different passwords entered");
+            throw new PasswordException("Введены разные пароли");
         }
         String captcha = regRequest.getCode();
         String secret = regRequest.getCodeSecret();
         Optional<Captcha> optionalCaptcha = captchaRepository.findCaptchaBySecretCode(secret);
         if (optionalCaptcha.isPresent()) {
             if (!optionalCaptcha.get().getCode().equals(captcha)) {
-                throw new CaptchaException("Invalid captcha entered");
+                throw new CaptchaException("Введена неверная капча");
             }
         } else {
-            //TODO: Переписать сообщение об ошибке на более понятное для пользователя
-            throw new CaptchaException("Сaptcha not found in repository");
+            throw new CaptchaException("Невалидная капча, обновите страницу или капчу");
         }
         registerRs.setEmail(regRequest.getEmail());
         registerRs.setData(data);

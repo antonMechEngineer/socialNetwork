@@ -16,6 +16,8 @@ public interface FriendshipsRepository extends JpaRepository<Friendship, Long> {
 
     List<Friendship> findFriendshipBySrcPerson(Person srcPerson);
 
+    List<Friendship> findFriendshipById(Long id);
+
     @Query(value = "SELECT * FROM friendships WHERE (dst_person_id = :id OR src_person_id = :id)",
             nativeQuery = true)
     List<Friendship> findFriendsToDelete(@Param("id") long id);
@@ -23,6 +25,8 @@ public interface FriendshipsRepository extends JpaRepository<Friendship, Long> {
     List<Friendship> findFriendshipsByDstPerson(Person dstPerson);
 
     Friendship findFriendshipBySrcPersonIdAndDstPersonId(Long srcPersonId, Long dstPersonId);
+
+    Optional<Friendship>findFriendshipBySrcPersonAndDstPerson(Person srcPerson, Person dstPerson);
 
     List<Friendship> findFriendshipsByDstPersonIdAndFriendshipStatus(Long id, FriendshipStatusTypes status);
 

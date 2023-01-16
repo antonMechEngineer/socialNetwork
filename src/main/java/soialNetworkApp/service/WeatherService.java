@@ -1,6 +1,7 @@
 package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.cloudinary.json.JSONArray;
 import soialNetworkApp.api.response.WeatherRs;
 import soialNetworkApp.model.entities.Weather;
@@ -22,6 +23,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WeatherService {
 
     private final CitiesRepository citiesRepository;
@@ -39,22 +41,14 @@ public class WeatherService {
     private String timezone;
 
     public Integer getGismeteoCityId(City city) {
-//        RestTemplate template = new RestTemplate();
-//        String qwe = new RestTemplate().getForObject(cityIdPath, String.class, Map.of(header, token));
-//        HttpRequest request = HttpRequest.newBuilder().header(header, token).uri(new URI(cityIdPath + "киров")).build();
-//        String jsonData = new String(new URL(cityIdPath + "киров").openStream());
-//        System.out.println("><>< " + qwe);
-
-
         Integer cityId = null;
         try {
             URLConnection connection = new URL(cityIdPath + city.getName()).openConnection();
             connection.addRequestProperty(header, token);
             String jsonData = new String(connection.getInputStream().readAllBytes());
-
             JSONArray citiesItems = new JSONObject(jsonData).getJSONObject("response").getJSONArray("items");
             for (int i = 0; i < citiesItems.length(); i++) {
-                JSONObject currentCity = new JSONObject(citiesItems.getJSONObject(i));
+                JSONObject currentCity = citiesItems.getJSONObject(i);
                 if (!currentCity.getJSONObject("country").getString("code")
                         .equals(city.getCountry().getCodeTwoSymbols()) ||
                         !currentCity.getString("name").equals(city.getName())) {
@@ -66,16 +60,8 @@ public class WeatherService {
                 }
                 cityId = currentCity.getInt("id");
             }
-
-            cityId = new JSONObject(jsonData).getInt("id");
         } catch (IOException ignored) {}
         return cityId;
-
-//        String result = Request.Get("https://www.cbr-xml-daily.ru/daily_json.js")
-////                .setHeader("Authorization", token)
-//                .execute()
-//                .returnContent().toString();
-//        System.out.println("><><" + result);
     }
 
     @Scheduled(cron = "${socialNetwork.scheduling.weather}", zone = "${socialNetwork.timezone}")
@@ -85,18 +71,15 @@ public class WeatherService {
             URLConnection connection = new URL(dataPath + id + "/").openConnection();
             connection.addRequestProperty(header, token);
             String jsonData = new String(connection.getInputStream().readAllBytes());
+            JSONObject weatherInfo = new JSONObject(jsonData).getJSONObject("response");
             Weather weather = new Weather();
             weather.setGismeteoId(id);
-//            weather.setTime(ZonedDateTime.parse(new JSONObject(
-//                    new JSONObject(jsonData).getString("date")).getString("UTC")).toLocalDateTime());
             weather.setTime(LocalDateTime.ofInstant(Instant.ofEpochSecond(
-                    new JSONObject(new JSONObject(jsonData).getString("date")).getLong("unix")),
+                    weatherInfo.getJSONObject("date").getLong("unix")),
                     ZoneId.of(timezone)));
-            weather.setWeatherDescription(new JSONObject(
-                    new JSONObject(jsonData).getString("description")).getString("full"));
-            weather.setTemperature(new JSONObject(
-                    new JSONObject(jsonData).getString("temperature")).getDouble("air"));
-
+            weather.setWeatherDescription(weatherInfo.getJSONObject("description").getString("full"));
+            weather.setTemperature(weatherInfo.getJSONObject("temperature").getJSONObject("air").getDouble("C"));
+            weatherRepository.save(weather);
             } catch (IOException ignored) {}
         });
     }

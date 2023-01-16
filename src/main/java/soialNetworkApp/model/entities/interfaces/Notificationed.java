@@ -8,4 +8,6 @@ public interface Notificationed {
     NotificationTypes getNotificationType();
 
     Person getAuthor();
+
+    Long getId();
 }
