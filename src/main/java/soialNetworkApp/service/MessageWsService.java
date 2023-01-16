@@ -5,6 +5,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import soialNetworkApp.api.request.MessageWsRq;
 import soialNetworkApp.mappers.DialogMapper;
+import soialNetworkApp.model.entities.Dialog;
 import soialNetworkApp.model.entities.Message;
 import soialNetworkApp.repository.DialogsRepository;
 import soialNetworkApp.repository.MessagesRepository;
@@ -26,6 +27,9 @@ public class MessageWsService {
                 dialogsRepository.findById(messageWsRq.getDialogId()).orElseThrow(),
                 personsRepository.findPersonById(messageWsRq.getAuthorId()).orElseThrow());
         messagesRepository.save(message);
+        Dialog dialog = dialogsRepository.findById(messageWsRq.getDialogId()).orElseThrow();
+        dialog.setLastMessage(message);
+        dialogsRepository.save(dialog);
     }
 
 
