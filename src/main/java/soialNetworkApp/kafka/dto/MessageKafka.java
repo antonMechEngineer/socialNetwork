@@ -19,6 +19,8 @@ import java.time.ZonedDateTime;
 @RequiredArgsConstructor
 public class MessageKafka {
 
+    private Long id;
+
     private ZonedDateTime time;
 
     private String messageText;

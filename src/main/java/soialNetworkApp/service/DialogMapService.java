@@ -33,6 +33,11 @@ public class DialogMapService {
         return getRecipientFromDialog(messageWsRq.getAuthorId(), messageWsRq.getDialogId());
     }
 
+    @Named("getRecipientIdFromDialog")
+    public Long getRecipientIdFromDialog(MessageWsRq messageWsRq) {
+        return getRecipientFromDialog(messageWsRq.getAuthorId(), messageWsRq.getDialogId()).getId();
+    }
+
     public Person getRecipientFromDialog(Long authorId, Long dialogId) {
         Dialog dialog = dialogsRepository.findById(dialogId).orElseThrow();
         return !authorId.equals(dialog.getFirstPerson().getId()) ?
