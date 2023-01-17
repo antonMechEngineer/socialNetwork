@@ -6,7 +6,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import soialNetworkApp.api.request.MessageWsRq;
 import soialNetworkApp.kafka.dto.MessageKafka;
-import soialNetworkApp.kafka.mappers.MessageKafkaMapper;
+import soialNetworkApp.mappers.DialogMapper;
 import soialNetworkApp.model.entities.Message;
 import soialNetworkApp.repository.DialogsRepository;
 
@@ -17,18 +17,22 @@ import soialNetworkApp.repository.DialogsRepository;
 public class MessagesKafkaProducer {
     private final DialogsRepository dialogsRepository;
     private final KafkaTemplate<String, MessageKafka> kafkaTemplate;
-    private final MessageKafkaMapper messageKafkaMapper;
+    private final DialogMapper dialogMapper;
 
-    public void sendMessage (MessageWsRq messageWsRq){
-        log.info(String.format("Sent -> %s", messageWsRq.toString()));
-        MessageKafka messageKafka = messageKafkaMapper.toMessageKafkaFromMessageWs(messageWsRq,
+    public void sendMessage(MessageWsRq messageWsRq){
+        MessageKafka messageKafka = dialogMapper.toMessageKafkaFromMessageWs(messageWsRq,
                 dialogsRepository.findById(messageWsRq.getDialogId()).orElseThrow());
-        kafkaTemplate.send("messages", messageKafka);
+        sendMessageKafka(messageKafka);
     }
 
     public void sendMessage(Message message){
-        log.info(String.format("Sent -> %s", message.toString()));
-        MessageKafka messageKafka = messageKafkaMapper.toMessageKafkaFromMessage(message);
+        MessageKafka messageKafka = dialogMapper.toMessageKafkaFromMessage(message);
+        sendMessageKafka(messageKafka);
+    }
+
+    private void sendMessageKafka(MessageKafka messageKafka){
+        log.info(String.format("Sent -> %s", messageKafka.toString()));
         kafkaTemplate.send("messages", messageKafka);
+
     }
 }

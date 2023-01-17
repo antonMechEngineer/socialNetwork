@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 @Builder
 public class NotificationKafka {
 
+    private Long id;
+
     private NotificationTypes notificationType;
 
     private LocalDateTime sentTime;
