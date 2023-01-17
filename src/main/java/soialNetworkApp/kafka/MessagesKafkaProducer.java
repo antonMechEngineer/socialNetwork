@@ -9,7 +9,7 @@ import soialNetworkApp.model.entities.Message;
 @Slf4j
 @Service
 public class MessagesKafkaProducer {
-    private KafkaTemplate<String, MessageKafka> kafkaTemplate;
+    private final KafkaTemplate<String, MessageKafka> kafkaTemplate;
     public MessagesKafkaProducer(KafkaTemplate<String, MessageKafka> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }

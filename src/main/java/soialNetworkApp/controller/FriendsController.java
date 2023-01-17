@@ -14,6 +14,7 @@ import soialNetworkApp.errors.PersonException;
 import soialNetworkApp.service.FriendsRecommendationService;
 import soialNetworkApp.service.FriendsService;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -50,7 +51,7 @@ public class FriendsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonRs<ComplexRs> sendFriendshipRequest (@PathVariable Long id) throws Exception {
+    public CommonRs<ComplexRs> sendFriendshipRequest(@PathVariable Long id) throws Exception {
         return friendsService.sendFriendshipRequest(id);
     }
 
@@ -64,7 +65,7 @@ public class FriendsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonRs<ComplexRs> addFriend (@PathVariable Long id) throws Exception {
+    public CommonRs<ComplexRs> addFriend(@PathVariable Long id) throws Exception {
         return friendsService.addFriend(id);
     }
 
@@ -83,7 +84,7 @@ public class FriendsController {
     }
 
     @UpdateOnlineTime
-    @DeleteMapping("request/{id}")
+    @DeleteMapping("/request/{id}")
     @ApiOperation(value = "decline friendship request by id")
     @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
     @ApiResponses(value = {
@@ -92,7 +93,7 @@ public class FriendsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
-    public CommonRs<ComplexRs> deleteSentFriendshipRequest (@PathVariable Long id) throws Exception {
+    public CommonRs<ComplexRs> deleteSentFriendshipRequest(@PathVariable Long id) throws Exception {
         return friendsService.deleteSentFriendshipRequest(id);
     }
 
@@ -141,5 +142,21 @@ public class FriendsController {
     })
     public void userBlocksUser(@PathVariable(name = "id") Long blockUserId) throws PersonException {
         friendsService.userBlocksUser(blockUserId);
+    }
+
+    @GetMapping("/outgoing_requests")
+    @ApiOperation(value = "get outgoing requests by user")
+    @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "\"Name of error\"",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
+    public CommonRs<List<PersonRs>> getOutgoingRequests(
+            @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
+            @RequestParam(name = "perPage", required = false, defaultValue = "${socialNetwork.default.size}") int size
+    ) throws Exception {
+        return friendsService.getOutgoingRequests(offset, size);
     }
 }

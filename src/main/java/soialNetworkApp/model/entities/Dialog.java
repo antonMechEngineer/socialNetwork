@@ -6,8 +6,11 @@ import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "dialogs")
 public class Dialog {
 
@@ -19,7 +22,7 @@ public class Dialog {
     private ZonedDateTime lastActiveTime;
 
     @OneToOne
-    @JoinColumn(name = "last_message_id", referencedColumnName = "dialog_id")
+    @JoinColumn(name = "last_message_id")
     private Message lastMessage;
 
     @ManyToOne
