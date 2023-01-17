@@ -83,6 +83,9 @@ socialNetwork:
     first-cities-in-response: Москва (Московская область, Центральный федеральный округ); Санкт-Петербург (Ленинградская область, Санкт-Петербург)
     # 20 запросов в сутки
     token: aae8395d07c1255b0ca5ab1962268afd
+  telegram-bot:
+    name: JavaTeam30Bot
+    token: 5821691600:AAHeMv01ySdp63uglQ1ob0VQh3zSs_LagEA
 
 auth:
   secret: someSecretCode
