@@ -52,8 +52,7 @@ public class DialogsService {
         messagesRepository.findAllByDialogIdAndRecipientAndReadStatusAndIsDeletedFalse(dialogId, currentUserExtractor.getPerson(), ReadStatusTypes.SENT)
                 .forEach(m -> {
                     m.setReadStatus(ReadStatusTypes.READ);
-//                    messagesKafkaProducer.sendMessage(m);
-                    messagesRepository.save(m);
+                    messagesKafkaProducer.sendMessage(m);
                     readCount[0]++;
                 });
         return new CommonRs<>(new ComplexRs(readCount[0]));

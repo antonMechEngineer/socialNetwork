@@ -33,6 +33,5 @@ public class MessagesKafkaProducer {
     private void sendMessageKafka(MessageKafka messageKafka){
         log.info(String.format("Sent -> %s", messageKafka.toString()));
         kafkaTemplate.send("messages", messageKafka);
-
     }
 }

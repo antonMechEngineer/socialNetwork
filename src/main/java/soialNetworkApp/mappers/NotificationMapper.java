@@ -1,5 +1,6 @@
 package soialNetworkApp.mappers;
 
+import org.mapstruct.Named;
 import soialNetworkApp.api.response.NotificationRs;
 import soialNetworkApp.kafka.dto.MessageKafka;
 import soialNetworkApp.kafka.dto.NotificationKafka;
@@ -26,12 +27,15 @@ public interface NotificationMapper {
     NotificationKafka toNotificationKafka(Notification notification);
 
     @Mapping(target = "id", expression = "java(0L)")
-    @Mapping(target = "notificationType", source = "entity", qualifiedByName = "getNotificationType")
-    @Mapping(target = "personId", source = "person", qualifiedByName = "getId")
+    @Mapping(target = "notificationType", source = "notificationed", qualifiedByName = "getNotificationType")
+    @Mapping(target = "personId", source = "person.id")
+    @Mapping(target = "notificationedId", source = "notificationed", qualifiedByName = "getNotificationedId")
     @Mapping(target = "isRead", expression = "java(false)")
-    MessageKafka toNotificationKafkaFromNotificationed(Notificationed notificationed, Person person);
+    @Mapping(target = "sentTime", expression = "java(LocalDateTime.now())")
+    NotificationKafka toNotificationKafkaFromNotificationed(Notificationed notificationed, Person person);
 
-    default LocalDateTime getSentTime(){
-        return LocalDateTime.now();
-    }
+//    @Named("getSentTime")
+//    default LocalDateTime getSentTime(){
+//        return LocalDateTime.now();
+//    }
 }
