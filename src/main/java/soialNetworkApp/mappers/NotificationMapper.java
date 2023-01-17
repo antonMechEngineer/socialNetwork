@@ -1,6 +1,7 @@
 package soialNetworkApp.mappers;
 
 import soialNetworkApp.api.response.NotificationRs;
+import soialNetworkApp.kafka.dto.NotificationKafka;
 import soialNetworkApp.model.entities.Notification;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -12,4 +13,9 @@ public interface NotificationMapper {
     @Mapping(target = "notificationType", source = "entity.notificationType")
     @Mapping(target = "entityAuthor", source = "entity.author")
     NotificationRs toNotificationResponse(Notification notification);
+
+    @Mapping(target = "notificationType", source = "entity.notificationType")
+    @Mapping(target = "notificationedId", source = "entity.id")
+    @Mapping(target = "personId", source = "person.id")
+    NotificationKafka toNotificationKafka(Notification notification);
 }

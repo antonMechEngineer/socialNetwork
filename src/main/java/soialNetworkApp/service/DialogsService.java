@@ -1,7 +1,6 @@
 package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import soialNetworkApp.api.request.DialogUserShortListDto;
 import soialNetworkApp.kafka.MessagesKafkaProducer;
@@ -43,22 +42,18 @@ public class DialogsService {
 
 
     public CommonRs<ComplexRs> getUnreadMessages() {
-        return new CommonRs<>(new ComplexRs(messagesRepository
-                .findAllByRecipientAndIsDeletedFalse(currentUserExtractor.getPerson())
-                .stream()
-                .filter(m -> m.getReadStatus().equals(ReadStatusTypes.SENT))
-                .count()));
+        return new CommonRs<>(new ComplexRs((long) messagesRepository
+                .findAllByRecipientAndReadStatusAndIsDeletedFalse(currentUserExtractor.getPerson(), ReadStatusTypes.SENT)
+                .size()));
     }
 
     public CommonRs<ComplexRs> setReadMessages(Long dialogId) {
         final Long[] readCount = {0L};
-        messagesRepository.findAllByDialogIdAndIsDeletedFalse(dialogId)
-                .stream()
-                .filter(m -> m.getRecipient().equals(currentUserExtractor.getPerson()))
-                .filter(m -> m.getReadStatus().equals(ReadStatusTypes.SENT))
+        messagesRepository.findAllByDialogIdAndRecipientAndReadStatusAndIsDeletedFalse(dialogId, currentUserExtractor.getPerson(), ReadStatusTypes.SENT)
                 .forEach(m -> {
                     m.setReadStatus(ReadStatusTypes.READ);
-                    messagesKafkaProducer.sendMessage(m);
+//                    messagesKafkaProducer.sendMessage(m);
+                    messagesRepository.save(m);
                     readCount[0]++;
                 });
         return new CommonRs<>(new ComplexRs(readCount[0]));
@@ -87,14 +82,10 @@ public class DialogsService {
     public CommonRs<List<MessageRs>> getMessages(Long dialogId) {
         List<MessageRs> messagesRs = new ArrayList<>();
         messagesRepository.findAllByDialogIdAndIsDeletedFalse(dialogId)
-                .forEach(m -> {
-                    m.setReadStatus(ReadStatusTypes.READ);
-                    messagesRs.add(dialogMapper.toMessageRs(m, dialogMapService.getRecipientForLastMessage(m)));
-                });
-        return new CommonRs<>(messagesRs
-                .stream()
+                .forEach(m -> messagesRs.add(dialogMapper.toMessageRs(m, dialogMapService.getRecipientForLastMessage(m))));
+        return new CommonRs<>(messagesRs.stream()
                 .sorted(Comparator.comparing(MessageRs::getTime))
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList()), (long) messagesRs.size());
     }
 
     private List<DialogRs> createDialogRsList(Person person) {
@@ -107,7 +98,7 @@ public class DialogsService {
 
     private MessageRs createLastMessageRs(Dialog dialog) {
         try {
-            Message message = getLastMessage(dialog.getId());
+            Message message = dialog.getLastMessage();
             return dialogMapper.toMessageRs(message, dialogMapService.getRecipientForLastMessage(message));
         } catch (Exception e) {
             Person currentPerson = currentUserExtractor.getPerson();
@@ -120,17 +111,17 @@ public class DialogsService {
         }
     }
 
-    private Message getLastMessage(Long dialogId) {
+/*    private Message getLastMessage(Long dialogId) {
         return messagesRepository.findAllByDialogIdAndIsDeletedFalse(dialogId)
                 .stream()
                 .max(Comparator.comparing(Message::getTime)).orElseThrow();
-    }
+    }*/
 
     private List<DialogRs> blockDialogs(List<DialogRs> dialogs) {
-        Person me = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
+        Person me = currentUserExtractor.getPerson();
         List<Friendship> friendships =
                 friendshipsRepository.findFriendshipsByFriendshipStatusAndSrcPersonIdOrDstPersonId(FriendshipStatusTypes.BLOCKED, me.getId(), me.getId());
-        Set<Long> srcDstPersonsIds =  getSrcDstPersonsIds(friendships, me);
+        Set<Long> srcDstPersonsIds = getSrcDstPersonsIds(friendships, me);
         return dialogs
                 .stream()
                 .filter(dialog -> !srcDstPersonsIds.contains(dialog.getAuthorId()) && !srcDstPersonsIds.contains(dialog.getRecipientId()))

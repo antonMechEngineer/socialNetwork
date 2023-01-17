@@ -1,6 +1,6 @@
 package soialNetworkApp.kafka;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import soialNetworkApp.repository.DialogsRepository;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class MessagesKafkaProducer {
     private final DialogsRepository dialogsRepository;
     private final KafkaTemplate<String, MessageKafka> kafkaTemplate;
