@@ -18,15 +18,15 @@ public class NotificationsKafkaProducer {
     public NotificationsKafkaProducer(KafkaTemplate<String, NotificationKafka> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
-    public void sendMessage (Notification notification) {
-        LOGGER.info(String.format("Sent -> %s", notification.toString()));
+    public void sendMessage (NotificationKafka notificationKafka) {
+        LOGGER.info(String.format("Sent -> %s", notificationKafka.toString()));
 
-        NotificationKafka notificationKafka = new NotificationKafka(
-                notification.getNotificationType(),
-                notification.getSentTime(),
-                notification.getEntity().getId(),
-                notification.getPerson().getId(),
-                notification.getIsRead());
+//        NotificationKafka notificationKafka = new NotificationKafka(
+//                notification.getNotificationType(),
+//                notification.getSentTime(),
+//                notification.getEntity().getId(),
+//                notification.getPerson().getId(),
+//                notification.getIsRead());
         kafkaTemplate.send("notifications", notificationKafka);
     }
 }

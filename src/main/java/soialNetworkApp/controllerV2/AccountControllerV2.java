@@ -8,16 +8,20 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import soialNetworkApp.api.request.EmailRq;
+import soialNetworkApp.api.request.PasswordRq;
+import soialNetworkApp.api.request.PasswordSetRq;
+import soialNetworkApp.api.request.RegisterRq;
+import soialNetworkApp.api.response.*;
 import soialNetworkApp.aop.annotations.UpdateOnlineTime;
 import soialNetworkApp.api.request.*;
-import soialNetworkApp.api.response.*;
 import soialNetworkApp.errors.CaptchaException;
 import soialNetworkApp.errors.IncorrectRequestTypeException;
 import soialNetworkApp.errors.PasswordException;
 import soialNetworkApp.errors.PersonNotFoundException;
 import soialNetworkApp.service.AccountService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,7 +39,7 @@ public class AccountControllerV2 {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public ResponseEntity<RegisterRs> register(@RequestBody RegisterRq regRequest) throws PasswordException, CaptchaException {
         return ResponseEntity.ok(accountService.getRegResponse(regRequest));
@@ -48,7 +52,7 @@ public class AccountControllerV2 {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public ResponseEntity<RegisterRs> passwordSet(@RequestBody PasswordSetRq passwordSetRq){
         return ResponseEntity.ok(accountService.getPasswordSet(passwordSetRq));}
@@ -60,7 +64,7 @@ public class AccountControllerV2 {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public ResponseEntity<RegisterRs> passwordReSet(@RequestBody PasswordRq passwordRq){
         return ResponseEntity.ok(accountService.getPasswordReSet(passwordRq));}
@@ -72,7 +76,7 @@ public class AccountControllerV2 {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public ResponseEntity<RegisterRs> passwordRecovery(@RequestBody LinkedHashMap email){
         return ResponseEntity.ok(accountService.getPasswordRecovery(email.get("email").toString()));}
@@ -84,9 +88,11 @@ public class AccountControllerV2 {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public ResponseEntity<RegisterRs> emailSet(@RequestBody EmailRq emailRq) {return null;}
+    public ResponseEntity<RegisterRs> emailSet(@RequestBody EmailRq emailRq) {
+        return ResponseEntity.ok(accountService.getNewEmail(emailRq));
+    }
 
     @PutMapping("/email/recovery")
     @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
@@ -95,9 +101,9 @@ public class AccountControllerV2 {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "forbidden")
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public ResponseEntity<RegisterRs> emailRecovery(@RequestBody EmailRq emailRq) {
+    public ResponseEntity<RegisterRs> emailRecovery() {
         return ResponseEntity.ok(accountService.getEmailRecovery());}
 
     @UpdateOnlineTime
