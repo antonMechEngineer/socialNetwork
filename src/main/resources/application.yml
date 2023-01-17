@@ -59,7 +59,7 @@ socialNetwork:
     noteSize: 10
   timezone: Europe/Moscow
   scheduling:
-    currencies: 0 1 16 * * MON-FRI
+    currencies: 0 6 16 * * MON-FRI
     birthdays: 0 0 8 * * *
     weather: 0 0 7,12,17,22 * * *
   #Банк России
