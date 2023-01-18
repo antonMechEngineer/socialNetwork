@@ -77,13 +77,14 @@ public class AccountService {
         person.setEmail(regRequest.getEmail());
         person.setMessagePermission(MessagePermissionTypes.ALL);
         person.setPersonSettings(createDefaultNotificationsSettings(person));
-        personsRepository.save(person);
+        personCacheService.cachePerson(person);
+//        personsRepository.save(person);
         return registerRs;
     }
 
     public RegisterRs getPasswordSet(PasswordSetRq passwordSetRq) {
-        Person person = personsRepository.findPersonByEmail(SecurityContextHolder
-                .getContext().getAuthentication().getName()).orElseThrow();
+        Person person = personCacheService.getPersonByEmail(SecurityContextHolder
+                .getContext().getAuthentication().getName());
         RegisterRs response = new RegisterRs();
         ComplexRs data = getComplexRs();
         response.setEmail(person.getEmail());
@@ -91,7 +92,7 @@ public class AccountService {
         response.setData(data);
 
         person.setPassword(passwordEncoder.encode(passwordSetRq.getPassword()));
-        personsRepository.save(person);
+        personCacheService.cachePerson(person);
 
         return response;
     }
@@ -111,7 +112,7 @@ public class AccountService {
 
         if (rescuePerson != null) {
             rescuePerson.setPassword(passwordEncoder.encode(passwordRq.getPassword()));
-            personsRepository.save(rescuePerson);
+            personCacheService.cachePerson(rescuePerson);
         }
 
         return response;
@@ -124,10 +125,10 @@ public class AccountService {
         response.setTimestamp(0);
         response.setData(data);
 
-        Person person = personsRepository.findPersonByEmail(email).orElseThrow();
+        Person person = personCacheService.getPersonByEmail(email);
         String token = UUID.randomUUID().toString().replaceAll("-", "");
         person.setChangePasswordToken(token);
-        personsRepository.save(person);
+        personCacheService.cachePerson(person);
 
         String subject = "Восстановление пароля";
         String text = basePassUrl + token;
@@ -141,8 +142,8 @@ public class AccountService {
     }
 
     public RegisterRs getEmailRecovery() {
-        Person person = personsRepository.findPersonByEmail(SecurityContextHolder
-                .getContext().getAuthentication().getName()).orElseThrow();
+        Person person = personCacheService.getPersonByEmail(SecurityContextHolder
+                .getContext().getAuthentication().getName());
         RegisterRs response = new RegisterRs();
         ComplexRs data = getComplexRs();
         response.setEmail(person.getEmail());
@@ -151,7 +152,7 @@ public class AccountService {
 
         String token = UUID.randomUUID().toString().replaceAll("-", "");
         person.setChangePasswordToken(token);
-        personsRepository.save(person);
+        personCacheService.cachePerson(person);
 
         String to = person.getEmail();
         String subject = "Смена ящика почты";
@@ -172,7 +173,7 @@ public class AccountService {
 
         rescuePerson.setEmail(emailRq.getEmail());
         rescuePerson.setChangePasswordToken(null);
-        personsRepository.save(rescuePerson);
+        personCacheService.cachePerson(rescuePerson);
 
         return response;
     }
@@ -243,7 +244,7 @@ public class AccountService {
         PersonSettings personSettings = person.getPersonSettings();
         if (personSettings == null) {
             person.setPersonSettings(createDefaultNotificationsSettings(person));
-            personSettings = personsRepository.save(person).getPersonSettings();
+            personSettings = personCacheService.cachePerson(person).getPersonSettings();
         }
         PersonSettingsRs postValue = PersonSettingsRs.builder()
                 .type(String.valueOf(NotificationTypes.POST)).enable(personSettings.getPostNotification()).build();
