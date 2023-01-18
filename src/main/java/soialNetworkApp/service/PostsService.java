@@ -47,6 +47,7 @@ public class PostsService {
     private final PostMapper postMapper;
     private final SearchPosts searchPosts;
     private final CurrentUserExtractor currentUserExtractor;
+    private final PersonCacheService personCacheService;
 
     @Value("${socialNetwork.timezone}")
     private String timezone;
@@ -135,8 +136,8 @@ public class PostsService {
     }
 
     private boolean validatePerson(Person person) {
-        return person != null && person.equals(personsRepository.findPersonByEmail(
-                (SecurityContextHolder.getContext().getAuthentication().getName())).orElse(null));
+        return person != null && person.equals(personCacheService.getPersonByEmail(
+                (SecurityContextHolder.getContext().getAuthentication().getName())));
     }
 
     public CommonRs<List<PostRs>> findPosts(FindPostRq postRq, int offset, int perPage) throws EmptyFieldException {
@@ -179,7 +180,7 @@ public class PostsService {
     }
 
     private Page<Post> blockPosts(Pageable pageable) {
-        Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
+        Person person = personCacheService.getPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         List<Friendship> friendships = friendshipsRepository.findFriendshipsByDstPersonIdAndFriendshipStatus(person.getId(), BLOCKED);
         if (friendships.size() != 0) {
             List<Person> srcPersons = new ArrayList<>();

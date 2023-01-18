@@ -51,9 +51,10 @@ public class UsersService {
     private final GeolocationsService geolocationsService;
     private final PersonMapper personMapper;
     private final SearchPersons searchPersons;
+    private final PersonCacheService personCacheService;
 
     public CommonRs<StorageDataRs> storeImage(MultipartFile photo) throws IOException, FileException {
-        Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
+        Person person = personCacheService.getPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         long personId = person.getId();
         StorageDataRs dataRs = new StorageDataRs();
 
@@ -87,7 +88,7 @@ public class UsersService {
         dataRs.setFileType(extension);
 
         person.setPhoto(relativePath);
-        personsRepository.save(person);
+        personCacheService.cachePerson(person);
         return CommonRs.<StorageDataRs>builder()
                 .timestamp(System.currentTimeMillis())
                 .data(dataRs)
@@ -95,7 +96,7 @@ public class UsersService {
     }
 
     public CommonRs<PersonRs> editProfile(UserRq userRq) throws Exception {
-        Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
+        Person person = personCacheService.getPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         PersonRs personRs = personMapper.toPersonResponse(person);
         if (userRq.getAbout() != null) {
             person.setAbout(userRq.getAbout());
@@ -131,7 +132,7 @@ public class UsersService {
             personRs.setPhoto(userRq.getPhoto_id());
         }
 
-        personsRepository.save(person);
+        personCacheService.cachePerson(person);
         return CommonRs.<PersonRs>builder()
                 .timestamp(System.currentTimeMillis())
                 .data(personRs)
@@ -161,7 +162,7 @@ public class UsersService {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
         person.setIsDeleted(true);
         person.setDeletedTime(LocalDateTime.now());
-        personsRepository.save(person);
+        personCacheService.cachePerson(person);
 
         return CommonRs.<ComplexRs>builder()
                 .timestamp(System.currentTimeMillis())
@@ -173,7 +174,7 @@ public class UsersService {
         Person person = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
         person.setIsDeleted(false);
         person.setDeletedTime(null);
-        personsRepository.save(person);
+        personCacheService.cachePerson(person);
 
         return CommonRs.<ComplexRs>builder()
                 .timestamp(System.currentTimeMillis())
