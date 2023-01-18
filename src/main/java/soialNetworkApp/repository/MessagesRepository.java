@@ -11,6 +11,7 @@ import soialNetworkApp.model.enums.ReadStatusTypes;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MessagesRepository extends JpaRepository<Message, Long> {
@@ -19,6 +20,8 @@ public interface MessagesRepository extends JpaRepository<Message, Long> {
     @Query(value = "DELETE FROM messages WHERE (author_id = :id OR recipient_id = :id)",
             nativeQuery = true)
     void messagesDelete(@Param("id") long id);
+
+    Optional<Message> findMessageByAuthorIdAndRecipientIdAndTime(Long authorId, Long recipientId, ZonedDateTime zonedDateTime);
 
     List<Message> findAllByRecipientAndIsDeletedFalse(Person recipient);
 

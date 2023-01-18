@@ -1,26 +1,20 @@
 package soialNetworkApp.kafka.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import soialNetworkApp.model.enums.NotificationTypes;
 
-import java.time.LocalDateTime;
-
-@Data
-@Builder
+@Getter
+@Setter
+@RequiredArgsConstructor
 public class NotificationKafka {
 
     private Long id;
 
     private NotificationTypes notificationType;
 
-    private LocalDateTime sentTime;
-
     private Long notificationedId;
 
     private Long personId;
 
     private Boolean isRead;
-
-
 }

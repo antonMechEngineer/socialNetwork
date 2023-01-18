@@ -13,7 +13,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import java.time.ZonedDateTime;
 
-@AllArgsConstructor
 @Getter
 @Setter
 @RequiredArgsConstructor

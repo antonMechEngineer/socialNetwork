@@ -73,19 +73,19 @@ public class NotificationsService {
         if (readAll) {
             notificationsRepository.findAllByPersonAndIsReadIsFalse(person).forEach(notification -> {
                 notification.setIsRead(true);
-                notificationsKafkaProducer.sendMessage(notificationMapper.toNotificationKafka(notification));
+                notificationsKafkaProducer.sendMessage(notification);
             });
         } else {
             Notification notification = notificationsRepository.findById(notificationId)
                     .orElseThrow(new NoSuchEntityException("Notification with id " + notificationId + "was not found"));
             notification.setIsRead(true);
-            notificationsKafkaProducer.sendMessage(notificationMapper.toNotificationKafka(notification));
+            notificationsKafkaProducer.sendMessage(notification);
         }
         return getAllNotificationsByPerson(offset, size, person);
     }
 
     public void createNotification(Notificationed entity, Person person)  {
-        notificationsKafkaProducer.sendMessage(entity, person);
+        notificationsKafkaProducer.sendMessage(entity.getNotificationType(), entity.getId() , person);
         template.convertAndSend(String.format("/user/%s/queue/notifications", person.getId()),
                 getAllNotificationsByPerson(offset, size, person));
     }

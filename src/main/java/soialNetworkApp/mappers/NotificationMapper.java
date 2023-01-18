@@ -10,6 +10,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.model.entities.interfaces.Notificationed;
+import soialNetworkApp.model.enums.NotificationTypes;
 
 import java.time.LocalDateTime;
 
@@ -27,15 +28,15 @@ public interface NotificationMapper {
     NotificationKafka toNotificationKafka(Notification notification);
 
     @Mapping(target = "id", expression = "java(0L)")
-    @Mapping(target = "notificationType", source = "notificationed", qualifiedByName = "getNotificationType")
+    @Mapping(target = "notificationType", source = "notificationTypes")
     @Mapping(target = "personId", source = "person.id")
-    @Mapping(target = "notificationedId", source = "notificationed", qualifiedByName = "getNotificationedId")
+    @Mapping(target = "notificationedId", source = "notificationId")
     @Mapping(target = "isRead", expression = "java(false)")
-    @Mapping(target = "sentTime", expression = "java(LocalDateTime.now())")
-    NotificationKafka toNotificationKafkaFromNotificationed(Notificationed notificationed, Person person);
 
-//    @Named("getSentTime")
-//    default LocalDateTime getSentTime(){
-//        return LocalDateTime.now();
-//    }
+    NotificationKafka toNotificationKafkaFromNotificationed(NotificationTypes notificationTypes, Long notificationId, Person person);
+
+
+    default LocalDateTime getSentTime(){
+        return LocalDateTime.now();
+    }
 }

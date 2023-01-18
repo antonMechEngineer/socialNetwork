@@ -15,6 +15,7 @@ import soialNetworkApp.mappers.NotificationMapper;
 import soialNetworkApp.model.entities.Notification;
 import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.model.entities.interfaces.Notificationed;
+import soialNetworkApp.model.enums.NotificationTypes;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,8 +25,9 @@ public class NotificationsKafkaProducer {
     private final KafkaTemplate<String, NotificationKafka> kafkaTemplate;
     private final NotificationMapper notificationMapper;
 
-    public void sendMessage(Notificationed notificationed, Person person) {
-        NotificationKafka notificationKafka = notificationMapper.toNotificationKafkaFromNotificationed(notificationed, person);
+    public void sendMessage(NotificationTypes notificationType, Long notificationId, Person person) {
+        NotificationKafka notificationKafka =
+                notificationMapper.toNotificationKafkaFromNotificationed(notificationType, notificationId, person);
         sendMessageKafka(notificationKafka);
     }
 
