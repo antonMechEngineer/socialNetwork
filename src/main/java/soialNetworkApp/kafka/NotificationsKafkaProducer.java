@@ -32,6 +32,7 @@ public class NotificationsKafkaProducer {
     }
 
     public void sendMessage(Notification notification) {
+        System.out.println("notificationProdInvoked");
         NotificationKafka notificationKafka = notificationMapper.toNotificationKafka(notification);
         sendMessageKafka(notificationKafka);
     }

@@ -20,7 +20,9 @@ public class NotificationsKafkaConsumer {
     public void consume(NotificationKafka notificationKafka) {
         log.info(String.format("Json received -> %s", notificationKafka.toString()));
         if (notificationKafka.getId() > 0) {
+            System.out.println("notificationConsumerInvoked");
             Notification notification = notificationsRepository.findById(notificationKafka.getId()).orElseThrow();
+            notification.setIsRead(true);
             notificationsRepository.save(notification);
         } else {
             notificationsRepository.save(notificationKafka.getNotificationType().toString(), notificationKafka.getNotificationedId(),
