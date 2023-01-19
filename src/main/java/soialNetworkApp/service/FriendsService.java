@@ -130,7 +130,7 @@ public class FriendsService {
     private void deleteFriendships(Person srcPerson, Person dstPerson) {
         Friendship srcFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(srcPerson, dstPerson).orElseThrow();
         Friendship dstFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(dstPerson, srcPerson).orElseThrow();
-        notificationsService.deleteNotification(dstFriendship);
+        notificationsService.deleteNotification(srcFriendship);
         friendshipsRepository.delete(srcFriendship);
         friendshipsRepository.delete(dstFriendship);
     }

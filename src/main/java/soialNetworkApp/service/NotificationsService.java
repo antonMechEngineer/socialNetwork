@@ -74,15 +74,13 @@ public class NotificationsService {
         if (readAll) {
             notificationsRepository.findAllByPersonAndIsReadIsFalse(person).forEach(notification -> {
                 notification.setIsRead(true);
-                notificationsRepository.save(notification);
-                //notificationsKafkaProducer.sendMessage(notification);
+                notificationsKafkaProducer.sendMessage(notification);
             });
         } else {
             Notification notification = notificationsRepository.findById(notificationId)
                     .orElseThrow(new NoSuchEntityException("Notification with id " + notificationId + "was not found"));
             notification.setIsRead(true);
-            notificationsRepository.save(notification);
-            //notificationsKafkaProducer.sendMessage(notification);
+            notificationsKafkaProducer.sendMessage(notification);
         }
         return getAllNotificationsByPerson(offset, size, person);
     }
