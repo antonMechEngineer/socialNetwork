@@ -67,38 +67,27 @@ public class NotificationsService {
     }
 
     public CommonRs<List<NotificationRs>> markNotificationStatusAsRead(Long notificationId, boolean readAll) throws Exception {
+        System.out.println("markNotifInoked");
         Person person = personsRepository.findPersonByEmail(
                 SecurityContextHolder.getContext().getAuthentication().getName())
                 .orElseThrow(new PersonNotFoundException("Person is not available"));
         if (readAll) {
             notificationsRepository.findAllByPersonAndIsReadIsFalse(person).forEach(notification -> {
                 notification.setIsRead(true);
-                notificationsKafkaProducer.sendMessage(notificationMapper.toNotificationKafka(notification));
+                notificationsKafkaProducer.sendMessage(notification);
             });
         } else {
             Notification notification = notificationsRepository.findById(notificationId)
                     .orElseThrow(new NoSuchEntityException("Notification with id " + notificationId + "was not found"));
             notification.setIsRead(true);
-            notificationsKafkaProducer.sendMessage(notificationMapper.toNotificationKafka(notification));
+            notificationsKafkaProducer.sendMessage(notification);
         }
         return getAllNotificationsByPerson(offset, size, person);
     }
 
     public void createNotification(Notificationed entity, Person person)  {
-//        Notification notification = new Notification();
-//        notification.setIsRead(false);
-//        notification.setPerson(person);
-//        notification.setNotificationType(entity.getNotificationType());
-//        notification.setEntity(entity);
-//        notification.setSentTime(LocalDateTime.now(ZoneId.of(timezone)));
-        NotificationKafka notificationKafka = NotificationKafka.builder()
-                .notificationType(entity.getNotificationType())
-                .notificationedId(entity.getId())
-                .personId(person.getId())
-                .sentTime(LocalDateTime.now(ZoneId.of(timezone)))
-                .isRead(false)
-                .build();
-        notificationsKafkaProducer.sendMessage(notificationKafka);
+        notificationsKafkaProducer.sendMessage(entity.getNotificationType(), entity.getId() , person);
+
         template.convertAndSend(String.format("/user/%s/queue/notifications", person.getId()),
                 getAllNotificationsByPerson(offset, size, person));
     }

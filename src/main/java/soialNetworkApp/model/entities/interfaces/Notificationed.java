@@ -1,5 +1,6 @@
 package soialNetworkApp.model.entities.interfaces;
 
+import org.mapstruct.Named;
 import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.model.enums.NotificationTypes;
 

@@ -3,7 +3,6 @@ package soialNetworkApp.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import soialNetworkApp.api.request.DialogUserShortListDto;
-import soialNetworkApp.api.response.*;
 import soialNetworkApp.kafka.MessagesKafkaProducer;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.ComplexRs;
@@ -53,8 +52,7 @@ public class DialogsService {
         messagesRepository.findAllByDialogIdAndRecipientAndReadStatusAndIsDeletedFalse(dialogId, currentUserExtractor.getPerson(), ReadStatusTypes.SENT)
                 .forEach(m -> {
                     m.setReadStatus(ReadStatusTypes.READ);
-//                    messagesKafkaProducer.sendMessage(m);
-                    messagesRepository.save(m);
+                    messagesKafkaProducer.sendMessage(m);
                     readCount[0]++;
                 });
         return new CommonRs<>(new ComplexRs(readCount[0]));
