@@ -86,7 +86,7 @@ public class NotificationsService {
     }
 
     public void createNotification(Notificationed entity, Person person)  {
-        notificationsKafkaProducer.sendMessage(entity.getNotificationType(), entity.getId() , person);
+        notificationsKafkaProducer.sendMessage(entity, person);
 
         template.convertAndSend(String.format("/user/%s/queue/notifications", person.getId()),
                 getAllNotificationsByPerson(offset, size, person));
