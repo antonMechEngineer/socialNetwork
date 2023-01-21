@@ -28,7 +28,7 @@ public interface NotificationsRepository extends JpaRepository<Notification, Lon
     @Transactional
     @Query(value = "INSERT INTO notifications (notification_type, entity_id, is_read, sent_time, person_id)" +
             " VALUES (:type, :entityId, :isRead, :sentTime, :personId)", nativeQuery = true)
-    void save(@Param("type") NotificationTypes type, @Param("entityId") Long entityId,
+    void save(@Param("type") String type, @Param("entityId") Long entityId,
               @Param("isRead") Boolean isRead, @Param("sentTime") LocalDateTime sentTime, @Param("personId") Long personId);
 
     Page<Notification> findAllByPersonAndIsReadIsFalse(Person person, Pageable pageable);

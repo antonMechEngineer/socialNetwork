@@ -55,7 +55,7 @@ public class NotificationsController {
     public CommonRs<List<NotificationRs>> markAsReadNotification(
             @RequestParam(required = false) Long id,
             @RequestParam(required = false, defaultValue = "false") boolean all) throws Exception {
-
+        System.out.println("controllerInvoked");
         return notificationsService.markNotificationStatusAsRead(id, all);
     }
 }

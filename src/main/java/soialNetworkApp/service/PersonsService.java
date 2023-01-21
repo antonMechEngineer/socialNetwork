@@ -27,7 +27,7 @@ public class PersonsService {
     private final PersonCacheService personCacheService;
 
     public CommonRs<PersonRs> getPersonDataById(Long id) {
-        Person srcPerson = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow();
+        Person srcPerson = personCacheService.getPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         Person person = personCacheService.getPersonById(id);
         person.setFriendStatus(friendsService.getStatusTwoPersons(person, srcPerson));
         if (blockUserPage(srcPerson, id)) {
@@ -40,18 +40,6 @@ public class PersonsService {
         return getCommonPersonResponse(personCacheService.getPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()));
     }
 
-//    public Person getPersonById(long personId) {
-//        return personsRepository.findById(personId).orElse(null);
-//    }
-//
-//    public Person getPersonByEmail(String email) {
-//        return personsRepository.findPersonByEmail(email).orElse(null);
-//    }
-//
-//    public Person getPersonByContext() {
-//        return personsRepository.findPersonByEmail((SecurityContextHolder.getContext().getAuthentication().getName()))
-//                .orElse(null);
-//    }
 
     public boolean validatePerson(Person person) {
         return person != null && person.equals(personCacheService.getPersonByContext());
