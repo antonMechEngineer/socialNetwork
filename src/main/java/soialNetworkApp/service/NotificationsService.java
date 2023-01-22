@@ -67,7 +67,6 @@ public class NotificationsService {
     }
 
     public CommonRs<List<NotificationRs>> markNotificationStatusAsRead(Long notificationId, boolean readAll) throws Exception {
-        System.out.println("markNotifInoked");
         Person person = personsRepository.findPersonByEmail(
                 SecurityContextHolder.getContext().getAuthentication().getName())
                 .orElseThrow(new PersonNotFoundException("Person is not available"));
@@ -87,7 +86,6 @@ public class NotificationsService {
 
     public void createNotification(Notificationed entity, Person person)  {
         notificationsKafkaProducer.sendMessage(entity.getNotificationType(), entity.getId() , person);
-
         template.convertAndSend(String.format("/user/%s/queue/notifications", person.getId()),
                 getAllNotificationsByPerson(offset, size, person));
     }

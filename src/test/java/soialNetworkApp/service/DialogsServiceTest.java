@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import soialNetworkApp.api.request.DialogUserShortListDto;
+import soialNetworkApp.kafka.MessagesKafkaProducer;
 import soialNetworkApp.model.entities.Dialog;
 import soialNetworkApp.model.entities.Message;
 import soialNetworkApp.model.entities.Person;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -42,6 +43,9 @@ class DialogsServiceTest {
     private PersonsRepository personsRepository;
     @MockBean
     private CurrentUserExtractor currentUserExtractor;
+    @MockBean
+    private MessagesKafkaProducer messagesKafkaProducer;
+
 
     private Person person1,
             person2,
@@ -112,6 +116,7 @@ class DialogsServiceTest {
         when(messagesRepository.findAllByDialogIdAndRecipientAndReadStatusAndIsDeletedFalse(any(), any(), any()))
                 .thenReturn(messages.stream().filter(m -> m.getRecipient().equals(person1) && m.getReadStatus().equals(ReadStatusTypes.SENT)).collect(Collectors.toList()));
         assertEquals(5, dialogsService.setReadMessages(1L).getData().getCount());
+        verify(messagesKafkaProducer, times(5)).sendMessage(any(Message.class));
 
     }
 

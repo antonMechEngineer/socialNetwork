@@ -25,7 +25,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithUserDetails("rhoncus.nullam@yahoo.edu")
 class FriendsControllerTest {
 
-    // TODO: 29.12.2022 исправить тестовую базу
     @Autowired
     FriendshipsRepository friendshipsRepository;
 
