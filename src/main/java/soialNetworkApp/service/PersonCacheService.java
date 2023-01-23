@@ -1,12 +1,15 @@
 package soialNetworkApp.service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.repository.PersonsRepository;
 
 @Service
+@CacheConfig(cacheNames = "cache-person")
 @RequiredArgsConstructor
 public class PersonCacheService {
     private final PersonsRepository personsRepository;
@@ -20,7 +23,8 @@ public class PersonCacheService {
         return getPersonByEmail(personsRepository.findPersonById(personId).get().getEmail());
     }
 
-    @CachePut(value = "persons")
+   // @CachePut(value = "persons")
+    @Cacheable(value="persons")
     public Person getPersonByEmail(String email) {
         return personsRepository.findPersonByEmail(email).orElse(null);
     }
