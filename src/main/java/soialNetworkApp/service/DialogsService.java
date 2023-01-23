@@ -3,6 +3,7 @@ package soialNetworkApp.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import soialNetworkApp.api.request.DialogUserShortListDto;
+import soialNetworkApp.api.request.MessageRq;
 import soialNetworkApp.kafka.MessagesKafkaProducer;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.ComplexRs;
@@ -40,6 +41,29 @@ public class DialogsService {
     private final PersonMapper personMapper;
     private final MessagesKafkaProducer messagesKafkaProducer;
 
+    public CommonRs<ComplexRs> deleteDialog(Long dialogId) {
+        return null;
+    }
+
+    public CommonRs<ComplexRs> deleteMessage(Long messageId) {
+        Message message = messagesRepository.findById(messageId).orElseThrow();
+        if (!isMyMessage(message)) {
+            return new CommonRs<>(new ComplexRs("Сообщение не может быть удалено!"));
+        }
+        messagesRepository.delete(message);
+        return new CommonRs<>(new ComplexRs("Сообщение удалено"));
+    }
+
+    public CommonRs<MessageRs> editMessage(Long messageId, MessageRq messageRq) {
+        Message message = messagesRepository.findById(messageId).orElseThrow();
+        message.setMessageText(messageRq.getMessageText());
+        messagesRepository.save(message);
+        return new CommonRs<>(dialogMapper.toMessageRs(message, currentUserExtractor.getPerson()));
+    }
+
+    private boolean isMyMessage(Message message) {
+        return message.getAuthor().equals(currentUserExtractor.getPerson());
+    }
 
     public CommonRs<ComplexRs> getUnreadMessages() {
         return new CommonRs<>(new ComplexRs((long) messagesRepository
