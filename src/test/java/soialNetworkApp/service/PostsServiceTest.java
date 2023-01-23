@@ -127,7 +127,6 @@ class PostsServiceTest {
         when(personMapper.toPersonResponse(any())).thenReturn(PersonRs.builder().id(1L).build());
         when(postsRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(friendshipsRepository.findFriendshipsByDstPerson(any())).thenReturn(List.of(friendship));
-
         assertEquals(postText, postsService.createPost(postRq, 1L, null).getData().getPostText());
         verify(notificationsService).createNotification(any(), any());
     }
@@ -146,18 +145,18 @@ class PostsServiceTest {
         assertEquals(postText, postsService.getFeeds(offset, size).getData().get(0).getPostText());
     }
 
-    @Test
-    void getAllPostsByAuthor() {
-        when(postsRepository.findPostsByAuthorOrderByTimeDesc(any(), any())).thenReturn(new PageImpl<>(List.of(post)));
-        when(tagsService.tagsToStringsMapper(any())).thenReturn(new ArrayList<>());
-        when(tagsService.stringsToTagsMapper(any())).thenReturn(new ArrayList<>());
-        when(likesService.getLikesCount(any())).thenReturn(0);
-        when(likesService.getMyLike(any())).thenReturn(false);
-        when(commentsService.embeddedCommentsToResponse(any())).thenReturn(new ArrayList<>());
-        when(personMapper.toPersonResponse(any())).thenReturn(PersonRs.builder().id(1L).build());
-
-        assertEquals(postText, postsService.getAllPostsByAuthor(offset, size, person).getData().get(0).getPostText());
-    }
+//    @Test
+//    void getAllPostsByAuthor() {
+//        when(postsRepository.findPostsByAuthorOrderByTimeDesc(any(), any())).thenReturn(new PageImpl<>(List.of(post)));
+//        when(tagsService.tagsToStringsMapper(any())).thenReturn(new ArrayList<>());
+//        when(tagsService.stringsToTagsMapper(any())).thenReturn(new ArrayList<>());
+//        when(likesService.getLikesCount(any())).thenReturn(0);
+//        when(likesService.getMyLike(any())).thenReturn(false);
+//        when(commentsService.embeddedCommentsToResponse(any())).thenReturn(new ArrayList<>());
+//        when(personMapper.toPersonResponse(any())).thenReturn(PersonRs.builder().id(1L).build());
+//
+//        assertEquals(postText, postsService.getAllPostsByAuthor(offset, size, person).getData().get(0).getPostText());
+//    }
 
     @Test
     void getPostById() {

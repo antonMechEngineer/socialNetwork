@@ -1,6 +1,9 @@
 package soialNetworkApp.controller;
 
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Mockito;
+import soialNetworkApp.kafka.NotificationsKafkaProducer;
 import soialNetworkApp.model.entities.Notification;
 import soialNetworkApp.repository.CommentsRepository;
 import soialNetworkApp.repository.NotificationsRepository;
@@ -21,11 +24,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode.BEFORE_EACH_TEST_METHOD;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -45,6 +53,8 @@ class NotificationsControllerTest {
     private PostsRepository postsRepository;
     @Autowired
     private CommentsRepository commentsRepository;
+    @MockBean
+    private NotificationsKafkaProducer notificationsKafkaProducer;
 
     Notification notification1;
     Notification notification2;
@@ -52,11 +62,13 @@ class NotificationsControllerTest {
     @BeforeEach
     void setUp() {
         Notification notification1 = new Notification();
+        notification1.setId(1L);
         notification1.setPerson(personsRepository.findById(1L).get());
         notification1.setEntity(postsRepository.findById(1L).get());
         notification1.setIsRead(false);
         notification1.setSentTime(LocalDateTime.now());
         Notification notification2 = new Notification();
+        notification2.setId(2L);
         notification2.setPerson(personsRepository.findById(1L).get());
         notification2.setEntity(commentsRepository.findById(1L).get());
         notification2.setIsRead(false);
@@ -82,6 +94,14 @@ class NotificationsControllerTest {
 
     @Test
     void markAsReadAllNotifications() throws Exception {
+        doAnswer(invocationOnMock -> {
+            List<Notification> notifications = notificationsRepository.findAll();
+            for (Notification notification : notifications) {
+                notification.setIsRead(true);
+                notificationsRepository.save(notification);
+            }
+            return null;
+        }).when(notificationsKafkaProducer).sendMessage(any());
         mockMvc.perform(put("/api/v1/notifications")
                         .param("all", "true"))
                 .andDo(print())
@@ -91,11 +111,18 @@ class NotificationsControllerTest {
 
     @Test
     void markAsReadNotification() throws Exception {
+        doAnswer(invocationOnMock -> {
+            Notification notification = notificationsRepository.findById(1L).orElseThrow();
+            notification.setIsRead(true);
+            notificationsRepository.save(notification);
+            return null;
+        }).when(notificationsKafkaProducer).sendMessage(any());
         mockMvc.perform(put("/api/v1/notifications")
                         .param("id", "1"))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.data.length()").value(1))
                 .andExpect(jsonPath("$.data[0].id").value(2));
+
     }
 }

@@ -44,7 +44,4 @@ public interface NotificationMapper {
     NotificationKafka toNotificationKafkaFromNotificationed(NotificationTypes notificationTypes, Long notificationId, Person person);
 
 
-    default LocalDateTime getSentTime(){
-        return LocalDateTime.now();
-    }
 }
