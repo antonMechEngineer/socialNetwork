@@ -1,6 +1,5 @@
 package soialNetworkApp.service;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
-import org.checkerframework.checker.units.qual.C;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.PersonRs;
 import soialNetworkApp.mappers.PersonMapper;
