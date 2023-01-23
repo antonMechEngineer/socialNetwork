@@ -48,19 +48,5 @@ public class RedisConfiguration {
         return new RedisProperties();
     }
 
-//    @Bean
-//    @Primary
-//    public ReactiveRedisConnectionFactory reactiveRedisConnectionFactory(org.springframework.data.redis.connection.RedisConfiguration defaultRedisConfig) {
-//        LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
-//                .useSsl().build();
-//        return new LettuceConnectionFactory(defaultRedisConfig, clientConfig);
-//    }
 
-//    @Bean
-//    public RedisConfiguration defaultRedisConfig() {
-//        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
-//        config.setHostName(host);
-//        config.setPassword(RedisPassword.of(password));
-//        return config;
-//    }
 }

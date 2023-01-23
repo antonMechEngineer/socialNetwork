@@ -31,10 +31,13 @@ spring:
   redis:
     port: 6379
     host: 194.87.244.66
+    database: 0
+    password: 000000
   cache:
     type: redis
+    cache-names: cache-person
     redis:
-      cache-null-values: true
+      cache-null-values: false
       time-to-live: 3000000
   kafka:
     bootstrap-servers: 194.87.244.66:9092
