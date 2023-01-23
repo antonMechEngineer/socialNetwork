@@ -1,5 +1,6 @@
 package soialNetworkApp.service;
 
+import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,7 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@AutoConfigureEmbeddedDatabase
 class DialogsServiceTest {
 
     @Autowired
