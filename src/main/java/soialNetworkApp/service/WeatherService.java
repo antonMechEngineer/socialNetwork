@@ -86,7 +86,7 @@ public class WeatherService {
 
     @Named("getWeatherResponse")
     public WeatherRs getWeatherResponse(String cityName) {
-                WeatherRs weatherRs = new WeatherRs();
+        WeatherRs weatherRs = new WeatherRs();
         if (cityName != null) {
             List<String> cityFields = GeolocationsService.getCityFields(cityName);
             City city = citiesRepository.findCityByNameAndDistrictAndSubDistrict(

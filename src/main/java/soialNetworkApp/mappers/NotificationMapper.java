@@ -32,7 +32,6 @@ public interface NotificationMapper {
     @Mapping(target = "personId", source = "person.id")
     @Mapping(target = "notificationedId", source = "notificationed.id")
     @Mapping(target = "isRead", constant = "false")
-
     NotificationKafka toNotificationKafkaFromNotificationed(Notificationed notificationed, Person person);
 
     @Mapping(target = "id", expression = "java(0L)")

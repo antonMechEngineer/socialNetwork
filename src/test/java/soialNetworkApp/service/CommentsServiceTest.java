@@ -3,6 +3,7 @@ package soialNetworkApp.service;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import soialNetworkApp.api.request.CommentRq;
 import soialNetworkApp.api.response.PersonRs;
+import soialNetworkApp.kafka.NotificationsKafkaProducer;
 import soialNetworkApp.mappers.PersonMapper;
 import soialNetworkApp.model.entities.Comment;
 import soialNetworkApp.model.entities.Person;
@@ -50,7 +51,7 @@ class CommentsServiceTest {
     private LikesService likesService;
 
     @MockBean
-    private NotificationsService notificationsService;
+    private NotificationsKafkaProducer notificationsKafkaProducer;
 
     @MockBean
     private PersonMapper personMapper;
@@ -106,7 +107,7 @@ class CommentsServiceTest {
         when(personMapper.toPersonResponse(any())).thenReturn(PersonRs.builder().id(1L).build());
 
         assertEquals(commentsService.createComment(post, request).getData().getCommentText(), commentText);
-        verify(notificationsService).createNotification(any(), any());
+        verify(notificationsKafkaProducer).sendMessage(any(), any());
     }
 
     @Test

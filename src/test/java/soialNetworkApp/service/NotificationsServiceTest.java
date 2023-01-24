@@ -159,10 +159,11 @@ class NotificationsServiceTest {
     }
 
     @Test
-    void createNotification() {
+    void sendNotificationsToWs() {
         when(notificationsRepository.findAllByPersonAndIsReadIsFalse(any(), any())).thenReturn(new PageImpl<>(new ArrayList<>()));
-        notificationsService.createNotification(post, person);
-        verify(notificationsKafkaProducer).sendMessage(any(), any(), any());    //verify(notificationsRepository).save(any());
+
+        notificationsService.sendNotificationsToWs(person);
+//        verify(notificationsKafkaProducer).sendMessage(any(), any(), any());    //verify(notificationsRepository).save(any());
         verify(template).convertAndSend(anyString(), (Object) any());
     }
 
@@ -171,8 +172,9 @@ class NotificationsServiceTest {
         when(personsRepository.findPeopleByBirthDate(anyInt(), anyInt())).thenReturn(List.of(person));
         when(friendshipsRepository.findFriendshipsByDstPerson(any())).thenReturn(List.of(friendship));
         when(notificationsRepository.findAllByPersonAndIsReadIsFalse(any(), any())).thenReturn(new PageImpl<>(new ArrayList<>()));
+
         notificationsService.birthdaysNotificator();
-        verify(notificationsKafkaProducer).sendMessage(any(), any(), any()); //verify(notificationsRepository).save(any());
+        verify(notificationsKafkaProducer).sendMessage(any(), any()); //verify(notificationsRepository).save(any());
     }
 
     @Test

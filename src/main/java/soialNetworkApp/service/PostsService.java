@@ -12,6 +12,7 @@ import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.PostRs;
 import soialNetworkApp.errors.EmptyFieldException;
 import soialNetworkApp.errors.PersonNotFoundException;
+import soialNetworkApp.kafka.NotificationsKafkaProducer;
 import soialNetworkApp.mappers.PostMapper;
 import soialNetworkApp.model.entities.Friendship;
 import soialNetworkApp.model.entities.Person;
@@ -48,6 +49,7 @@ public class PostsService {
     private final SearchPosts searchPosts;
     private final CurrentUserExtractor currentUserExtractor;
     private final PersonCacheService personCacheService;
+    private final NotificationsKafkaProducer notificationsKafkaProducer;
 
     @Value("${socialNetwork.timezone}")
     private String timezone;
@@ -136,8 +138,8 @@ public class PostsService {
     }
 
     private boolean validatePerson(Person person) {
-        return person != null && person.equals(personCacheService.getPersonByEmail(
-                (SecurityContextHolder.getContext().getAuthentication().getName())));
+        return person != null && person.equals(personCacheService.getPersonByContext());
+//        return person != null && person.equals(currentUserExtractor.getPerson());
     }
 
     public CommonRs<List<PostRs>> findPosts(FindPostRq postRq, int offset, int perPage) throws EmptyFieldException {
@@ -169,7 +171,8 @@ public class PostsService {
         friendshipsRepository.findFriendshipsByDstPerson(person).forEach(friendship -> {
             if (friendship.getFriendshipStatus().equals(FriendshipStatusTypes.FRIEND) ||
                     friendship.getFriendshipStatus().equals(FriendshipStatusTypes.SUBSCRIBED)) {
-                notificationsService.createNotification(post, friendship.getSrcPerson());
+//                notificationsService.createNotification(post, friendship.getSrcPerson());
+                notificationsKafkaProducer.sendMessage(post, friendship.getSrcPerson());
             }
         });
 //        friendshipsRepository.findFriendshipBySrcPerson(person).forEach(friendship -> {

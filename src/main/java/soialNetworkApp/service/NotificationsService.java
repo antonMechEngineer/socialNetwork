@@ -13,7 +13,6 @@ import soialNetworkApp.api.response.NotificationRs;
 import soialNetworkApp.errors.NoSuchEntityException;
 import soialNetworkApp.errors.PersonNotFoundException;
 import soialNetworkApp.kafka.NotificationsKafkaProducer;
-import soialNetworkApp.kafka.dto.NotificationKafka;
 import soialNetworkApp.mappers.NotificationMapper;
 import soialNetworkApp.model.entities.Notification;
 import soialNetworkApp.model.entities.Person;
@@ -67,7 +66,6 @@ public class NotificationsService {
     }
 
     public CommonRs<List<NotificationRs>> markNotificationStatusAsRead(Long notificationId, boolean readAll) throws Exception {
-        System.out.println("markNotifInoked");
         Person person = personsRepository.findPersonByEmail(
                 SecurityContextHolder.getContext().getAuthentication().getName())
                 .orElseThrow(new PersonNotFoundException("Person is not available"));
@@ -85,8 +83,8 @@ public class NotificationsService {
         return getAllNotificationsByPerson(offset, size, person);
     }
 
-    public void createNotification(Notificationed entity, Person person)  {
-        notificationsKafkaProducer.sendMessage(entity, person);
+    public void sendNotificationsToWs(Person person)  {
+//        notificationsKafkaProducer.sendMessage(entity, person);
 
         template.convertAndSend(String.format("/user/%s/queue/notifications", person.getId()),
                 getAllNotificationsByPerson(offset, size, person));
@@ -100,7 +98,8 @@ public class NotificationsService {
             if (friendship.getFriendshipStatus().equals(FriendshipStatusTypes.FRIEND) &&
                     friendship.getSrcPerson().getPersonSettings() != null &&
                     friendship.getSrcPerson().getPersonSettings().getFriendBirthdayNotification()) {
-                createNotification(person, friendship.getSrcPerson());
+//                createNotification(person, friendship.getSrcPerson());
+                notificationsKafkaProducer.sendMessage(person, friendship.getSrcPerson());
             }
         }));
     }

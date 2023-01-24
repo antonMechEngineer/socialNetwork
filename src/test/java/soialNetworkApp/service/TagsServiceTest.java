@@ -53,6 +53,7 @@ class TagsServiceTest {
     void stringsToTagsMapper() {
         when(tagsRepository.findByTagName(any())).thenReturn(null);
         when(tagsRepository.save(any())).thenReturn(tag);
+
         assertEquals(tagsService.stringsToTagsMapper(null).size(), 0);
         assertTrue(tagsService.stringsToTagsMapper(List.of(anyString())).contains(tag));
     }
@@ -75,6 +76,7 @@ class TagsServiceTest {
     void dropPostFromTag() {
         tag.setPosts(List.of(post));
         when(tagsRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
         assertTrue(tagsService.dropPostFromTag(tag, post).getPosts().isEmpty());
     }
 }
