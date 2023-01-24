@@ -1,0 +1,10 @@
+databaseChangeLog:
+- changeSet:
+    id: sprint-5-1
+    author: YurK
+    changes:
+    - addColumn:
+        tableName: persons
+        column:
+            name: telegram_id
+            type: BIGINT
