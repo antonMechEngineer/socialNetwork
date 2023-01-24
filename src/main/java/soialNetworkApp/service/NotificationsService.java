@@ -125,13 +125,13 @@ public class NotificationsService {
     public void sendNotificationToTelegramBot(NotificationTypes notificationType, long personId) {
         Person person = personsRepository.findPersonById(personId).orElse(new Person());
         if (person.getTelegramId() != null) {
-            NotificationRs notificationRs = new NotificationRs();
-            notificationRs.setNotificationType(notificationType);
-            notificationRs.setEntityAuthor(personMapper.toPersonResponse(person));
             HttpClient httpClient = HttpClientBuilder.create().build();
             try {
                 HttpPost request = new HttpPost("http://194.87.244.66:8087/bot?userId=" + person.getTelegramId());
-                JSONObject jsonObject = new JSONObject(notificationRs);
+                JSONObject jsonObject = new JSONObject()
+                        .put("notification_type", notificationType)
+                        .put("entity_author", new JSONObject()
+                                .put("first_name", person.getFirstName()).put("last_name", person.getLastName()));
                 StringEntity params = new StringEntity(jsonObject.toString());
                 request.addHeader("content-type", "application/json");
                 request.setEntity(params);
