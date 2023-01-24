@@ -28,9 +28,9 @@ public class NotificationsKafkaConsumer {
             notificationsRepository.save(notification);
             notificationsService.sendNotificationsToWs(notification.getPerson());
         } else {
-            Notification notification = notificationsRepository.save(notificationKafka.getNotificationType().toString(), notificationKafka.getNotificationedId(),
+            notificationsRepository.save(notificationKafka.getNotificationType().toString(), notificationKafka.getNotificationedId(),
                     notificationKafka.getIsRead(), LocalDateTime.now(), notificationKafka.getPersonId());
-            notificationsService.sendNotificationsToWs(notification.getPerson());
+            notificationsService.sendNotificationsToWs(notificationKafka.getPersonId());
         }
     }
 
