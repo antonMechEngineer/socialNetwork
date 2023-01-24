@@ -1,5 +1,6 @@
 package soialNetworkApp.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import soialNetworkApp.model.entities.interfaces.Notificationed;
 import soialNetworkApp.model.enums.FriendshipStatusTypes;
@@ -135,6 +136,9 @@ public class Person implements Notificationed, Serializable {
 
     @Transient
     private FriendshipStatusTypes friendStatus = FriendshipStatusTypes.UNKNOWN;
+
+    @Column(name = "telegram_id)")
+    private Long telegramId;
 
     @Override
     public NotificationTypes getNotificationType() {

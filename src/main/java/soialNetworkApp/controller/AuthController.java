@@ -45,8 +45,10 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public CommonRs<PersonRs> login(@RequestBody LoginRq loginRq) throws PasswordException, WrongEmailException {
-            return authService.loginUser(loginRq);
+    public CommonRs<PersonRs> login(
+            @RequestBody LoginRq loginRq,
+            @RequestParam(required = false) Long telegramId) throws PasswordException, WrongEmailException {
+            return authService.loginUser(loginRq, telegramId);
     }
 
     @PostMapping("/logout")
