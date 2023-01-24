@@ -90,6 +90,10 @@ public class NotificationsService {
                 getAllNotificationsByPerson(offset, size, person));
     }
 
+    public void sendNotificationsToWs(long personId)  {
+        sendNotificationsToWs(personsRepository.findPersonById(personId).orElseThrow());
+    }
+
     @Scheduled(cron = "${socialNetwork.scheduling.birthdays}", zone = "${socialNetwork.timezone}")
     public void birthdaysNotificator() {
         LocalDateTime currentDate = LocalDateTime.now(ZoneId.of(timezone));
