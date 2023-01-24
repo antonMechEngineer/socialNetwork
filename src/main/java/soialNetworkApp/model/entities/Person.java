@@ -137,7 +137,7 @@ public class Person implements Notificationed, Serializable {
     @Transient
     private FriendshipStatusTypes friendStatus = FriendshipStatusTypes.UNKNOWN;
 
-    @Column(name = "telegram_id)")
+    @Column(name = "telegram_id")
     private Long telegramId;
 
     @Override
