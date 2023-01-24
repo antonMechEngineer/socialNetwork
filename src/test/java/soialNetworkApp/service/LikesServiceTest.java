@@ -145,6 +145,7 @@ class LikesServiceTest {
             likes.add(like);
         }
         when(likesRepository.findLikesByEntity(liked2.getType(), liked2)).thenReturn(likes);
+
         likesService.getLikesCount(liked1);
         verify(likesRepository).findLikesByEntity(liked1.getType(), liked1);
         assertEquals(likesCount, (int) likesService.getLikesCount(liked2));
@@ -158,6 +159,7 @@ class LikesServiceTest {
         when(personCacheService.getPersonByContext()).thenReturn(person);
         when(likesRepository.findLikeByPersonAndEntity(liked1.getType(), liked1, person)).thenReturn(Optional.empty());
         when(likesRepository.findLikeByPersonAndEntity(liked2.getType(), liked2, person)).thenReturn(Optional.of(like));
+
         assertFalse(likesService.getMyLike(liked1));
         verify(likesRepository).findLikeByPersonAndEntity(liked1.getType(), liked1, person);
         assertTrue(likesService.getMyLike(liked2));

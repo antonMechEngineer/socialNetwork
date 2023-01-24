@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import soialNetworkApp.api.request.LikeRq;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.LikeRs;
+import soialNetworkApp.kafka.NotificationsKafkaProducer;
 import soialNetworkApp.model.entities.Like;
 import soialNetworkApp.model.entities.interfaces.Liked;
 import soialNetworkApp.model.entities.Person;
@@ -28,6 +29,7 @@ public class LikesService {
     private final PersonsService personsService;
     private final NotificationsService notificationsService;
     private  final PersonCacheService personCacheService;
+    private final NotificationsKafkaProducer notificationsKafkaProducer;
 
     @Value("${socialNetwork.timezone}")
     private String timezone;
@@ -42,7 +44,8 @@ public class LikesService {
             like.setTime(LocalDateTime.now(ZoneId.of(timezone)));
             likesRepository.save(like);
             if (person.getPersonSettings() != null && person.getPersonSettings().getLikeNotification()) {
-                notificationsService.createNotification(like, liked.getAuthor());
+//                notificationsService.createNotification(like, liked.getAuthor());
+                notificationsKafkaProducer.sendMessage(like, liked.getAuthor());
             }
         }
         return getLikesResponse(liked);

@@ -2,6 +2,7 @@ package soialNetworkApp.service;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.PersonRs;
+import soialNetworkApp.kafka.NotificationsKafkaProducer;
 import soialNetworkApp.mappers.PersonMapper;
 import soialNetworkApp.model.entities.Friendship;
 import soialNetworkApp.model.entities.Person;
@@ -40,7 +41,7 @@ class FriendsServiceTest {
     private FriendsService friendsService;
 
     @MockBean
-    private NotificationsService notificationsService;
+    private NotificationsKafkaProducer notificationsKafkaProducer;
 
     @MockBean
     private FriendshipsRepository friendshipsRepository;
@@ -165,7 +166,7 @@ class FriendsServiceTest {
     void sendFriendshipRequest() throws Exception {
         friendsService.sendFriendshipRequest(REQUESTED_FRIEND.getId());
         verify(friendshipsRepository, times(2)).save(any());
-        verify(notificationsService, times(1)).createNotification(any(), any());
+        verify(notificationsKafkaProducer, times(1)).sendMessage(any(), any());
     }
 
     @Test
