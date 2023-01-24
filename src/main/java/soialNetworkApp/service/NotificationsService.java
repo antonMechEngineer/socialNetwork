@@ -124,18 +124,20 @@ public class NotificationsService {
 
     public void sendNotificationToTelegramBot(NotificationTypes notificationType, long personId) {
         Person person = personsRepository.findPersonById(personId).orElse(new Person());
-        NotificationRs notificationRs = new NotificationRs();
-        notificationRs.setNotificationType(notificationType);
-        notificationRs.setEntityAuthor(personMapper.toPersonResponse(person));
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        try {
-            HttpPost request = new HttpPost("http://194.87.244.66:8087/bot?userId=");
-            JSONObject jsonObject = new JSONObject(notificationRs);
-            StringEntity params = new StringEntity(jsonObject.toString());
-            request.addHeader("content-type", "application/json");
-            request.setEntity(params);
-            httpClient.execute(request);
+        if (person.getTelegramId() != null) {
+            NotificationRs notificationRs = new NotificationRs();
+            notificationRs.setNotificationType(notificationType);
+            notificationRs.setEntityAuthor(personMapper.toPersonResponse(person));
+            HttpClient httpClient = HttpClientBuilder.create().build();
+            try {
+                HttpPost request = new HttpPost("http://194.87.244.66:8087/bot?userId=" + person.getTelegramId());
+                JSONObject jsonObject = new JSONObject(notificationRs);
+                StringEntity params = new StringEntity(jsonObject.toString());
+                request.addHeader("content-type", "application/json");
+                request.setEntity(params);
+                httpClient.execute(request);
+            } catch (IOException ignore) {
+            }
         }
-        catch (IOException ignore) {}
     }
 }
