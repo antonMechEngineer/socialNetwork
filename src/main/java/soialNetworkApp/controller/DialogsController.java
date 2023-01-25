@@ -35,7 +35,7 @@ public class DialogsController {
         return dialogsService.deleteMessage(dialogId, messageId);
     }
 
-    @PutMapping("/{dialogId}/messages/{messageId}/edit")
+    @PutMapping("/messages/{messageId}/edit")
     public CommonRs<MessageRs> messageEdit(@PathVariable Long messageId, @RequestBody MessageRq messageRq) {
         return dialogsService.editMessage(messageId, messageRq);
     }
