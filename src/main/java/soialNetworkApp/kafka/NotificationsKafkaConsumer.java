@@ -1,3 +1,5 @@
+
+//https://gitlab.skillbox.ru/javapro_team30/social-telegram-bot.git
 package soialNetworkApp.kafka;
 
 import lombok.RequiredArgsConstructor;
