@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import soialNetworkApp.kafka.dto.NotificationKafka;
 import soialNetworkApp.model.entities.Notification;
 import soialNetworkApp.repository.NotificationsRepository;
+import soialNetworkApp.service.NotificationsService;
 
 import java.time.LocalDateTime;
 
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class NotificationsKafkaConsumer {
     private final NotificationsRepository notificationsRepository;
+    private final NotificationsService notificationsService;
 
     @KafkaListener(topics = "notifications", groupId = "myGroup", autoStartup = "${listen.auto.start:true}")
     public void consume(NotificationKafka notificationKafka) {
@@ -24,9 +26,12 @@ public class NotificationsKafkaConsumer {
             Notification notification = notificationsRepository.findById(notificationKafka.getId()).orElseThrow();
             notification.setIsRead(true);
             notificationsRepository.save(notification);
+            notificationsService.sendNotificationsToWs(notification.getPerson());
         } else {
             notificationsRepository.save(notificationKafka.getNotificationType().toString(), notificationKafka.getNotificationedId(),
                     notificationKafka.getIsRead(), LocalDateTime.now(), notificationKafka.getPersonId());
+            notificationsService.sendNotificationsToWs(notificationKafka.getPersonId());
+            notificationsService.sendNotificationToTelegramBot(notificationKafka.getNotificationType(), notificationKafka.getPersonId());
         }
     }
 

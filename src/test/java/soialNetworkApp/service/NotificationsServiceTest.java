@@ -2,6 +2,7 @@ package soialNetworkApp.service;
 
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import soialNetworkApp.api.response.PersonRs;
+import soialNetworkApp.kafka.NotificationsKafkaProducer;
 import soialNetworkApp.mappers.PersonMapper;
 import soialNetworkApp.model.entities.*;
 import soialNetworkApp.model.enums.FriendshipStatusTypes;
@@ -52,6 +53,9 @@ class NotificationsServiceTest {
     private PersonMapper personMapper;
     @MockBean
     private SimpMessagingTemplate template;
+    @MockBean
+    private NotificationsKafkaProducer notificationsKafkaProducer;
+
 
     private Person person;
     private Notification notification1;
@@ -108,52 +112,58 @@ class NotificationsServiceTest {
         assertEquals(notificationsService.getAllNotificationsByPerson(offset, size).getData().stream().findFirst().get().getNotificationType(), NotificationTypes.POST);
         assertEquals(notificationsService.getAllNotificationsByPerson(offset, size).getData().stream().findFirst().get().getEntityAuthor().getId(), 1L);
     }
-
+//такой функциональности в отдельном методе нет в сервисе, она внутри mark... под условием. М.б. лучше проверить в отдельном методе, что бы не было дублирований
     @Test
     void markAllNotificationsStatusAsRead() throws Exception {
-        List<Notification> notifications = new ArrayList<>();
+//      List<Notification> notifications = new ArrayList<>();
         when(personsRepository.findPersonByEmail(any())).thenReturn(Optional.of(person));
         when(notificationsRepository.findAllByPersonAndIsReadIsFalse(any(), any())).thenReturn(new PageImpl<>(List.of(notification1, notification2)));
         when(notificationsRepository.findAllByPersonAndIsReadIsFalse(any())).thenReturn(List.of(notification1, notification2));
         when(personMapper.toPersonResponse(any())).thenReturn(PersonRs.builder().id(1L).build());
-        when(notificationsRepository.save(any())).then(invocation -> {
-            Notification notification = invocation.getArgument(0);
-            notifications.add(notification);
-            return notification;
-        });
 
+        //наверное достаточно проверить что был вызов send/save
+//        when(notificationsRepository.save(any())).then(invocation -> {
+//            Notification notification = invocation.getArgument(0);
+//            notifications.add(notification);
+//            return notification;
+//        });
         notificationsService.markNotificationStatusAsRead(null, true);
-        verify(notificationsRepository, Mockito.times(2)).save(any());
-        assertEquals(2, notifications.size());
-        assertTrue(notifications.stream().map(Notification::getIsRead).allMatch(aBoolean -> aBoolean.equals(true)));
+        verify(notificationsKafkaProducer, Mockito.times(2)).sendMessage(any());//verify(notificationsRepository, Mockito.times(2)).save(any());
+//        assertEquals(2, notifications.size());
+//        assertTrue(notifications.stream().map(Notification::getIsRead).allMatch(aBoolean -> aBoolean.equals(true)));
+        assertTrue(notification1.getIsRead());
+        assertTrue(notification2.getIsRead());
+
     }
 
     @Test
     void markNotificationStatusAsRead() throws Exception {
-        List<Notification> notifications = new ArrayList<>();
+//      List<Notification> notifications = new ArrayList<>();
         when(personsRepository.findPersonByEmail(any())).thenReturn(Optional.of(person));
         when(notificationsRepository.findAllByPersonAndIsReadIsFalse(any(), any())).thenReturn(new PageImpl<>(List.of(notification1, notification2)));
         when(notificationsRepository.findAllByPersonAndIsReadIsFalse(any())).thenReturn(List.of(notification1, notification2));
         when(notificationsRepository.findById(any())).thenReturn(Optional.of(notification1));
         when(personMapper.toPersonResponse(any())).thenReturn(PersonRs.builder().id(1L).build());
-        when(notificationsRepository.save(any())).then(invocation -> {
-            Notification notification = invocation.getArgument(0);
-            notifications.add(notification);
-            return notification;
-        });
+
+//наверное достаточно проверить что был вызов send/save
+//        when(notificationsRepository.save(any())).then(invocation -> {
+//            Notification notification = invocation.getArgument(0);
+//            notifications.add(notification);
+//            return notification;
+//        });
 
         notificationsService.markNotificationStatusAsRead(1L, false);
-        verify(notificationsRepository).save(any());
-        assertEquals(1, notifications.size());
-        assertTrue(notifications.get(0).getIsRead());
+        verify(notificationsKafkaProducer).sendMessage(any()); //verify(notificationsRepository).save(any());
+//        assertEquals(1, notifications.size());
+        assertTrue(notification1.getIsRead()); //assertTrue(notifications.get(0).getIsRead());
     }
 
     @Test
-    void createNotification() {
+    void sendNotificationsToWs() {
         when(notificationsRepository.findAllByPersonAndIsReadIsFalse(any(), any())).thenReturn(new PageImpl<>(new ArrayList<>()));
 
-        notificationsService.createNotification(post, person);
-        verify(notificationsRepository).save(any());
+        notificationsService.sendNotificationsToWs(person);
+//        verify(notificationsKafkaProducer).sendMessage(any(), any(), any());    //verify(notificationsRepository).save(any());
         verify(template).convertAndSend(anyString(), (Object) any());
     }
 
@@ -164,7 +174,7 @@ class NotificationsServiceTest {
         when(notificationsRepository.findAllByPersonAndIsReadIsFalse(any(), any())).thenReturn(new PageImpl<>(new ArrayList<>()));
 
         notificationsService.birthdaysNotificator();
-        verify(notificationsRepository).save(any());
+        verify(notificationsKafkaProducer).sendMessage(any(), any()); //verify(notificationsRepository).save(any());
     }
 
     @Test

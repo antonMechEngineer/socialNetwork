@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import soialNetworkApp.api.request.CommentRq;
 import soialNetworkApp.api.response.CommentRs;
 import soialNetworkApp.api.response.CommonRs;
+import soialNetworkApp.kafka.NotificationsKafkaProducer;
 import soialNetworkApp.mappers.CommentMapper;
 import soialNetworkApp.model.entities.Comment;
 import soialNetworkApp.model.entities.Person;
@@ -32,6 +33,7 @@ public class CommentsService {
     private final NotificationsService notificationsService;
     private final CommentMapper commentMapper;
     private final PersonCacheService personCacheService;
+    private final NotificationsKafkaProducer notificationsKafkaProducer;
 
     @Value("${socialNetwork.timezone}")
     private String timezone;
@@ -42,10 +44,12 @@ public class CommentsService {
         post = parentComment == null ? post : null;
         Comment comment = commentRepository.save(commentMapper.commentRequestToNewComment(commentRq, post, person, parentComment));
         if (post != null && person.getPersonSettings() != null && person.getPersonSettings().getPostCommentNotification()) {
-            notificationsService.createNotification(comment, post.getAuthor());
+//            notificationsService.createNotification(comment, post.getAuthor());
+            notificationsKafkaProducer.sendMessage(comment, post.getAuthor());
         }
         if (post == null && person.getPersonSettings() != null && person.getPersonSettings().getCommentCommentNotification()) {
-            notificationsService.createNotification(comment, parentComment.getAuthor());
+//            notificationsService.createNotification(comment, parentComment.getAuthor());
+            notificationsKafkaProducer.sendMessage(comment, parentComment.getAuthor());
         }
         return buildCommonResponse(comment);
     }

@@ -11,6 +11,7 @@ import soialNetworkApp.api.response.ComplexRs;
 import soialNetworkApp.api.response.PersonRs;
 import soialNetworkApp.errors.PersonException;
 import soialNetworkApp.errors.PersonNotFoundException;
+import soialNetworkApp.kafka.NotificationsKafkaProducer;
 import soialNetworkApp.mappers.PersonMapper;
 import soialNetworkApp.model.entities.Friendship;
 import soialNetworkApp.model.entities.Person;
@@ -33,6 +34,7 @@ public class FriendsService {
     private final PersonsRepository personsRepository;
     private final PersonMapper personMapper;
     private final NotificationsService notificationsService;
+    private final NotificationsKafkaProducer notificationsKafkaProducer;
 
     public CommonRs<ComplexRs> addFriend(Long receivedFriendId) throws Exception {
         Person srcPerson = getSrcPerson();
@@ -123,7 +125,8 @@ public class FriendsService {
         friendshipsRepository.save(srcFriendship);
         friendshipsRepository.save(dstFriendship);
         if (dstPerson.getPersonSettings() != null && dstPerson.getPersonSettings().getFriendRequestNotification()) {
-            notificationsService.createNotification(dstFriendship, dstPerson);
+//            notificationsService.createNotification(dstFriendship, dstPerson);
+            notificationsKafkaProducer.sendMessage(dstFriendship, dstPerson);
         }
     }
 

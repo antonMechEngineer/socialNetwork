@@ -11,12 +11,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import soialNetworkApp.api.request.FindPostRq;
 import soialNetworkApp.api.request.PostRq;
 import soialNetworkApp.api.response.PersonRs;
 import soialNetworkApp.errors.EmptyFieldException;
 import soialNetworkApp.errors.PersonNotFoundException;
+import soialNetworkApp.kafka.NotificationsKafkaProducer;
 import soialNetworkApp.mappers.PersonMapper;
 import soialNetworkApp.model.entities.*;
 import soialNetworkApp.model.enums.FriendshipStatusTypes;
@@ -24,6 +26,7 @@ import soialNetworkApp.repository.FriendshipsRepository;
 import soialNetworkApp.repository.PersonsRepository;
 import soialNetworkApp.repository.PostsRepository;
 import soialNetworkApp.service.search.SearchPosts;
+import soialNetworkApp.service.util.CurrentUserExtractor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -60,11 +63,13 @@ class PostsServiceTest {
     @MockBean
     private CommentsService commentsService;
     @MockBean
-    private NotificationsService notificationsService;
+    private NotificationsKafkaProducer notificationsKafkaProducer;
     @MockBean
     private PersonMapper personMapper;
     @MockBean
     private Authentication authentication;
+//    @MockBean
+//    private CurrentUserExtractor currentUserExtractor;
 
     @MockBean
     private SearchPosts searchPosts;
@@ -129,7 +134,7 @@ class PostsServiceTest {
         when(friendshipsRepository.findFriendshipsByDstPerson(any())).thenReturn(List.of(friendship));
 
         assertEquals(postText, postsService.createPost(postRq, 1L, null).getData().getPostText());
-        verify(notificationsService).createNotification(any(), any());
+        verify(notificationsKafkaProducer).sendMessage(any(), any());
     }
 
     @Test
@@ -155,6 +160,8 @@ class PostsServiceTest {
         when(likesService.getMyLike(any())).thenReturn(false);
         when(commentsService.embeddedCommentsToResponse(any())).thenReturn(new ArrayList<>());
         when(personMapper.toPersonResponse(any())).thenReturn(PersonRs.builder().id(1L).build());
+        when(personsRepository.findPersonByEmail(any())).thenReturn(Optional.of(person));
+        when(friendshipsRepository.findFriendshipByFriendshipStatusAndSrcPersonIdAndDstPersonId(any(), any(), any())).thenReturn(Optional.empty());
 
         assertEquals(postText, postsService.getAllPostsByAuthor(offset, size, person).getData().get(0).getPostText());
     }
