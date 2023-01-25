@@ -30,12 +30,12 @@ public class DialogsController {
         return dialogsService.deleteDialog(dialogId);
     }
 
-    @DeleteMapping("/messages/{messageId}/delete")
-    public CommonRs<ComplexRs> messageDelete(@PathVariable Long messageId) {
-        return dialogsService.deleteMessage(messageId);
+    @DeleteMapping("/{dialogId}/messages/{messageId}/delete")
+    public CommonRs<ComplexRs> messageDelete(@PathVariable Long dialogId, @PathVariable Long messageId) {
+        return dialogsService.deleteMessage(dialogId, messageId);
     }
 
-    @PutMapping("/messages/{messageId}/edit")
+    @PutMapping("/{dialogId}/messages/{messageId}/edit")
     public CommonRs<MessageRs> messageEdit(@PathVariable Long messageId, @RequestBody MessageRq messageRq) {
         return dialogsService.editMessage(messageId, messageRq);
     }

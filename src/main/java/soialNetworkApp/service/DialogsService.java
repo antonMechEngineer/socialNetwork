@@ -45,12 +45,21 @@ public class DialogsService {
         return null;
     }
 
-    public CommonRs<ComplexRs> deleteMessage(Long messageId) {
+    public CommonRs<ComplexRs> deleteMessage(Long dialogId, Long messageId) {
         Message message = messagesRepository.findById(messageId).orElseThrow();
         if (!isMyMessage(message)) {
             return new CommonRs<>(new ComplexRs("Сообщение не может быть удалено!"));
         }
+        Dialog dialog = dialogsRepository.findById(dialogId).orElseThrow();
+        if (messageId.equals(dialog.getLastMessage().getId())) {
+            dialog.setLastMessage(null);
+            dialogsRepository.save(dialog);
+        }
         messagesRepository.delete(message);
+        if (dialog.getLastMessage() == null) {
+            dialog.setLastMessage(getLastMessage(dialogId));
+            dialogsRepository.save(dialog);
+        }
         return new CommonRs<>(new ComplexRs("Сообщение удалено"));
     }
 
@@ -134,11 +143,11 @@ public class DialogsService {
         }
     }
 
-/*    private Message getLastMessage(Long dialogId) {
+    private Message getLastMessage(Long dialogId) {
         return messagesRepository.findAllByDialogIdAndIsDeletedFalse(dialogId)
                 .stream()
                 .max(Comparator.comparing(Message::getTime)).orElseThrow();
-    }*/
+    }
 
     private List<DialogRs> blockDialogs(List<DialogRs> dialogs) {
         Person me = currentUserExtractor.getPerson();
