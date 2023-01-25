@@ -31,6 +31,7 @@ public class NotificationsKafkaConsumer {
             notificationsRepository.save(notificationKafka.getNotificationType().toString(), notificationKafka.getNotificationedId(),
                     notificationKafka.getIsRead(), LocalDateTime.now(), notificationKafka.getPersonId());
             notificationsService.sendNotificationsToWs(notificationKafka.getPersonId());
+            notificationsService.sendNotificationToTelegramBot(notificationKafka.getNotificationType(), notificationKafka.getPersonId());
         }
     }
 

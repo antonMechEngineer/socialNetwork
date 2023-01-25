@@ -15,4 +15,8 @@ public class ComplexRs {
     public ComplexRs(Long count) {
         this.count = count;
     }
+
+    public ComplexRs(String message) {
+        this.message = message;
+    }
 }

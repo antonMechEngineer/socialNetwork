@@ -58,3 +58,15 @@ VALUES
 INSERT INTO captcha (code, secret_code, time)
 VALUES
     ('code','secret', '2022-11-27 07:44:53');
+
+INSERT INTO dialogs (last_active_time,first_person_id,second_person_id,last_message_id)
+VALUES
+    ('2022-03-21 08:00:59',1,2,null);
+
+INSERT INTO messages (time,is_deleted,message_text,read_status,author_id,recipient_id,dialog_id)
+VALUES
+    ('2022-03-19 16:47:51','false','message2','READ',1,2,1),
+    ('2022-03-20 16:47:51','false','message4','READ',2,1,1),
+    ('2022-03-21 08:00:59','false','message5','SENT',2,1,1);
+
+UPDATE dialogs SET last_message_id = 3;
