@@ -3,7 +3,7 @@ package soialNetworkApp.service;
 import lombok.RequiredArgsConstructor;
 import org.mapstruct.Named;
 import org.springframework.stereotype.Service;
-import soialNetworkApp.api.request.MessageWsRq;
+import soialNetworkApp.api.websocket.MessageWs;
 import soialNetworkApp.model.entities.Dialog;
 import soialNetworkApp.model.entities.Message;
 import soialNetworkApp.model.entities.Person;
@@ -29,12 +29,12 @@ public class DialogMapService {
     }
 
     @Named("getRecipientFromDialog")
-    public Person getRecipientFromDialog(MessageWsRq messageWsRq) {
+    public Person getRecipientFromDialog(MessageWs messageWsRq) {
         return getRecipientFromDialog(messageWsRq.getAuthorId(), messageWsRq.getDialogId());
     }
 
     @Named("getRecipientIdFromDialog")
-    public Long getRecipientIdFromDialog(MessageWsRq messageWsRq) {
+    public Long getRecipientIdFromDialog(MessageWs messageWsRq) {
         return getRecipientFromDialog(messageWsRq.getAuthorId(), messageWsRq.getDialogId()).getId();
     }
 

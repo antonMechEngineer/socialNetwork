@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import soialNetworkApp.api.request.MessageWsRq;
+import soialNetworkApp.api.websocket.MessageWs;
 import soialNetworkApp.kafka.dto.MessageKafka;
 import soialNetworkApp.mappers.DialogMapper;
 import soialNetworkApp.model.entities.Message;
@@ -19,7 +19,7 @@ public class MessagesKafkaProducer {
     private final KafkaTemplate<String, MessageKafka> kafkaTemplate;
     private final DialogMapper dialogMapper;
 
-    public void sendMessage(MessageWsRq messageWsRq){
+    public void sendMessage(MessageWs messageWsRq){
         MessageKafka messageKafka = dialogMapper.toMessageKafkaFromMessageWs(messageWsRq,
                 dialogsRepository.findById(messageWsRq.getDialogId()).orElseThrow());
         sendMessageKafka(messageKafka);

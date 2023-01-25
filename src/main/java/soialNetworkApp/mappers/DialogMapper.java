@@ -3,7 +3,7 @@ package soialNetworkApp.mappers;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import soialNetworkApp.api.request.MessageWsRq;
+import soialNetworkApp.api.websocket.MessageWs;
 import soialNetworkApp.api.response.DialogRs;
 import soialNetworkApp.api.response.MessageRs;
 import soialNetworkApp.api.response.MessageTypingWsRs;
@@ -37,19 +37,19 @@ public interface DialogMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "recipient", source = "messageWsRq", qualifiedByName = "getRecipientFromDialog")
     @Mapping(target = "isDeleted", expression = "java(false)")
-    Message toMessageFromWs(MessageWsRq messageWsRq, Dialog dialog, Person author);
+    Message toMessageFromWs(MessageWs messageWs, Dialog dialog, Person author);
 
     @Mapping(target = "id", expression = "java(0L)")
     @Mapping(target = "recipientId", source = "messageWsRq", qualifiedByName = "getRecipientIdFromDialog")
     @Mapping(target = "isDeleted", expression = "java(false)")
-    MessageKafka toMessageKafkaFromMessageWs(MessageWsRq messageWsRq, Dialog dialog);
+    MessageKafka toMessageKafkaFromMessageWs(MessageWs messageWs, Dialog dialog);
 
     @Mapping(target = "recipientId", source = "message", qualifiedByName = "getRecipientId")
     @Mapping(target = "authorId", source = "message", qualifiedByName = "getAuthorId")
     @Mapping(target = "dialogId", source = "message", qualifiedByName = "getDialogId")
     MessageKafka toMessageKafkaFromMessage(Message message);
 
-    MessageTypingWsRs toMessageTypingWsRs(Long userId, Long dialogId, Boolean typing);
+    MessageTypingWsRs toMessageTypingWs(Long userId, Long dialogId, Boolean typing);
 
     @Named("getRecipientId")
     default Long getRecipientId(Message message) {
