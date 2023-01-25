@@ -3,6 +3,7 @@ package soialNetworkApp.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import soialNetworkApp.api.request.DialogUserShortListDto;
+import soialNetworkApp.api.request.MessageRq;
 import soialNetworkApp.kafka.MessagesKafkaProducer;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.ComplexRs;
@@ -40,6 +41,38 @@ public class DialogsService {
     private final PersonMapper personMapper;
     private final MessagesKafkaProducer messagesKafkaProducer;
 
+    public CommonRs<ComplexRs> deleteDialog(Long dialogId) {
+        return null;
+    }
+
+    public CommonRs<ComplexRs> deleteMessage(Long dialogId, Long messageId) {
+        Message message = messagesRepository.findById(messageId).orElseThrow();
+        if (!isMyMessage(message)) {
+            return new CommonRs<>(new ComplexRs("Сообщение не может быть удалено!"));
+        }
+        Dialog dialog = dialogsRepository.findById(dialogId).orElseThrow();
+        if (messageId.equals(dialog.getLastMessage().getId())) {
+            dialog.setLastMessage(null);
+            dialogsRepository.save(dialog);
+        }
+        messagesRepository.delete(message);
+        if (dialog.getLastMessage() == null) {
+            dialog.setLastMessage(getLastMessage(dialogId));
+            dialogsRepository.save(dialog);
+        }
+        return new CommonRs<>(new ComplexRs("Сообщение удалено"));
+    }
+
+    public CommonRs<MessageRs> editMessage(Long messageId, MessageRq messageRq) {
+        Message message = messagesRepository.findById(messageId).orElseThrow();
+        message.setMessageText(messageRq.getMessageText());
+        messagesRepository.save(message);
+        return new CommonRs<>(dialogMapper.toMessageRs(message, currentUserExtractor.getPerson()));
+    }
+
+    private boolean isMyMessage(Message message) {
+        return message.getAuthor().equals(currentUserExtractor.getPerson());
+    }
 
     public CommonRs<ComplexRs> getUnreadMessages() {
         return new CommonRs<>(new ComplexRs((long) messagesRepository
@@ -110,11 +143,11 @@ public class DialogsService {
         }
     }
 
-/*    private Message getLastMessage(Long dialogId) {
+    private Message getLastMessage(Long dialogId) {
         return messagesRepository.findAllByDialogIdAndIsDeletedFalse(dialogId)
                 .stream()
                 .max(Comparator.comparing(Message::getTime)).orElseThrow();
-    }*/
+    }
 
     private List<DialogRs> blockDialogs(List<DialogRs> dialogs) {
         Person me = currentUserExtractor.getPerson();

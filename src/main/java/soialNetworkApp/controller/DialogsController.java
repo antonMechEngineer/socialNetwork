@@ -25,6 +25,21 @@ public class DialogsController {
 
     private final DialogsService dialogsService;
 
+    @DeleteMapping("/{dialogId}/delete")
+    public CommonRs<ComplexRs> dialogDelete(@PathVariable Long dialogId) {
+        return dialogsService.deleteDialog(dialogId);
+    }
+
+    @DeleteMapping("/{dialogId}/messages/{messageId}/delete")
+    public CommonRs<ComplexRs> messageDelete(@PathVariable Long dialogId, @PathVariable Long messageId) {
+        return dialogsService.deleteMessage(dialogId, messageId);
+    }
+
+    @PutMapping("/messages/{messageId}/edit")
+    public CommonRs<MessageRs> messageEdit(@PathVariable Long messageId, @RequestBody MessageRq messageRq) {
+        return dialogsService.editMessage(messageId, messageRq);
+    }
+
     @GetMapping
     @ApiOperation(value = "recover comment by id")
     @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
@@ -91,7 +106,7 @@ public class DialogsController {
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     @UpdateOnlineTime
-    public CommonRs<ComplexRs> read(@RequestBody MessageRq messageRq) {
-        return dialogsService.setReadMessages(messageRq.getDialogId());
+    public CommonRs<ComplexRs> read(@PathVariable Long dialogId) {
+        return dialogsService.setReadMessages(dialogId);
     }
 }
