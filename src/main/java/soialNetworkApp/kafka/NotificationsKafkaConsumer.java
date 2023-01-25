@@ -18,7 +18,7 @@ public class NotificationsKafkaConsumer {
     private final NotificationsRepository notificationsRepository;
     private final NotificationsService notificationsService;
 
-    @KafkaListener(topics = "notifications", groupId = "myGroup", autoStartup = "${listen.auto.start:true}")
+    @KafkaListener(topics = "notifications", autoStartup = "${listen.auto.start:true}")
     public void consume(NotificationKafka notificationKafka) {
         log.info(String.format("Json received -> %s", notificationKafka.toString()));
         if (notificationKafka.getId() > 0) {
