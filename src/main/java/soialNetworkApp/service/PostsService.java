@@ -173,6 +173,7 @@ public class PostsService {
                     friendship.getFriendshipStatus().equals(FriendshipStatusTypes.SUBSCRIBED)) {
 //                notificationsService.createNotification(post, friendship.getSrcPerson());
                 notificationsKafkaProducer.sendMessage(post, friendship.getSrcPerson());
+                notificationsService.sendNotificationToTelegramBot(post, friendship.getSrcPerson());
             }
         });
 //        friendshipsRepository.findFriendshipBySrcPerson(person).forEach(friendship -> {

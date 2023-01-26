@@ -63,6 +63,11 @@ public class Post implements Liked, Notificationed {
     }
 
     @Override
+    public String getSimpleInfo() {
+        return title;
+    }
+
+    @Override
     public String toString() {
         return "Post{" +
                 "id=" + id +

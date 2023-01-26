@@ -25,16 +25,12 @@ public class AuthService {
     private final PersonMapper personMapper;
     private final JWTUtil jwtUtil;
 
-    public CommonRs<PersonRs> loginUser(LoginRq loginRq, Long telegramId) throws PasswordException, WrongEmailException {
+    public CommonRs<PersonRs> loginUser(LoginRq loginRq) throws PasswordException, WrongEmailException {
         Person person = personCacheService.getPersonByEmail(loginRq.getEmail());
         if (person != null) {
             if (!passwordEncoder.matches(loginRq.getPassword(), person.getPassword())) {
                 throw new PasswordException("Wrong password for email: '" + loginRq.getEmail() + "'");
             } else {
-                if (telegramId != null) {
-                    person.setTelegramId(telegramId);
-                    personsRepository.save(person);
-                }
                 return buildCommonResponse(person);
             }
         } else {

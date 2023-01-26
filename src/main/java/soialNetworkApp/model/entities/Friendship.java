@@ -47,6 +47,11 @@ public class Friendship implements Notificationed {
         return dstPerson;
     }
 
+    @Override
+    public String getSimpleInfo() {
+        return null;
+    }
+
     public Friendship(LocalDateTime sentTime, Person srcPerson, Person dstPerson, FriendshipStatusTypes friendshipStatus) {
         this.sentTime = sentTime;
         this.srcPerson = srcPerson;

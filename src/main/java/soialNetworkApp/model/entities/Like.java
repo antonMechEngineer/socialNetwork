@@ -54,4 +54,9 @@ public class Like implements Notificationed {
     public NotificationTypes getNotificationType() {
         return NotificationTypes.POST_LIKE;
     }
+
+    @Override
+    public String getSimpleInfo() {
+        return type.equals(LikeTypes.POST) ? "post" : "comment";
+    }
 }
