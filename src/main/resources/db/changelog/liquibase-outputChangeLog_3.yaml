@@ -8,3 +8,39 @@ databaseChangeLog:
         column:
             name: telegram_id
             type: BIGINT
+- changeSet:
+    id: sprint-5-2
+    author: YurK
+    changes:
+    - dropUniqueConstraint:
+        columnNames: first_name, last_name
+        constraintName: full_name_index
+        tableName: persons
+- changeSet:
+    id: sprint-5-3
+    author: YurK
+    changes:
+    - addUniqueConstraint:
+        columnNames: email
+        constraintName: email_index
+        tableName: persons
+- changeSet:
+    id: sprint-5-4
+    author: YurK
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: first_name
+        indexName: first_name_index
+        tableName: persons
+- changeSet:
+    id: sprint-5-5
+    author: YurK
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: last_name
+        indexName: last_name_index
+        tableName: persons
