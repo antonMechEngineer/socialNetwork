@@ -11,8 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MessageTypingWs {
-    private boolean typing;
+    private Boolean typing;
     @JsonProperty("user_id")
     private Long userId;
-    private String token;
 }

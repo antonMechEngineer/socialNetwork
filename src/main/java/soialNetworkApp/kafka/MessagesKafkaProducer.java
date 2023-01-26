@@ -7,26 +7,18 @@ import org.springframework.stereotype.Service;
 import soialNetworkApp.api.websocket.MessageWs;
 import soialNetworkApp.kafka.dto.MessageKafka;
 import soialNetworkApp.mappers.DialogMapper;
-import soialNetworkApp.model.entities.Message;
-import soialNetworkApp.repository.DialogsRepository;
-
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MessagesKafkaProducer {
-    private final DialogsRepository dialogsRepository;
+
     private final KafkaTemplate<String, MessageKafka> kafkaTemplate;
     private final DialogMapper dialogMapper;
 
     public void sendMessage(MessageWs messageWsRq){
-        MessageKafka messageKafka = dialogMapper.toMessageKafkaFromMessageWs(messageWsRq,
-                dialogsRepository.findById(messageWsRq.getDialogId()).orElseThrow());
-        sendMessageKafka(messageKafka);
-    }
-
-    public void sendMessage(Message message){
-        MessageKafka messageKafka = dialogMapper.toMessageKafkaFromMessage(message);
+        MessageKafka messageKafka = dialogMapper.toMessageKafkaFromMessageWs(messageWsRq);
+        log.info(messageKafka.toString());
         sendMessageKafka(messageKafka);
     }
 
