@@ -147,9 +147,9 @@ public class AccountController {
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<Boolean> setTelegramProperties(
-            @RequestParam Long userId,
+            @RequestParam Long telegramId,
             @RequestParam Boolean value) throws PersonNotFoundException {
 
-        return accountService.setTelegramProperties(userId, value);
+        return accountService.setTelegramProperties(telegramId, value);
     }
 }
