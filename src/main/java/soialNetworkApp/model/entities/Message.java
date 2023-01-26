@@ -18,7 +18,7 @@ import java.time.ZonedDateTime;
 public class Message implements Notificationed {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false)
     private Long id;
 
     @Column(nullable = false)
