@@ -19,6 +19,8 @@ auth:
   email-restore: http://localhost:8080/shift-email?token=
 
 logging:
+  level:
+    root: WARN
   file:
     max-history: 1
     path: log
