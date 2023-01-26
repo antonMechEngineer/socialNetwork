@@ -127,6 +127,7 @@ public class FriendsService {
         if (dstPerson.getPersonSettings() != null && dstPerson.getPersonSettings().getFriendRequestNotification()) {
 //            notificationsService.createNotification(dstFriendship, dstPerson);
             notificationsKafkaProducer.sendMessage(dstFriendship, dstPerson);
+            notificationsService.sendNotificationToTelegramBot(dstFriendship, dstPerson);
         }
     }
 

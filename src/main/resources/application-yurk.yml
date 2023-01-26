@@ -20,6 +20,9 @@ spring:
     host: localhost
   cache:
     type: none
+  kafka:
+    consumer:
+      group-id: yuriGroup
 auth:
   secret: someSecretCode
   time-to-live: 3600000000

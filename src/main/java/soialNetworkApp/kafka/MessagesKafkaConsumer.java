@@ -21,7 +21,7 @@ public class MessagesKafkaConsumer {
     private final DialogMapper dialogMapper;
 
 
-    @KafkaListener(topics = "messages", groupId = "myGroup", autoStartup = "${listen.auto.start:true}")
+    @KafkaListener(topics = "messages", autoStartup = "${listen.auto.start:true}")
     public void consume(MessageKafka messageKafka) {
         log.info(String.format("Json received -> %s", messageKafka.toString()));
         Message message = dialogMapper.toMessageFromKafka(messageKafka);

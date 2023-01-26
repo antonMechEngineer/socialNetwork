@@ -50,4 +50,9 @@ public class Message implements Notificationed {
     public NotificationTypes getNotificationType() {
         return NotificationTypes.MESSAGE;
     }
+
+    @Override
+    public String getSimpleInfo() {
+        return messageText;
+    }
 }

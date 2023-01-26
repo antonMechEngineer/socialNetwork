@@ -46,10 +46,12 @@ public class CommentsService {
         if (post != null && person.getPersonSettings() != null && person.getPersonSettings().getPostCommentNotification()) {
 //            notificationsService.createNotification(comment, post.getAuthor());
             notificationsKafkaProducer.sendMessage(comment, post.getAuthor());
+            notificationsService.sendNotificationToTelegramBot(comment, post.getAuthor());
         }
         if (post == null && person.getPersonSettings() != null && person.getPersonSettings().getCommentCommentNotification()) {
 //            notificationsService.createNotification(comment, parentComment.getAuthor());
             notificationsKafkaProducer.sendMessage(comment, parentComment.getAuthor());
+            notificationsService.sendNotificationToTelegramBot(comment, parentComment.getAuthor());
         }
         return buildCommonResponse(comment);
     }
