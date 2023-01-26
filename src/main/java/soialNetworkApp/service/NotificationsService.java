@@ -19,12 +19,10 @@ import soialNetworkApp.errors.NoSuchEntityException;
 import soialNetworkApp.errors.PersonNotFoundException;
 import soialNetworkApp.kafka.NotificationsKafkaProducer;
 import soialNetworkApp.mappers.NotificationMapper;
-import soialNetworkApp.mappers.PersonMapper;
 import soialNetworkApp.model.entities.Notification;
 import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.model.entities.interfaces.Notificationed;
 import soialNetworkApp.model.enums.FriendshipStatusTypes;
-import soialNetworkApp.model.enums.NotificationTypes;
 import soialNetworkApp.repository.FriendshipsRepository;
 import soialNetworkApp.repository.NotificationsRepository;
 import soialNetworkApp.repository.PersonsRepository;
@@ -46,7 +44,6 @@ public class NotificationsService {
     private final NotificationMapper notificationMapper;
     private final SimpMessagingTemplate template;
     private final NotificationsKafkaProducer notificationsKafkaProducer;
-    private final PersonMapper personMapper;
 
     @Value("${socialNetwork.default.page}")
     private int offset;
@@ -113,6 +110,7 @@ public class NotificationsService {
                     friendship.getSrcPerson().getPersonSettings().getFriendBirthdayNotification()) {
 //                createNotification(person, friendship.getSrcPerson());
                 notificationsKafkaProducer.sendMessage(person, friendship.getSrcPerson());
+                sendNotificationToTelegramBot(person, friendship.getSrcPerson());
             }
         }));
     }
@@ -122,16 +120,18 @@ public class NotificationsService {
                 .ifPresent(notificationsRepository::delete);
     }
 
-    public void sendNotificationToTelegramBot(NotificationTypes notificationType, long personId) {
-        Person person = personsRepository.findPersonById(personId).orElse(new Person());
+    public void sendNotificationToTelegramBot(Notificationed notificationed, Person person) {
+//        Person person = personsRepository.findPersonById(personId).orElse(new Person());
         if (person.getTelegramId() != null) {
             HttpClient httpClient = HttpClientBuilder.create().build();
             try {
                 HttpPost request = new HttpPost("http://194.87.244.66:8087/bot?userId=" + person.getTelegramId());
                 JSONObject jsonObject = new JSONObject()
-                        .put("notification_type", notificationType)
-                        .put("entity_author", new JSONObject()
-                                .put("first_name", person.getFirstName()).put("last_name", person.getLastName()));
+                        .put("type", notificationed.getNotificationType())
+                        .put("info", notificationed.getSimpleInfo())
+                        .put("author", new JSONObject()
+                                .put("first_name", notificationed.getAuthor().getFirstName())
+                                .put("last_name", notificationed.getAuthor().getLastName()));
                 StringEntity params = new StringEntity(jsonObject.toString());
                 request.addHeader("content-type", "application/json");
                 request.setEntity(params);

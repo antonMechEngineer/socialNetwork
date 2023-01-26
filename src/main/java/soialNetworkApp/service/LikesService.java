@@ -46,6 +46,7 @@ public class LikesService {
             if (person.getPersonSettings() != null && person.getPersonSettings().getLikeNotification()) {
 //                notificationsService.createNotification(like, liked.getAuthor());
                 notificationsKafkaProducer.sendMessage(like, liked.getAuthor());
+                notificationsService.sendNotificationToTelegramBot(like, liked.getAuthor());
             }
         }
         return getLikesResponse(liked);

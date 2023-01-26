@@ -151,6 +151,11 @@ public class Person implements Notificationed, Serializable {
     }
 
     @Override
+    public String getSimpleInfo() {
+        return String.valueOf(LocalDateTime.now().getYear() - birthDate.getYear());
+    }
+
+    @Override
     public String toString() {
         return "Person{" +
                 "id=" + id +
