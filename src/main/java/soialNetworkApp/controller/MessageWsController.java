@@ -2,11 +2,9 @@ package soialNetworkApp.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.*;
 import soialNetworkApp.api.websocket.MessageTypingWs;
 import soialNetworkApp.api.websocket.MessageWs;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 import soialNetworkApp.service.MessageWsService;
 
@@ -18,17 +16,22 @@ public class MessageWsController {
     private final MessageWsService messageWsService;
 
     @MessageMapping("/dialogs/send_message")
-    public void sendMessage(@Payload MessageWs messageWsRq) {
-        messageWsService.getMessageFromWs(messageWsRq);
+    public void sendMessage(@Payload MessageWs messageWs) {
+        messageWsService.getMessageFromWs(messageWs);
     }
 
     @MessageMapping("/dialogs/start_typing")
-    public void startTyping(@Header("dialog_id") Long dialogId, @Payload MessageTypingWs messageTypingWs) {
-        messageWsService.messageTypingFromWs(dialogId, messageTypingWs);
+    public void startTyping(@Header("dialog_id") Long dialogId, @Header String token, @Payload MessageTypingWs messageTypingWs) {
+        messageWsService.messageTypingFromWs(dialogId, token, messageTypingWs);
     }
 
     @MessageMapping("/dialogs/stop_typing")
-    public void stopTyping(@Header("dialog_id") Long dialogId, @Payload MessageTypingWs messageTypingWs) {
-        messageWsService.messageTypingFromWs(dialogId, messageTypingWs);
+    public void stopTyping(@Header("dialog_id") Long dialogId, @Header String token, @Payload MessageTypingWs messageTypingWs) {
+        messageWsService.messageTypingFromWs(dialogId, token, messageTypingWs);
+    }
+
+    @MessageMapping("/dialogs/close")
+    public void close() {
+        messageWsService.closeDialog();
     }
 }
