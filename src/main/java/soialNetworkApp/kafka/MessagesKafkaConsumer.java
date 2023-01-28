@@ -9,7 +9,6 @@ import soialNetworkApp.kafka.dto.MessageKafka;
 import soialNetworkApp.mappers.DialogMapper;
 import soialNetworkApp.model.entities.Dialog;
 import soialNetworkApp.model.entities.Message;
-import soialNetworkApp.model.enums.ReadStatusTypes;
 import soialNetworkApp.repository.DialogsRepository;
 import soialNetworkApp.repository.MessagesRepository;
 import soialNetworkApp.service.NotificationsService;
@@ -17,7 +16,6 @@ import soialNetworkApp.service.NotificationsService;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 
 @Slf4j
 @Service
