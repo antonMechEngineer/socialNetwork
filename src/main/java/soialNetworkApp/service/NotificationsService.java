@@ -90,8 +90,6 @@ public class NotificationsService {
     }
 
     public void sendNotificationsToWs(Person person)  {
-//        notificationsKafkaProducer.sendMessage(entity, person);
-
         template.convertAndSend(String.format("/user/%s/queue/notifications", person.getId()),
                 getAllNotificationsByPerson(offset, size, person));
     }
@@ -108,7 +106,6 @@ public class NotificationsService {
             if (friendship.getFriendshipStatus().equals(FriendshipStatusTypes.FRIEND) &&
                     friendship.getSrcPerson().getPersonSettings() != null &&
                     friendship.getSrcPerson().getPersonSettings().getFriendBirthdayNotification()) {
-//                createNotification(person, friendship.getSrcPerson());
                 notificationsKafkaProducer.sendMessage(person, friendship.getSrcPerson());
                 sendNotificationToTelegramBot(person, friendship.getSrcPerson());
             }
@@ -121,7 +118,6 @@ public class NotificationsService {
     }
 
     public void sendNotificationToTelegramBot(Notificationed notificationed, Person person) {
-//        Person person = personsRepository.findPersonById(personId).orElse(new Person());
         if (person.getTelegramId() != null) {
             HttpClient httpClient = HttpClientBuilder.create().build();
             try {

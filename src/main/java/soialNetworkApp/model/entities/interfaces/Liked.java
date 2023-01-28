@@ -10,4 +10,6 @@ public interface Liked {
     Person getAuthor();
 
     LikeTypes getType();
+
+    String getParentName();
 }
