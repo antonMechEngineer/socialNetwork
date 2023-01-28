@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import soialNetworkApp.service.util.CurrentUserExtractor;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -38,6 +39,7 @@ public class AccountService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService eMailService;
     private final PersonCacheService personCacheService;
+    private final CurrentUserExtractor currentUserExtractor;
     @Value("${auth.pass-restore}")
     String basePassUrl;
     @Value("${auth.email-restore}")
@@ -271,5 +273,12 @@ public class AccountService {
                         friendsBirthdayValue,
                         postLikeValue))
                 .build();
+    }
+
+    public CommonRs<Boolean> setTelegramProperties(Long userId, Boolean value) {
+        Person person = currentUserExtractor.getPerson();
+        person.setTelegramId(value ? userId : null);
+        personsRepository.save(person);
+        return CommonRs.<Boolean>builder().timestamp(System.currentTimeMillis()).data(value).build();
     }
 }

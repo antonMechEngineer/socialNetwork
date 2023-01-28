@@ -58,6 +58,11 @@ public class Comment implements Liked, Notificationed {
     }
 
     @Override
+    public String getSimpleInfo() {
+        return (post == null ? ("comment by post \"" + parentComment.getPost().getTitle()) : ("post \"" + post.getTitle())) + "\": " + commentText;
+    }
+
+    @Override
     public String toString() {
         return "Comment{" +
                 "id=" + id +

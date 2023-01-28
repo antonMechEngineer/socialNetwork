@@ -1,13 +1,12 @@
 package soialNetworkApp.model.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import soialNetworkApp.model.entities.interfaces.Notificationed;
 import soialNetworkApp.model.enums.FriendshipStatusTypes;
 import soialNetworkApp.model.enums.MessagePermissionTypes;
 import soialNetworkApp.model.enums.NotificationTypes;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -22,7 +21,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Table(name = "persons", indexes = @Index(name = "full_name_index", columnList = "first_name, last_name", unique = true))
+@Table(name = "persons", indexes = {
+        @Index(name = "first_name_index", columnList = "first_name"),
+        @Index(name = "last_name_index", columnList = "last_name"),
+        @Index(name = "email_index", columnList = "email", unique = true)})
 public class Person implements Notificationed, Serializable {
     private static final long serialVersionUID = -4439114469417994311L;
 
@@ -148,6 +150,11 @@ public class Person implements Notificationed, Serializable {
     @Override
     public Person getAuthor() {
         return this;
+    }
+
+    @Override
+    public String getSimpleInfo() {
+        return String.valueOf(LocalDateTime.now().getYear() - birthDate.getYear());
     }
 
     @Override

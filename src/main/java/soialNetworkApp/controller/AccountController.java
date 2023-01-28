@@ -108,6 +108,14 @@ public class AccountController {
 
     @UpdateOnlineTime
     @GetMapping("/notifications")
+    @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
+    @ApiOperation("Get user's notifications properties")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "\"Name of error\"",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     public CommonRs<List<PersonSettingsRs>> getPersonSettings() throws PersonNotFoundException {
 
         return accountService.getPersonSettings();
@@ -115,9 +123,33 @@ public class AccountController {
 
     @UpdateOnlineTime
     @PutMapping("/notifications")
+    @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
+    @ApiOperation("Edit notifications properties")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "\"Name of error\"",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     public CommonRs<ComplexRs> editPersonSettings(
             @RequestBody PersonSettingsRq request) throws PersonNotFoundException, IncorrectRequestTypeException {
 
         return accountService.setPersonSetting(request);
+    }
+
+    @PutMapping("/telegram")
+    @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
+    @ApiOperation("Set telegram properties")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "\"Name of error\"",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
+    public CommonRs<Boolean> setTelegramProperties(
+            @RequestParam Long telegramId,
+            @RequestParam Boolean value) throws PersonNotFoundException {
+
+        return accountService.setTelegramProperties(telegramId, value);
     }
 }

@@ -4,6 +4,7 @@ package soialNetworkApp.kafka;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import soialNetworkApp.kafka.dto.NotificationKafka;
@@ -12,11 +13,15 @@ import soialNetworkApp.repository.NotificationsRepository;
 import soialNetworkApp.service.NotificationsService;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotificationsKafkaConsumer {
+
+    @Value("${socialNetwork.timezone}")
+    private String timezone;
     private final NotificationsRepository notificationsRepository;
     private final NotificationsService notificationsService;
 
@@ -31,9 +36,9 @@ public class NotificationsKafkaConsumer {
             notificationsService.sendNotificationsToWs(notification.getPerson());
         } else {
             notificationsRepository.save(notificationKafka.getNotificationType().toString(), notificationKafka.getNotificationedId(),
-                    notificationKafka.getIsRead(), LocalDateTime.now(), notificationKafka.getPersonId());
+                    notificationKafka.getIsRead(), LocalDateTime.now(ZoneId.of(timezone)), notificationKafka.getPersonId());
             notificationsService.sendNotificationsToWs(notificationKafka.getPersonId());
-            notificationsService.sendNotificationToTelegramBot(notificationKafka.getNotificationType(), notificationKafka.getPersonId());
+//            notificationsService.sendNotificationToTelegramBot(notificationKafka.getNotificationType(), notificationKafka.getPersonId());
         }
     }
 
