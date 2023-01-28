@@ -1,5 +1,6 @@
 package soialNetworkApp.repository;
 
+import org.mapstruct.Named;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import soialNetworkApp.api.response.RegionStatisticRs;
 import soialNetworkApp.model.entities.Person;
