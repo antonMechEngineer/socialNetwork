@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.ComplexRs;
 import soialNetworkApp.api.response.PersonRs;
-import soialNetworkApp.errors.PersonException;
+import soialNetworkApp.errors.FriendshipNotFoundException;
 import soialNetworkApp.errors.PersonNotFoundException;
 import soialNetworkApp.kafka.NotificationsKafkaProducer;
 import soialNetworkApp.mappers.PersonMapper;
@@ -39,8 +39,8 @@ public class FriendsService {
     public CommonRs<ComplexRs> addFriend(Long receivedFriendId) throws Exception {
         Person srcPerson = getSrcPerson();
         Person dstPerson = getDstPerson(receivedFriendId);
-        modifyFriendShipStatus(srcPerson, dstPerson);
-        modifyFriendShipStatus(dstPerson, srcPerson);
+        setFriendStatus(srcPerson, dstPerson);
+        setFriendStatus(dstPerson, srcPerson);
         return CommonRs.<ComplexRs>builder()
                 .timestamp(System.currentTimeMillis())
                 .data(ComplexRs.builder().build())
@@ -98,18 +98,17 @@ public class FriendsService {
         return srcFriendshipStatusType;
     }
 
-    public void userBlocksUser(Long blockUserId) throws PersonException {
-        Person me = personsRepository.findPersonByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).get();
-        Optional<Person> dstPerson = personsRepository.findPersonById(blockUserId);
-        if (dstPerson.isEmpty()) {
-            throw new PersonException("User to block not found by id: " + blockUserId);
-        }
-        Friendship meSrcFriendship = friendshipsRepository.findFriendshipBySrcPersonIdAndDstPersonId(me.getId(), blockUserId);
-        Friendship meDstFriendship = friendshipsRepository.findFriendshipBySrcPersonIdAndDstPersonId(blockUserId, me.getId());
-        if (meSrcFriendship != null && meSrcFriendship.getFriendshipStatus().equals(BLOCKED)) {
+    public void userBlocksUser(Long blockId) throws Exception {
+        Person srcPerson = getSrcPerson();
+        Person dstPerson = getDstPerson(blockId);
+        Optional <Friendship> meOptionalSrcFriendship = friendshipsRepository.findFriendshipBySrcPersonIdAndDstPersonId(srcPerson.getId(), blockId);
+        Friendship meDstFriendship = friendshipsRepository.findFriendshipBySrcPersonIdAndDstPersonId(blockId, srcPerson.getId()).orElseThrow(new FriendshipNotFoundException(dstPerson, srcPerson));
+        if(meOptionalSrcFriendship/)
+
+        if (meSrcFriendship.getFriendshipStatus().equals(BLOCKED)) {
             unblockPerson(meSrcFriendship);
         } else {
-            blockPerson(meDstFriendship, meSrcFriendship, me, dstPerson.get());
+            blockPerson(meDstFriendship, meSrcFriendship, srcPerson, dstPerson);
         }
     }
 
@@ -125,15 +124,14 @@ public class FriendsService {
         friendshipsRepository.save(srcFriendship);
         friendshipsRepository.save(dstFriendship);
         if (dstPerson.getPersonSettings() != null && dstPerson.getPersonSettings().getFriendRequestNotification()) {
-//            notificationsService.createNotification(dstFriendship, dstPerson);
             notificationsKafkaProducer.sendMessage(dstFriendship, dstPerson);
             notificationsService.sendNotificationToTelegramBot(dstFriendship, dstPerson);
         }
     }
 
-    private void deleteFriendships(Person srcPerson, Person dstPerson) {
-        Friendship srcFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(srcPerson, dstPerson).orElseThrow();
-        Friendship dstFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(dstPerson, srcPerson).orElseThrow();
+    private void deleteFriendships(Person srcPerson, Person dstPerson) throws Exception {
+        Friendship srcFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(srcPerson, dstPerson).orElseThrow(new FriendshipNotFoundException(srcPerson, dstPerson));
+        Friendship dstFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(dstPerson, srcPerson).orElseThrow(new FriendshipNotFoundException(dstPerson, srcPerson));
         notificationsService.deleteNotification(srcFriendship);
         friendshipsRepository.delete(srcFriendship);
         friendshipsRepository.delete(dstFriendship);
@@ -147,7 +145,7 @@ public class FriendsService {
         return personsRepository.findPersonByIdIn(friendlyIds, pageable);
     }
 
-    private void modifyFriendShipStatus(Person srcPerson, Person dstPerson) {
+    private void setFriendStatus(Person srcPerson, Person dstPerson) {
         Optional<Friendship> optionalSrcFriendship = friendshipsRepository.findFriendshipBySrcPersonAndDstPerson(srcPerson, dstPerson);
         if (optionalSrcFriendship.isPresent()) {
             Friendship friendship = optionalSrcFriendship.get();
@@ -185,12 +183,11 @@ public class FriendsService {
     private Person getSrcPerson() throws Exception {
         String srcEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         return personsRepository.findPersonByEmail(srcEmail)
-                .orElseThrow(new PersonNotFoundException("User by email: '" + srcEmail + "' not found"));
+                .orElseThrow(new PersonNotFoundException(srcEmail));
     }
 
     private Person getDstPerson(Long id) throws Exception {
-        return personsRepository.findPersonById(id).orElseThrow(
-                new PersonNotFoundException("User by id: '" + id + "' not found"));
+        return personsRepository.findPersonById(id).orElseThrow(new PersonNotFoundException(id));
     }
 
     private void blockPerson(Friendship meDstFriendship, Friendship meSrcFriendship, Person me, Person dstPerson) {

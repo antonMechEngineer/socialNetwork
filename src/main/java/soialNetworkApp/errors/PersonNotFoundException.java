@@ -13,6 +13,10 @@ public class PersonNotFoundException extends  RuntimeException implements Suppli
         super(message);
     }
 
+    public PersonNotFoundException(Long id){
+        super("Person doesn't exist with ID = " + id.toString());
+    }
+
     @Override
     public Exception get() {
         return this;
