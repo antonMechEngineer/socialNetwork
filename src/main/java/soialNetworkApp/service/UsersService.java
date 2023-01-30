@@ -1,6 +1,7 @@
 package soialNetworkApp.service;
 
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,6 +59,7 @@ public class UsersService {
         long personId = person.getId();
         StorageDataRs dataRs = new StorageDataRs();
 
+        @NonNull
         String originFileName = photo.getOriginalFilename();
         String extension = originFileName.substring(originFileName.lastIndexOf(".") + 1);
         String newFileName = "image" + personId + "." + extension;
