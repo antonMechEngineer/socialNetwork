@@ -2,6 +2,7 @@ package soialNetworkApp.service;
 
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import soialNetworkApp.api.request.LikeRq;
+import soialNetworkApp.errors.NoSuchEntityException;
 import soialNetworkApp.model.entities.Comment;
 import soialNetworkApp.model.entities.Like;
 import soialNetworkApp.model.entities.Person;
@@ -90,7 +91,7 @@ class LikesServiceTest {
     }
 
     @Test
-    void putLike() {
+    void putLike() throws Exception {
         when(likesRepository.save(any())).then(invocation -> {
             likes.add(invocation.getArgument(0));
             return null;
@@ -107,7 +108,7 @@ class LikesServiceTest {
     }
 
     @Test
-    void getLikesResponse() {
+    void getLikesResponse() throws NoSuchEntityException {
         Like like = new Like();
         like.setAuthor(person);
         likes.add(like);
@@ -120,7 +121,7 @@ class LikesServiceTest {
     }
 
     @Test
-    void deleteLike() {
+    void deleteLike() throws Exception {
         Like like = new Like();
         like.setAuthor(person);
         likes.add(like);

@@ -13,6 +13,7 @@ import soialNetworkApp.api.request.LikeRq;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.ErrorRs;
 import soialNetworkApp.api.response.LikeRs;
+import soialNetworkApp.errors.NoSuchEntityException;
 import soialNetworkApp.service.LikesService;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +37,7 @@ public class LikesController {
     })
     public CommonRs<LikeRs> getLikesList(
             @RequestParam(name = "item_id") long itemId,
-            @RequestParam String type) {
+            @RequestParam String type) throws NoSuchEntityException {
 
         return likesService.getLikesResponse(itemId, type);
     }
@@ -52,7 +53,7 @@ public class LikesController {
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<LikeRs> putLike(
-            @RequestBody LikeRq likeRq) {
+            @RequestBody LikeRq likeRq) throws Exception {
 
         return likesService.putLike(likeRq);
     }
@@ -69,7 +70,7 @@ public class LikesController {
     })
     public CommonRs<LikeRs> deleteLike(
             @RequestParam(name = "item_id") long itemId,
-            @RequestParam String type) {
+            @RequestParam String type) throws Exception {
 
         return likesService.deleteLike(itemId, type);
     }

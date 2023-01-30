@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import soialNetworkApp.api.request.LikeRq;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.LikeRs;
+import soialNetworkApp.errors.NoSuchEntityException;
 import soialNetworkApp.kafka.NotificationsKafkaProducer;
 import soialNetworkApp.model.entities.Like;
 import soialNetworkApp.model.entities.Person;
@@ -34,7 +35,7 @@ public class LikesService {
     @Value("${socialNetwork.timezone}")
     private String timezone;
 
-    public CommonRs<LikeRs> putLike(LikeRq likeRq) {
+    public CommonRs<LikeRs> putLike(LikeRq likeRq) throws Exception {
         Person person = personCacheService.getPersonByContext();
         Liked liked = getLikedEntity(likeRq.getItemId(), likeRq.getType());
         if (getLikeFromCurrentPerson(person, liked) == null) {
@@ -62,11 +63,11 @@ public class LikesService {
         return buildCommonResponse(likeRs);
     }
 
-    public CommonRs<LikeRs> getLikesResponse(long entityId, String type) {
+    public CommonRs<LikeRs> getLikesResponse(long entityId, String type) throws NoSuchEntityException {
         return getLikesResponse(getLikedEntity(entityId, type));
     }
 
-    public CommonRs<LikeRs> deleteLike(long entityId, String type) {
+    public CommonRs<LikeRs> deleteLike(long entityId, String type) throws Exception {
         Person person = personCacheService.getPersonByContext();
         Liked liked = getLikedEntity(entityId, type);
         Like like = getLikeFromCurrentPerson(person, liked);
@@ -77,22 +78,23 @@ public class LikesService {
         return getLikesResponse(liked);
     }
 
-    private Like getLikeFromCurrentPerson(Person person, Liked liked) {
-        return likesRepository.findLikeByPersonAndEntity(liked.getType(), liked, person).orElse(null);
+    private Like getLikeFromCurrentPerson(Person person, Liked liked) throws Exception {
+        return likesRepository.findLikeByPersonAndEntity(liked.getType(), liked, person)
+                .orElseThrow(new NoSuchEntityException("Like by current person not found!"));
     }
 
-    private Liked getLikedEntity(long entityId, String type) {
+    private Liked getLikedEntity(long entityId, String type) throws NoSuchEntityException {
         Liked liked;
         switch (type) {
             case "Post" : {
-                liked = postsRepository.findById(entityId).orElse(null);
+                liked = postsRepository.findById(entityId).orElseThrow();
                 break;
             }
             case "Comment" : {
-                liked = commentsRepository.findById(entityId).orElse(null);
+                liked = commentsRepository.findById(entityId).orElseThrow();
                 break;
             }
-            default: liked = null;
+            default: throw new NoSuchEntityException(type + " with id " + entityId + " not found!");
         }
         return liked;
     }
