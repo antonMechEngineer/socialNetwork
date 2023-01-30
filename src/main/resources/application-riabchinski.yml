@@ -20,7 +20,7 @@ auth:
 
 logging:
   level:
-    root: WARN
+    root: INFO
   file:
     max-history: 1
     path: log
