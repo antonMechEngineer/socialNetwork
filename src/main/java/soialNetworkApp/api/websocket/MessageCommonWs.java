@@ -12,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MessageCommonWs {
+    private Long id;
     @JsonProperty("dialog_id")
     private Long dialogId;
     @JsonProperty("message_ids")

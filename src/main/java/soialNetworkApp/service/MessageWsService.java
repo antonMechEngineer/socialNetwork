@@ -28,8 +28,6 @@ public class MessageWsService {
     private final MessagesRepository messagesRepository;
     private final DialogsRepository dialogsRepository;
     private final JWTUtil jwtUtil;
-    Long dialogId;
-    String token;
 
     public void getMessageFromWs(MessageWs messageWs) {
         Long id = messageWs.getDialogId() + messageWs.getAuthorId() + System.currentTimeMillis();
@@ -39,21 +37,19 @@ public class MessageWsService {
         messagesKafkaProducer.sendMessage(messageWs);
     }
 
-    public void messageTypingFromWs(Long dialogId, String token, MessageTypingWs messageTypingWs) {
-        if (this.dialogId == null && this.token == null) {
-            this.dialogId = dialogId;
-            this.token = token;
-        }
+    public void messageTypingFromWs(Long dialogId, MessageTypingWs messageTypingWs) {
         messagingTemplate.convertAndSendToUser(dialogId.toString(), "/queue/messages", messageTypingWs);
     }
 
     public void changeMessage(MessageCommonWs messageCommonWs) {
         Message message = messagesRepository.findById(messageCommonWs.getMessageId()).orElseThrow();
+        messagingTemplate.convertAndSendToUser(message.getDialog().getId().toString(), "/queue/messages", messageCommonWs);
         message.setMessageText(messageCommonWs.getMessageText());
         messagesRepository.save(message);
     }
 
     public void removeMessage(MessageCommonWs messages) {
+        messagingTemplate.convertAndSendToUser(messages.getDialogId().toString(), "/queue/messages", messages);
         Dialog dialog = dialogsRepository.findById(messages.getDialogId()).orElseThrow();
         messages.getMessageIds()
                 .forEach(id -> {
@@ -75,6 +71,7 @@ public class MessageWsService {
     }
 
     public void restoreMessage(MessageCommonWs messageCommonWs) {
+        messagingTemplate.convertAndSendToUser(messageCommonWs.getDialogId().toString(), "/queue/messages", messageCommonWs);
         Message message = messagesRepository.findById(messageCommonWs.getMessageId()).orElseThrow();
         message.setIsDeleted(false);
         messagesRepository.save(message);

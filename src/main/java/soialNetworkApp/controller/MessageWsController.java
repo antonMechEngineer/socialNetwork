@@ -23,12 +23,12 @@ public class MessageWsController {
 
     @MessageMapping("/dialogs/start_typing")
     public void startTyping(@Header("dialog_id") Long dialogId, @Header String token, @Payload MessageTypingWs messageTypingWs) {
-        messageWsService.messageTypingFromWs(dialogId, token, messageTypingWs);
+        messageWsService.messageTypingFromWs(dialogId, messageTypingWs);
     }
 
     @MessageMapping("/dialogs/stop_typing")
     public void stopTyping(@Header("dialog_id") Long dialogId, @Header String token, @Payload MessageTypingWs messageTypingWs) {
-        messageWsService.messageTypingFromWs(dialogId, token, messageTypingWs);
+        messageWsService.messageTypingFromWs(dialogId, messageTypingWs);
     }
 
     @MessageMapping("/dialogs/edit_message")
