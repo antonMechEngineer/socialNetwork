@@ -3,6 +3,7 @@ package soialNetworkApp.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.*;
+import soialNetworkApp.api.websocket.MessageCommonWs;
 import soialNetworkApp.api.websocket.MessageTypingWs;
 import soialNetworkApp.api.websocket.MessageWs;
 import org.springframework.stereotype.Controller;
@@ -30,8 +31,23 @@ public class MessageWsController {
         messageWsService.messageTypingFromWs(dialogId, token, messageTypingWs);
     }
 
-    @MessageMapping("/dialogs/close")
-    public void close() {
-        messageWsService.closeDialog();
+    @MessageMapping("/dialogs/edit_message")
+    public void editMessage(@Payload MessageCommonWs message) {
+        messageWsService.changeMessage(message);
+    }
+
+    @MessageMapping("/dialogs/delete_messages")
+    public void deleteMessages(@Payload MessageCommonWs messages) {
+        messageWsService.removeMessage(messages);
+    }
+
+    @MessageMapping("/dialogs/recover_message")
+    public void recoverMessage(@Payload MessageCommonWs messageCommonWs) {
+        messageWsService.restoreMessage(messageCommonWs);
+    }
+
+    @MessageMapping("/dialogs/close_dialog")
+    public void closeDialog(@Payload MessageCommonWs messageCommonWs) {
+        messageWsService.closeDialog(messageCommonWs);
     }
 }

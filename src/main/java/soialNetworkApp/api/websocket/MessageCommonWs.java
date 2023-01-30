@@ -2,25 +2,25 @@ package soialNetworkApp.api.websocket;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import soialNetworkApp.model.entities.Message;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MessageWs {
-    private Long id;
+public class MessageCommonWs {
     @JsonProperty("dialog_id")
     private Long dialogId;
-    @JsonProperty("author_id")
-    private Long authorId;
-    @JsonProperty("recipient_id")
-    private Long recipientId;
+    @JsonProperty("message_ids")
+    private List<Long> messageIds;
+    @JsonProperty("message_id")
+    private Long messageId;
+    @JsonProperty("user_id")
+    private Long userId;
     @JsonProperty("message_text")
     private String messageText;
-    @JsonProperty("read_status")
-    private String readStatus;
-    private Long time;
     private String token;
 }

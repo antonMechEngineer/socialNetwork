@@ -20,7 +20,6 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @Table(name = "persons", indexes = {
         @Index(name = "first_name_index", columnList = "first_name"),
         @Index(name = "last_name_index", columnList = "last_name"),
