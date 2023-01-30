@@ -36,6 +36,7 @@ public class DialogsService {
     private final PersonsRepository personsRepository;
     private final DialogMapper dialogMapper;
     private final DialogMapService dialogMapService;
+    private final NotificationsService notificationsService;
     private final CurrentUserExtractor currentUserExtractor;
     private final PersonMapper personMapper;
 
@@ -53,6 +54,7 @@ public class DialogsService {
             dialog.setLastMessage(null);
             dialogsRepository.save(dialog);
         }
+        notificationsService.deleteNotification(message);
         messagesRepository.delete(message);
         if (dialog.getLastMessage() == null) {
             dialog.setLastMessage(getLastMessage(dialogId));
