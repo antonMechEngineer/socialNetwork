@@ -17,8 +17,6 @@ spring:
     password: secret
     initialization-mode: never
     data: classpath:/db/changelog/data.sql
-    hikari:
-      max-lifetime: 30000
   liquibase:
     change-log: classpath:db/changelog/changelog-master.yaml
     enabled: true
