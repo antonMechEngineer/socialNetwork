@@ -27,7 +27,6 @@ public class MessageWsService {
     private final MessagesKafkaProducer messagesKafkaProducer;
     private final MessagesRepository messagesRepository;
     private final DialogsRepository dialogsRepository;
-    private final JWTUtil jwtUtil;
 
     public void getMessageFromWs(MessageWs messageWs) {
         Long id = messageWs.getDialogId() + messageWs.getAuthorId() + System.currentTimeMillis();
@@ -49,8 +48,8 @@ public class MessageWsService {
     }
 
     public void removeMessage(MessageCommonWs messages) {
-        messagingTemplate.convertAndSendToUser(messages.getDialogId().toString(), "/queue/messages", messages);
         Dialog dialog = dialogsRepository.findById(messages.getDialogId()).orElseThrow();
+        messagingTemplate.convertAndSendToUser(messages.getDialogId().toString(), "/queue/messages", messages);
         messages.getMessageIds()
                 .forEach(id -> {
                     log.info(id.toString());
@@ -71,8 +70,8 @@ public class MessageWsService {
     }
 
     public void restoreMessage(MessageCommonWs messageCommonWs) {
-        messagingTemplate.convertAndSendToUser(messageCommonWs.getDialogId().toString(), "/queue/messages", messageCommonWs);
         Message message = messagesRepository.findById(messageCommonWs.getMessageId()).orElseThrow();
+        messagingTemplate.convertAndSendToUser(messageCommonWs.getDialogId().toString(), "/queue/messages", messageCommonWs);
         message.setIsDeleted(false);
         messagesRepository.save(message);
     }
