@@ -28,9 +28,9 @@ sonarqube-check:
     paths:
       - .sonar/cache
   script:
-    - mvn verify sonar:sonar -Dsonar.projectKey=javapro_team30_javaproTeams30Backend_AYXeDhx8KuDJ71Rhlzg-
+    - mvn verify sonar:sonar -Dsonar.projectKey=javapro_team30_javaproTeams30Backend_AYYCdMi_9Hjjzs9ttWm9
                             -Dsonar.host.url=http://194.87.244.66:9000
-                            -Dsonar.login=sqp_09d97c53fa93cc83114e1934a56926a281d3c9d2
+                            -Dsonar.login=sqp_ca38ac25cf0919073a8289df19e385ec5e7d6e18
   allow_failure: true
   only:
     - dev

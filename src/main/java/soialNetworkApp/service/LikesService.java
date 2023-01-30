@@ -1,19 +1,20 @@
 package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
+import org.mapstruct.Named;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import soialNetworkApp.api.request.LikeRq;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.LikeRs;
 import soialNetworkApp.kafka.NotificationsKafkaProducer;
 import soialNetworkApp.model.entities.Like;
-import soialNetworkApp.model.entities.interfaces.Liked;
 import soialNetworkApp.model.entities.Person;
+import soialNetworkApp.model.entities.interfaces.Liked;
 import soialNetworkApp.repository.CommentsRepository;
 import soialNetworkApp.repository.LikesRepository;
 import soialNetworkApp.repository.PostsRepository;
-import org.mapstruct.Named;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -26,7 +27,6 @@ public class LikesService {
     private final LikesRepository likesRepository;
     private final PostsRepository postsRepository;
     private final CommentsRepository commentsRepository;
-    private final PersonsService personsService;
     private final NotificationsService notificationsService;
     private  final PersonCacheService personCacheService;
     private final NotificationsKafkaProducer notificationsKafkaProducer;
@@ -43,8 +43,8 @@ public class LikesService {
             like.setAuthor(person);
             like.setTime(LocalDateTime.now(ZoneId.of(timezone)));
             likesRepository.save(like);
-            if (person.getPersonSettings() != null && person.getPersonSettings().getLikeNotification()) {
-//                notificationsService.createNotification(like, liked.getAuthor());
+            if (like.getEntity().getAuthor().getPersonSettings() != null &&
+                    like.getEntity().getAuthor().getPersonSettings().getLikeNotification()) {
                 notificationsKafkaProducer.sendMessage(like, liked.getAuthor());
                 notificationsService.sendNotificationToTelegramBot(like, liked.getAuthor());
             }

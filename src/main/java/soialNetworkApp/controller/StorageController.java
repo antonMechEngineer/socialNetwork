@@ -23,7 +23,7 @@ public class StorageController {
 
     @UpdateOnlineTime
     @PostMapping(value = "/storage", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public CommonRs<StorageDataRs> storage(@RequestParam(value = "file",required = false) MultipartFile photo) throws IOException, FileException {
+    public CommonRs<StorageDataRs> storage(@RequestParam(value = "file",required = true) MultipartFile photo) throws IOException, FileException {
         return usersService.storeImage(photo);
     }
 }
