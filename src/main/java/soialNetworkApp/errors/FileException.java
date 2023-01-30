@@ -2,7 +2,7 @@ package soialNetworkApp.errors;
 
 public class FileException extends Exception {
 
-    public FileException() {
+    public FileException(String s) {
 
     }
 }

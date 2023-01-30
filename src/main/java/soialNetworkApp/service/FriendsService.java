@@ -35,9 +35,10 @@ public class FriendsService {
     private final PersonMapper personMapper;
     private final NotificationsService notificationsService;
     private final NotificationsKafkaProducer notificationsKafkaProducer;
+    private final PersonCacheService personCacheService;
 
     public CommonRs<ComplexRs> addFriend(Long receivedFriendId) throws Exception {
-        Person srcPerson = getSrcPerson();
+        Person srcPerson = personCacheService.getPersonByContext();
         Person dstPerson = getDstPerson(receivedFriendId);
         setFriendStatus(srcPerson, dstPerson);
         setFriendStatus(dstPerson, srcPerson);
@@ -48,7 +49,7 @@ public class FriendsService {
     }
 
     public CommonRs<ComplexRs> sendFriendshipRequest(Long requestedFriendId) throws Exception {
-        Person srcPerson = getSrcPerson();
+        Person srcPerson = personCacheService.getPersonByContext();
         Person dstPerson = getDstPerson(requestedFriendId);
         createFriendshipRequest(srcPerson, dstPerson);
         return CommonRs.<ComplexRs>builder()
@@ -58,7 +59,7 @@ public class FriendsService {
     }
 
     public CommonRs<ComplexRs> deleteFriend(Long idDeletableFriend) throws Exception {
-        Person srcPerson = getSrcPerson();
+        Person srcPerson = personCacheService.getPersonByContext();
         Person dstPerson = getDstPerson(idDeletableFriend);
         deleteFriendships(srcPerson, dstPerson);
         return CommonRs.<ComplexRs>builder()
@@ -68,7 +69,7 @@ public class FriendsService {
     }
 
     public CommonRs<ComplexRs> deleteSentFriendshipRequest(Long idRequestedFriend) throws Exception {
-        Person srcPerson = getSrcPerson();
+        Person srcPerson = personCacheService.getPersonByContext();
         Person dstPerson = getDstPerson(idRequestedFriend);
         deleteFriendships(srcPerson, dstPerson);
         return CommonRs.<ComplexRs>builder()
@@ -77,14 +78,14 @@ public class FriendsService {
                 .build();
     }
 
-    public CommonRs<List<PersonRs>> getFriends(Integer offset, Integer size) throws Exception {
-        Person srcPerson = getSrcPerson();
+    public CommonRs<List<PersonRs>> getFriends(Integer offset, Integer size) {
+        Person srcPerson =personCacheService.getPersonByContext();
         Page<Person> requestedPersons = getPersons(srcPerson, offset, size, FriendshipStatusTypes.FRIEND);
         return buildCommonResponse(requestedPersons, srcPerson, offset);
     }
 
     public CommonRs<List<PersonRs>> getRequestedPersons(Integer offset, Integer size) throws Exception {
-        Person srcPerson = getSrcPerson();
+        Person srcPerson = personCacheService.getPersonByContext();
         Page<Person> personsSentResponse = getPersons(srcPerson, offset, size, RECEIVED_REQUEST);
         return buildCommonResponse(personsSentResponse, srcPerson, offset);
     }
@@ -98,24 +99,23 @@ public class FriendsService {
         return srcFriendshipStatusType;
     }
 
-    public void userBlocksUser(Long blockId) throws Exception {
-        Person srcPerson = getSrcPerson();
-        Person dstPerson = getDstPerson(blockId);
-        Optional <Friendship> meOptionalSrcFriendship = friendshipsRepository.findFriendshipBySrcPersonIdAndDstPersonId(srcPerson.getId(), blockId);
-        Friendship meDstFriendship = friendshipsRepository.findFriendshipBySrcPersonIdAndDstPersonId(blockId, srcPerson.getId()).orElseThrow(new FriendshipNotFoundException(dstPerson, srcPerson));
-        if(meOptionalSrcFriendship/)
 
-        if (meSrcFriendship.getFriendshipStatus().equals(BLOCKED)) {
-            unblockPerson(meSrcFriendship);
-        } else {
-            blockPerson(meDstFriendship, meSrcFriendship, srcPerson, dstPerson);
-        }
-    }
-
-    public CommonRs<List<PersonRs>> getOutgoingRequests(Integer offset, Integer size) throws Exception {
-        Person srcPerson = getSrcPerson();
+    public CommonRs<List<PersonRs>> getOutgoingRequests(Integer offset, Integer size) {
+        Person srcPerson = personCacheService.getPersonByContext();
         Page<Person> requestedPersons = getPersons(srcPerson, offset, size, REQUEST);
         return buildCommonResponse(requestedPersons, srcPerson, offset);
+    }
+
+    public void userBlocksUser(Long blockId) throws Exception {
+        Person srcPerson = personCacheService.getPersonByContext();
+        Person dstPerson = getDstPerson(blockId);
+        Optional<Friendship> meOptionalSrcFriendship = friendshipsRepository.findFriendshipBySrcPersonIdAndDstPersonId(srcPerson.getId(), blockId);
+        Optional<Friendship> meDstFriendship = friendshipsRepository.findFriendshipBySrcPersonIdAndDstPersonId(blockId, srcPerson.getId());
+        if (meOptionalSrcFriendship.isPresent() && meOptionalSrcFriendship.get().getFriendshipStatus().equals(BLOCKED)) {
+            unblockPerson(meOptionalSrcFriendship.get());
+        } else {
+            blockPerson(meDstFriendship, meOptionalSrcFriendship, srcPerson, dstPerson);
+        }
     }
 
     private void createFriendshipRequest(Person srcPerson, Person dstPerson) {
@@ -190,20 +190,21 @@ public class FriendsService {
         return personsRepository.findPersonById(id).orElseThrow(new PersonNotFoundException(id));
     }
 
-    private void blockPerson(Friendship meDstFriendship, Friendship meSrcFriendship, Person me, Person dstPerson) {
-        if (meDstFriendship != null && meDstFriendship.getFriendshipStatus() != BLOCKED) {
-            friendshipsRepository.delete(meDstFriendship);
-        }
-        if (meSrcFriendship != null) {
-            meSrcFriendship.setFriendshipStatus(BLOCKED);
-            meSrcFriendship.setSentTime(LocalDateTime.now());
-        } else {
-            meSrcFriendship = new Friendship(LocalDateTime.now(), me, dstPerson, BLOCKED);
-        }
-        friendshipsRepository.save(meSrcFriendship);
-    }
-
     private void unblockPerson(Friendship meSrcFriendship) {
         friendshipsRepository.delete(meSrcFriendship);
+    }
+
+    public void blockPerson(Optional<Friendship> meOptionalDstFriendship, Optional<Friendship> meOptionalSrcFriendship, Person srcPerson, Person dstPerson) throws Exception {
+        if (meOptionalDstFriendship.isEmpty()) {
+            friendshipsRepository.save(new Friendship(LocalDateTime.now(), srcPerson, dstPerson, BLOCKED));
+        } else {
+            Friendship srcFriendship = meOptionalSrcFriendship.orElseThrow();
+            if (meOptionalDstFriendship.get().getFriendshipStatus() != BLOCKED) {
+                friendshipsRepository.delete(meOptionalDstFriendship.get());
+            }
+            srcFriendship.setFriendshipStatus(BLOCKED);
+            srcFriendship.setSentTime(LocalDateTime.now());
+            friendshipsRepository.save(srcFriendship);
+        }
     }
 }

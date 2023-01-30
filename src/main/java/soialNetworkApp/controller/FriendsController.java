@@ -140,7 +140,7 @@ public class FriendsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public void userBlocksUser(@PathVariable(name = "id") Long blockUserId) throws PersonException {
+    public void userBlocksUser(@PathVariable(name = "id") Long blockUserId) throws Exception {
         friendsService.userBlocksUser(blockUserId);
     }
 
