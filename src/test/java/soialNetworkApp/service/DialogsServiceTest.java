@@ -119,8 +119,6 @@ class DialogsServiceTest {
         when(messagesRepository.findAllByDialogIdAndRecipientAndReadStatusAndIsDeletedFalse(any(), any(), any()))
                 .thenReturn(messages.stream().filter(m -> m.getRecipient().equals(person1) && m.getReadStatus().equals(ReadStatusTypes.SENT)).collect(Collectors.toList()));
         assertEquals(5, dialogsService.setReadMessages(1L).getData().getCount());
-//        verify(messagesKafkaProducer, times(5)).sendMessage(any(Message.class));
-
     }
 
     @Test
