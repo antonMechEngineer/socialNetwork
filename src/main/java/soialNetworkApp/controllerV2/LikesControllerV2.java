@@ -70,7 +70,7 @@ public class LikesControllerV2 {
     })
     public CommonRs<LikeRs> deleteLike(
             @RequestParam(name = "item_id") long itemId,
-            @RequestParam String type) throws Exception {
+            @RequestParam String type) throws NoSuchEntityException {
 
         return likesService.deleteLike(itemId, type);
     }
