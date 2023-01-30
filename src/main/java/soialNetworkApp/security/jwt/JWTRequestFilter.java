@@ -13,6 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 @Component
 @RequiredArgsConstructor
@@ -34,7 +35,7 @@ public class JWTRequestFilter extends OncePerRequestFilter {
                 }
             }
             filterChain.doFilter(request, response);
-        } catch (ExpiredJwtException e) {
+        } catch (ExpiredJwtException | NoSuchElementException e) {
             SecurityContextHolder.clearContext();
             response.setStatus(401);
         }

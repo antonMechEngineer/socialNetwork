@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -58,7 +59,7 @@ public class UsersService {
         long personId = person.getId();
         StorageDataRs dataRs = new StorageDataRs();
 
-        String originFileName = photo.getOriginalFilename();
+        String originFileName = Objects.requireNonNull(photo.getOriginalFilename());
         String extension = originFileName.substring(originFileName.lastIndexOf(".") + 1);
         String newFileName = "image" + personId + "." + extension;
         String newFileNameShort = "image" + personId;

@@ -39,7 +39,7 @@ spring:
     type: redis
     cache-names: cache-person
     redis:
-      cache-null-values: false
+      cache-null-values: true
       time-to-live: 3000000
   kafka:
     bootstrap-servers: 194.87.244.66:9092

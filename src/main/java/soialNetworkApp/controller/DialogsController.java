@@ -25,20 +25,20 @@ public class DialogsController {
 
     private final DialogsService dialogsService;
 
-    @DeleteMapping("/{dialogId}/delete")
-    public CommonRs<ComplexRs> dialogDelete(@PathVariable Long dialogId) {
-        return dialogsService.deleteDialog(dialogId);
-    }
+//    @DeleteMapping("/{dialogId}/delete")
+//    public CommonRs<ComplexRs> dialogDelete(@PathVariable Long dialogId) {
+//        return dialogsService.deleteDialog(dialogId);
+//    }
+//
+//    @DeleteMapping("/{dialogId}/messages/{messageId}/delete")
+//    public CommonRs<ComplexRs> messageDelete(@PathVariable Long dialogId, @PathVariable Long messageId) {
+//        return dialogsService.deleteMessage(dialogId, messageId);
+//    }
 
-    @DeleteMapping("/{dialogId}/messages/{messageId}/delete")
-    public CommonRs<ComplexRs> messageDelete(@PathVariable Long dialogId, @PathVariable Long messageId) {
-        return dialogsService.deleteMessage(dialogId, messageId);
-    }
-
-    @PutMapping("/messages/{messageId}/edit")
-    public CommonRs<MessageRs> messageEdit(@PathVariable Long messageId, @RequestBody MessageRq messageRq) {
-        return dialogsService.editMessage(messageId, messageRq);
-    }
+//    @PutMapping("/messages/{messageId}/edit")
+//    public CommonRs<MessageRs> messageEdit(@PathVariable Long messageId, @RequestBody MessageRq messageRq) {
+//        return dialogsService.editMessage(messageId, messageRq);
+//    }
 
     @GetMapping
     @ApiOperation(value = "recover comment by id")
