@@ -35,20 +35,21 @@ public class LikesService {
     @Value("${socialNetwork.timezone}")
     private String timezone;
 
-    public CommonRs<LikeRs> putLike(LikeRq likeRq) throws Exception {
+    public CommonRs<LikeRs> putLike(LikeRq likeRq) throws NoSuchEntityException {
         Person person = personCacheService.getPersonByContext();
         Liked liked = getLikedEntity(likeRq.getItemId(), likeRq.getType());
-        if (getLikeFromCurrentPerson(person, liked) == null) {
-            Like like = new Like();
-            like.setEntity(liked);
-            like.setAuthor(person);
-            like.setTime(LocalDateTime.now(ZoneId.of(timezone)));
-            likesRepository.save(like);
-            if (like.getEntity().getAuthor().getPersonSettings() != null &&
-                    like.getEntity().getAuthor().getPersonSettings().getLikeNotification()) {
-                notificationsKafkaProducer.sendMessage(like, liked.getAuthor());
-                notificationsService.sendNotificationToTelegramBot(like, liked.getAuthor());
-            }
+        if (getLikeFromCurrentPerson(person, liked) != null) {
+            throw new NoSuchEntityException("Like is already exists");
+        }
+        Like like = new Like();
+        like.setEntity(liked);
+        like.setAuthor(person);
+        like.setTime(LocalDateTime.now(ZoneId.of(timezone)));
+        likesRepository.save(like);
+        if (like.getEntity().getAuthor().getPersonSettings() != null &&
+                like.getEntity().getAuthor().getPersonSettings().getLikeNotification()) {
+            notificationsKafkaProducer.sendMessage(like, liked.getAuthor());
+            notificationsService.sendNotificationToTelegramBot(like, liked.getAuthor());
         }
         return getLikesResponse(liked);
     }
@@ -67,7 +68,7 @@ public class LikesService {
         return getLikesResponse(getLikedEntity(entityId, type));
     }
 
-    public CommonRs<LikeRs> deleteLike(long entityId, String type) throws Exception {
+    public CommonRs<LikeRs> deleteLike(long entityId, String type) throws NoSuchEntityException {
         Person person = personCacheService.getPersonByContext();
         Liked liked = getLikedEntity(entityId, type);
         Like like = getLikeFromCurrentPerson(person, liked);
@@ -78,9 +79,8 @@ public class LikesService {
         return getLikesResponse(liked);
     }
 
-    private Like getLikeFromCurrentPerson(Person person, Liked liked) throws Exception {
-        return likesRepository.findLikeByPersonAndEntity(liked.getType(), liked, person)
-                .orElseThrow(new NoSuchEntityException("Like by current person not found!"));
+    private Like getLikeFromCurrentPerson(Person person, Liked liked) {
+        return likesRepository.findLikeByPersonAndEntity(liked.getType(), liked, person).orElse(null);
     }
 
     private Liked getLikedEntity(long entityId, String type) throws NoSuchEntityException {

@@ -53,7 +53,7 @@ public class LikesController {
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public CommonRs<LikeRs> putLike(
-            @RequestBody LikeRq likeRq) throws Exception {
+            @RequestBody LikeRq likeRq) throws NoSuchEntityException {
 
         return likesService.putLike(likeRq);
     }
@@ -70,7 +70,7 @@ public class LikesController {
     })
     public CommonRs<LikeRs> deleteLike(
             @RequestParam(name = "item_id") long itemId,
-            @RequestParam String type) throws Exception {
+            @RequestParam String type) throws NoSuchEntityException {
 
         return likesService.deleteLike(itemId, type);
     }
