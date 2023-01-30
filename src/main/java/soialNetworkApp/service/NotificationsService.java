@@ -142,7 +142,7 @@ public class NotificationsService {
     }
 
     public void handleMessageForNotification(Long messageId) {
-        Message message = messagesRepository.findById(messageId).get();
+        Message message = messagesRepository.findById(messageId).orElseThrow();
         if (message.getRecipient().getPersonSettings().getMessageNotification() &&
                 LocalDateTime.now(ZoneId.of(timezone)).minus(1, ChronoUnit.MINUTES)
                         .isAfter(message.getRecipient().getLastOnlineTime())) {

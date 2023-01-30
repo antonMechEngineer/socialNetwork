@@ -13,6 +13,7 @@ import soialNetworkApp.aop.annotations.UpdateOnlineTime;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.ErrorRs;
 import soialNetworkApp.api.response.LikeRs;
+import soialNetworkApp.errors.NoSuchEntityException;
 import soialNetworkApp.service.LikesService;
 
 @RestController
@@ -35,7 +36,7 @@ public class LikesControllerV2 {
     })
     public CommonRs<LikeRs> getLikesList(
             @RequestParam(name = "item_id") long itemId,
-            @RequestParam String type) {
+            @RequestParam String type) throws NoSuchEntityException {
 
         return likesService.getLikesResponse(itemId, type);
     }
@@ -69,7 +70,7 @@ public class LikesControllerV2 {
     })
     public CommonRs<LikeRs> deleteLike(
             @RequestParam(name = "item_id") long itemId,
-            @RequestParam String type) {
+            @RequestParam String type) throws Exception {
 
         return likesService.deleteLike(itemId, type);
     }
