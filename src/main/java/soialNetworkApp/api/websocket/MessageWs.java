@@ -1,4 +1,4 @@
-package soialNetworkApp.api.request;
+package soialNetworkApp.api.websocket;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -10,16 +10,18 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MessageWsRq {
+public class MessageWs {
+    private Long id;
     @JsonProperty("dialog_id")
     private Long dialogId;
-    @JsonProperty("message_text")
-    private String messageText;
     @JsonProperty("author_id")
     private Long authorId;
-    private Long time;
+    @JsonProperty("recipient_id")
+    private Long recipientId;
+    @JsonProperty("message_text")
+    private String messageText;
     @JsonProperty("read_status")
     private String readStatus;
+    private Long time;
     private String token;
-    private Boolean typing;
 }

@@ -57,6 +57,6 @@ public class Like implements Notificationed {
 
     @Override
     public String getSimpleInfo() {
-        return type.equals(LikeTypes.POST) ? "post" : "comment";
+        return (entity.getType().equals(LikeTypes.POST) ? "post \"" : "comment by post \"") + entity.getParentName() + "\"";
     }
 }

@@ -6,6 +6,9 @@ spring:
     url: jdbc:postgresql://localhost:5432/social
     username: postgres
     password: 123
+  kafka:
+    consumer:
+      group-id: dimGroup
 
 auth:
   pass-restore: http://localhost:8080/change-password?token=

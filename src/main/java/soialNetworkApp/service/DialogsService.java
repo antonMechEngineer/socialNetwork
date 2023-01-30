@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import soialNetworkApp.api.request.DialogUserShortListDto;
 import soialNetworkApp.api.request.MessageRq;
-import soialNetworkApp.kafka.MessagesKafkaProducer;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.ComplexRs;
 import soialNetworkApp.api.response.DialogRs;
@@ -37,9 +36,9 @@ public class DialogsService {
     private final PersonsRepository personsRepository;
     private final DialogMapper dialogMapper;
     private final DialogMapService dialogMapService;
+    private final NotificationsService notificationsService;
     private final CurrentUserExtractor currentUserExtractor;
     private final PersonMapper personMapper;
-    private final MessagesKafkaProducer messagesKafkaProducer;
 
     public CommonRs<ComplexRs> deleteDialog(Long dialogId) {
         return null;
@@ -55,6 +54,7 @@ public class DialogsService {
             dialog.setLastMessage(null);
             dialogsRepository.save(dialog);
         }
+        notificationsService.deleteNotification(message);
         messagesRepository.delete(message);
         if (dialog.getLastMessage() == null) {
             dialog.setLastMessage(getLastMessage(dialogId));
@@ -85,7 +85,7 @@ public class DialogsService {
         messagesRepository.findAllByDialogIdAndRecipientAndReadStatusAndIsDeletedFalse(dialogId, currentUserExtractor.getPerson(), ReadStatusTypes.SENT)
                 .forEach(m -> {
                     m.setReadStatus(ReadStatusTypes.READ);
-                    messagesKafkaProducer.sendMessage(m);
+                    messagesRepository.save(m);
                     readCount[0]++;
                 });
         return new CommonRs<>(new ComplexRs(readCount[0]));
@@ -134,7 +134,7 @@ public class DialogsService {
             return dialogMapper.toMessageRs(message, dialogMapService.getRecipientForLastMessage(message));
         } catch (Exception e) {
             Person currentPerson = currentUserExtractor.getPerson();
-            Person anotherPerson = dialogMapService.getRecipientFromDialog(currentPerson.getId(), dialog.getId());
+            Person anotherPerson = getRecipientFromDialog(currentPerson.getId(), dialog.getId());
             return MessageRs.builder()
                     .authorId(currentPerson.getId())
                     .recipientId(anotherPerson.getId())
@@ -143,10 +143,17 @@ public class DialogsService {
         }
     }
 
+        public Person getRecipientFromDialog(Long authorId, Long dialogId) {
+        Dialog dialog = dialogsRepository.findById(dialogId).orElseThrow();
+        return !authorId.equals(dialog.getFirstPerson().getId()) ?
+                dialog.getFirstPerson() :
+                dialog.getSecondPerson();
+    }
+
     private Message getLastMessage(Long dialogId) {
         return messagesRepository.findAllByDialogIdAndIsDeletedFalse(dialogId)
                 .stream()
-                .max(Comparator.comparing(Message::getTime)).orElseThrow();
+                .max(Comparator.comparing(Message::getTime)).orElse(null);
     }
 
     private List<DialogRs> blockDialogs(List<DialogRs> dialogs) {
