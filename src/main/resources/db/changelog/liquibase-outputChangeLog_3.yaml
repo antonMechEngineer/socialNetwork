@@ -51,8 +51,6 @@ databaseChangeLog:
     - addColumn:
         tableName: persons
         column:
-            constraints:
-                nullable: false
             name: person_settings_id
             type: BIGINT
 - changeSet:
