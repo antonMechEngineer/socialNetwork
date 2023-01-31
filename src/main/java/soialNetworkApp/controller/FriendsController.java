@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import soialNetworkApp.aop.annotations.UpdateOnlineTime;
 import soialNetworkApp.api.response.*;
 import soialNetworkApp.errors.PersonException;
-import soialNetworkApp.service.FriendsRecommendationService;
 import soialNetworkApp.service.FriendsService;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +24,6 @@ import java.util.List;
 public class FriendsController {
 
     private final FriendsService friendsService;
-    private final FriendsRecommendationService friendsRecommendationService;
 
     @UpdateOnlineTime
     @GetMapping("/recommendations")
@@ -38,7 +36,7 @@ public class FriendsController {
             @ApiResponse(responseCode = "403", description = "forbidden")
     })
     public CommonRs<List<PersonRs>> getRecommendedFriends() {
-        return friendsRecommendationService.getFriendsRecommendation();
+        return friendsService.getFriendsRecommendation();
     }
 
     @UpdateOnlineTime

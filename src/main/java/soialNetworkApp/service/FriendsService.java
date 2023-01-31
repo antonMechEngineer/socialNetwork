@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.ComplexRs;
@@ -79,7 +78,7 @@ public class FriendsService {
     }
 
     public CommonRs<List<PersonRs>> getFriends(Integer offset, Integer size) {
-        Person srcPerson =personCacheService.getPersonByContext();
+        Person srcPerson = personCacheService.getPersonByContext();
         Page<Person> requestedPersons = getPersons(srcPerson, offset, size, FriendshipStatusTypes.FRIEND);
         return buildCommonResponse(requestedPersons, srcPerson, offset);
     }
@@ -180,12 +179,7 @@ public class FriendsService {
         return personResponse;
     }
 
-    private Person getSrcPerson() throws Exception {
-        String srcEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        return personsRepository.findPersonByEmail(srcEmail)
-                .orElseThrow(new PersonNotFoundException(srcEmail));
-    }
-
+    
     private Person getDstPerson(Long id) throws Exception {
         return personsRepository.findPersonById(id).orElseThrow(new PersonNotFoundException(id));
     }
@@ -206,5 +200,35 @@ public class FriendsService {
             srcFriendship.setSentTime(LocalDateTime.now());
             friendshipsRepository.save(srcFriendship);
         }
+    }
+    
+    public CommonRs<List<PersonRs>> getFriendsRecommendation() {
+        Person srcPerson = personCacheService.getPersonByContext();
+        Pageable page = PageRequest.of(0, 8);
+        List<Long> excludedPersonsId = getExcludedPersonsId(srcPerson);
+        Page<Person> persons = personsRepository.getPersonByCityAndIdNotIn(page, srcPerson.getCity(), excludedPersonsId);
+        if (srcPerson.getCity() == null || persons.getTotalElements() == 0) {
+            persons = personsRepository.getPersonByIdNotInOrderByRegDateDesc(page, excludedPersonsId);
+        }
+        return buildCommonResponse(persons, 0, 8);
+    }
+
+    private CommonRs<List<PersonRs>> buildCommonResponse(Page<Person> persons, int offset, int perPage) {
+        return CommonRs.<List<PersonRs>>builder()
+                .timestamp(System.currentTimeMillis())
+                .total(persons.getTotalElements())
+                .offset(offset)
+                .perPage(perPage)
+                .data(persons.getContent().stream().map(personMapper::toPersonResponse).collect(Collectors.toList()))
+                .build();
+    }
+
+    private List<Long> getExcludedPersonsId(Person srcPerson) {
+        List<Long> excludedPersonsId = new ArrayList<>();
+        excludedPersonsId.add(srcPerson.getId());
+        List<Friendship> friendships = friendshipsRepository.findFriendshipsByDstPerson(srcPerson);
+        List<Long> familiarPersonsId = friendships.stream().map(friendship -> friendship.getSrcPerson().getId()).collect(Collectors.toList());
+        excludedPersonsId.addAll(familiarPersonsId);
+        return excludedPersonsId;
     }
 }
