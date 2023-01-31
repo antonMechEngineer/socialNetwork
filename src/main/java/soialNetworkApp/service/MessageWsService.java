@@ -12,8 +12,6 @@ import soialNetworkApp.model.entities.Dialog;
 import soialNetworkApp.model.entities.Message;
 import soialNetworkApp.repository.DialogsRepository;
 import soialNetworkApp.repository.MessagesRepository;
-import soialNetworkApp.repository.PersonsRepository;
-import soialNetworkApp.security.jwt.JWTUtil;
 
 import java.util.Comparator;
 
@@ -28,10 +26,11 @@ public class MessageWsService {
     private final MessagesRepository messagesRepository;
     private final DialogsRepository dialogsRepository;
 
-    public void getMessageFromWs(MessageWs messageWs) {
+    public void postMessage(MessageWs messageWs) {
         Long id = messageWs.getDialogId() + messageWs.getAuthorId() + System.currentTimeMillis();
+        Long recipientId = dialogsService.getRecipientFromDialog(messageWs.getAuthorId(), messageWs.getDialogId()).getId();
         messageWs.setId(id);
-        messageWs.setRecipientId(dialogsService.getRecipientFromDialog(messageWs.getAuthorId(), messageWs.getDialogId()).getId());
+        messageWs.setRecipientId(recipientId);
         messagingTemplate.convertAndSendToUser(messageWs.getDialogId().toString(), "/queue/messages", messageWs);
         messagesKafkaProducer.sendMessage(messageWs);
     }
@@ -83,7 +82,7 @@ public class MessageWsService {
     }
 
     private Message getLastMessage(Long dialogId) {
-        return messagesRepository.findAllByDialogIdAndIsDeletedFalse(dialogId)
+        return messagesRepository.findAllByDialogIdAndIsDeletedFalseOrderByTimeAsc(dialogId)
                 .stream()
                 .max(Comparator.comparing(Message::getTime)).orElse(null);
     }

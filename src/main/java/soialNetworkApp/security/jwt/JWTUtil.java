@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import soialNetworkApp.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class JWTUtil {
@@ -53,5 +55,12 @@ public class JWTUtil {
     public Authentication getAuth(String token) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(extractUserName(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }
+
+    public void refreshToken(String token) {
+        if (getTokenBody(token).getExpiration().getTime() - new Date().getTime() < 10000) {
+            getTokenBody(token).setExpiration(new Date(System.currentTimeMillis() + timeToLive));
+            log.info("!!!!!!!!!!!!!!!!!token refreshed! expired in " + getTokenBody(token).getExpiration());
+        }
     }
 }

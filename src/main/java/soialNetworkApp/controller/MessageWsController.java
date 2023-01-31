@@ -18,7 +18,7 @@ public class MessageWsController {
 
     @MessageMapping("/dialogs/send_message")
     public void sendMessage(@Payload MessageWs messageWs) {
-        messageWsService.getMessageFromWs(messageWs);
+        messageWsService.postMessage(messageWs);
     }
 
     @MessageMapping("/dialogs/start_typing")

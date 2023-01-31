@@ -1,4 +1,4 @@
-package soialNetworkApp.config;
+package soialNetworkApp.security.jwt.config;
 
 import com.fasterxml.classmate.TypeResolver;
 import soialNetworkApp.api.response.CommonRs;

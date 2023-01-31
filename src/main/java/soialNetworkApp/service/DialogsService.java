@@ -1,6 +1,8 @@
 package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import soialNetworkApp.api.request.DialogUserShortListDto;
 import soialNetworkApp.api.request.MessageRq;
@@ -21,6 +23,7 @@ import soialNetworkApp.repository.FriendshipsRepository;
 import soialNetworkApp.repository.MessagesRepository;
 import soialNetworkApp.repository.PersonsRepository;
 import soialNetworkApp.service.util.CurrentUserExtractor;
+import soialNetworkApp.service.util.NetworkPageRequest;
 
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -110,10 +113,20 @@ public class DialogsService {
         return new CommonRs<>(dialogRsList, (long) dialogRsList.size());
     }
 
-    public CommonRs<List<MessageRs>> getMessages(Long dialogId) {
+    public CommonRs<List<MessageRs>> getMessages(Long dialogId, long from, int offset, int size) {
         List<MessageRs> messagesRs = new ArrayList<>();
-        messagesRepository.findAllByDialogIdAndIsDeletedFalse(dialogId)
-                .forEach(m -> messagesRs.add(dialogMapper.toMessageRs(m, dialogMapService.getRecipientForLastMessage(m))));
+        List<Message> messages = messagesRepository.findAllByDialogIdAndIsDeletedFalseOrderByTimeAsc(dialogId);
+        Message message;
+        int start = 0;
+        if (from != 0) {
+            message = messagesRepository.findById(from).orElseThrow();
+            start = messages.indexOf(message) + offset;
+        }
+        messages
+                .subList(start, start + size)
+                .forEach(m -> {
+                    messagesRs.add(dialogMapper.toMessageRs(m, dialogMapService.getRecipientForLastMessage(m)));
+                });
         return new CommonRs<>(messagesRs.stream()
                 .sorted(Comparator.comparing(MessageRs::getTime))
                 .collect(Collectors.toList()), (long) messagesRs.size());
@@ -150,7 +163,7 @@ public class DialogsService {
     }
 
     private Message getLastMessage(Long dialogId) {
-        return messagesRepository.findAllByDialogIdAndIsDeletedFalse(dialogId)
+        return messagesRepository.findAllByDialogIdAndIsDeletedFalseOrderByTimeAsc(dialogId)
                 .stream()
                 .max(Comparator.comparing(Message::getTime)).orElse(null);
     }
