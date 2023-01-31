@@ -111,8 +111,8 @@ public class Person implements Notificationed, Serializable {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToOne
+    @JoinColumn(name = "person_settings_id", referencedColumnName = "id", nullable = false)
     private PersonSettings personSettings;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)

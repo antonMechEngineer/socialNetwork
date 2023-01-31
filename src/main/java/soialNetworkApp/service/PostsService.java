@@ -168,8 +168,7 @@ public class PostsService {
         friendshipsRepository.findFriendshipsByDstPerson(person).forEach(friendship -> {
             if (friendship.getFriendshipStatus().equals(FriendshipStatusTypes.FRIEND) ||
                     friendship.getFriendshipStatus().equals(FriendshipStatusTypes.SUBSCRIBED)) {
-                if (friendship.getSrcPerson().getPersonSettings() != null &&
-                        friendship.getSrcPerson().getPersonSettings().getPostNotification())
+                if (friendship.getSrcPerson().getPersonSettings().getPostNotification())
                 notificationsKafkaProducer.sendMessage(post, friendship.getSrcPerson());
                 notificationsService.sendNotificationToTelegramBot(post, friendship.getSrcPerson());
             }
