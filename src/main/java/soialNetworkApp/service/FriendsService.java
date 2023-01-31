@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.ComplexRs;
 import soialNetworkApp.api.response.PersonRs;
+import soialNetworkApp.errors.FriendshipNotFoundException;
 import soialNetworkApp.errors.PersonException;
 import soialNetworkApp.errors.PersonNotFoundException;
 import soialNetworkApp.kafka.NotificationsKafkaProducer;
