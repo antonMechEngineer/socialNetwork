@@ -53,7 +53,8 @@ public class DialogsService {
             dialog.setLastMessage(null);
             dialogsRepository.save(dialog);
         }
-        messagesRepository.delete(message);
+        message.setIsDeleted(true);
+        messagesRepository.save(message);
         if (dialog.getLastMessage() == null) {
             dialog.setLastMessage(getLastMessage(dialogId));
             dialogsRepository.save(dialog);

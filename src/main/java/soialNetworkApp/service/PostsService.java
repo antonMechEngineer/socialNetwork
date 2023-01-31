@@ -62,9 +62,7 @@ public class PostsService {
         LocalDateTime postPublishingTime = timestamp == null ? LocalDateTime.now(ZoneId.of(timezone)) : new Timestamp(timestamp).toLocalDateTime();
         Post post = postMapper.postRequestToNewPost(postRq, person, postPublishingTime);
         PostRs postRs = postMapper.postToResponse(postsRepository.save(updateTagsInPost(new ArrayList<>(post.getTags()), post)));
-        if (person.getPersonSettings() != null && person.getPersonSettings().getPostNotification()) {
-            createNotifications(post, person);
-        }
+        createNotifications(post, person);
         return buildCommonResponse(postRs);
     }
 
@@ -139,7 +137,6 @@ public class PostsService {
 
     private boolean validatePerson(Person person) {
         return person != null && person.equals(personCacheService.getPersonByContext());
-//        return person != null && person.equals(currentUserExtractor.getPerson());
     }
 
     public CommonRs<List<PostRs>> findPosts(FindPostRq postRq, int offset, int perPage) throws EmptyFieldException {
@@ -171,16 +168,11 @@ public class PostsService {
         friendshipsRepository.findFriendshipsByDstPerson(person).forEach(friendship -> {
             if (friendship.getFriendshipStatus().equals(FriendshipStatusTypes.FRIEND) ||
                     friendship.getFriendshipStatus().equals(FriendshipStatusTypes.SUBSCRIBED)) {
-//                notificationsService.createNotification(post, friendship.getSrcPerson());
+                if (friendship.getSrcPerson().getPersonSettings().getPostNotification())
                 notificationsKafkaProducer.sendMessage(post, friendship.getSrcPerson());
                 notificationsService.sendNotificationToTelegramBot(post, friendship.getSrcPerson());
             }
         });
-//        friendshipsRepository.findFriendshipBySrcPerson(person).forEach(friendship -> {
-//            if (friendship.getFriendshipStatus().getCode().equals(FriendshipStatusTypes.FRIEND)) {
-//                notificationsService.createNotification(post, friendship.getDstPerson());
-//            }
-//        });
     }
 
     private Page<Post> blockPosts(Pageable pageable) {

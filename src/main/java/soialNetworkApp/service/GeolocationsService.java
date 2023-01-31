@@ -15,6 +15,7 @@ import soialNetworkApp.repository.CountriesRepository;
 import soialNetworkApp.repository.PersonsRepository;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -64,8 +65,8 @@ public class GeolocationsService {
 
     private List<Country> getCountriesFromApi() {
         List<Country> response = new ArrayList<>();
-        try {
-            String jsonData = new String(new URL(countriesPath + token).openStream().readAllBytes());
+        try (InputStream stream = new URL(countriesPath + token).openStream()) {
+            String jsonData = new String(stream.readAllBytes());
             Set<String> jsonSet = new JSONObject(jsonData).keySet();
             jsonSet.forEach(key -> {
                 if (key.matches("\\D+")){
@@ -110,8 +111,8 @@ public class GeolocationsService {
         Country country = countriesRepository.findCountryByName(countryName)
                 .orElseThrow(new NoSuchEntityException("Country with " + countryName + " name was not found"));
         List<GeolocationRs> response = new ArrayList<>();
-        try {
-            String jsonData = new String(new URL(citiesPath1 + startsWith + citiesPath2 + token).openStream().readAllBytes());
+        try (InputStream stream = new URL(citiesPath1 + startsWith + citiesPath2 + token).openStream()) {
+            String jsonData = new String(stream.readAllBytes());
             Set<String> jsonSet = new JSONObject(jsonData).keySet();
             jsonSet.forEach(key -> {
                 if (key.matches("\\D+")){

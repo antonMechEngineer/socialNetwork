@@ -58,6 +58,11 @@ public class Post implements Liked, Notificationed {
     }
 
     @Override
+    public String getParentName() {
+        return title;
+    }
+
+    @Override
     public NotificationTypes getNotificationType() {
         return NotificationTypes.POST;
     }

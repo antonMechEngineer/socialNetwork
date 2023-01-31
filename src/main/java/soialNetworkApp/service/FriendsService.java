@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.ComplexRs;
 import soialNetworkApp.api.response.PersonRs;
-import soialNetworkApp.errors.FriendshipNotFoundException;
+import soialNetworkApp.errors.PersonException;
 import soialNetworkApp.errors.PersonNotFoundException;
 import soialNetworkApp.kafka.NotificationsKafkaProducer;
 import soialNetworkApp.mappers.PersonMapper;
@@ -122,7 +122,7 @@ public class FriendsService {
         Friendship dstFriendship = new Friendship(LocalDateTime.now(), dstPerson, srcPerson, RECEIVED_REQUEST);
         friendshipsRepository.save(srcFriendship);
         friendshipsRepository.save(dstFriendship);
-        if (dstPerson.getPersonSettings() != null && dstPerson.getPersonSettings().getFriendRequestNotification()) {
+        if (dstPerson.getPersonSettings().getFriendRequestNotification()) {
             notificationsKafkaProducer.sendMessage(dstFriendship, dstPerson);
             notificationsService.sendNotificationToTelegramBot(dstFriendship, dstPerson);
         }
@@ -179,7 +179,7 @@ public class FriendsService {
         return personResponse;
     }
 
-    
+
     private Person getDstPerson(Long id) throws Exception {
         return personsRepository.findPersonById(id).orElseThrow(new PersonNotFoundException(id));
     }
@@ -201,7 +201,7 @@ public class FriendsService {
             friendshipsRepository.save(srcFriendship);
         }
     }
-    
+
     public CommonRs<List<PersonRs>> getFriendsRecommendation() {
         Person srcPerson = personCacheService.getPersonByContext();
         Pageable page = PageRequest.of(0, 8);

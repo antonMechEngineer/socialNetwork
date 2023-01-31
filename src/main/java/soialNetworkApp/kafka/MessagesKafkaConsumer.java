@@ -10,6 +10,7 @@ import soialNetworkApp.model.entities.Dialog;
 import soialNetworkApp.model.entities.Message;
 import soialNetworkApp.repository.DialogsRepository;
 import soialNetworkApp.repository.MessagesRepository;
+import soialNetworkApp.service.NotificationsService;
 
 @Slf4j
 @Service
@@ -19,7 +20,7 @@ public class MessagesKafkaConsumer {
     private final MessagesRepository messagesRepository;
     private final DialogsRepository dialogsRepository;
     private final DialogMapper dialogMapper;
-
+    private final NotificationsService notificationsService;
 
     @KafkaListener(topics = "messages", autoStartup = "${listen.auto.start:true}")
     public void consume(MessageKafka messageKafka) {
@@ -29,5 +30,6 @@ public class MessagesKafkaConsumer {
         Dialog dialog = dialogsRepository.findById(messageKafka.getDialogId()).orElseThrow();
         dialog.setLastMessage(message);
         dialogsRepository.save(dialog);
+        notificationsService.handleMessageForNotification(message.getId());
     }
 }

@@ -19,11 +19,13 @@ import soialNetworkApp.errors.NoSuchEntityException;
 import soialNetworkApp.errors.PersonNotFoundException;
 import soialNetworkApp.kafka.NotificationsKafkaProducer;
 import soialNetworkApp.mappers.NotificationMapper;
+import soialNetworkApp.model.entities.Message;
 import soialNetworkApp.model.entities.Notification;
 import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.model.entities.interfaces.Notificationed;
 import soialNetworkApp.model.enums.FriendshipStatusTypes;
 import soialNetworkApp.repository.FriendshipsRepository;
+import soialNetworkApp.repository.MessagesRepository;
 import soialNetworkApp.repository.NotificationsRepository;
 import soialNetworkApp.repository.PersonsRepository;
 import soialNetworkApp.service.util.NetworkPageRequest;
@@ -31,6 +33,7 @@ import soialNetworkApp.service.util.NetworkPageRequest;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,6 +47,7 @@ public class NotificationsService {
     private final NotificationMapper notificationMapper;
     private final SimpMessagingTemplate template;
     private final NotificationsKafkaProducer notificationsKafkaProducer;
+    private final MessagesRepository messagesRepository;
 
     @Value("${socialNetwork.default.page}")
     private int offset;
@@ -90,8 +94,6 @@ public class NotificationsService {
     }
 
     public void sendNotificationsToWs(Person person)  {
-//        notificationsKafkaProducer.sendMessage(entity, person);
-
         template.convertAndSend(String.format("/user/%s/queue/notifications", person.getId()),
                 getAllNotificationsByPerson(offset, size, person));
     }
@@ -106,9 +108,7 @@ public class NotificationsService {
         List<Person> personList = personsRepository.findPeopleByBirthDate(currentDate.getMonthValue(), currentDate.getDayOfMonth());
         personList.forEach(person -> friendshipsRepository.findFriendshipsByDstPerson(person).forEach(friendship -> {
             if (friendship.getFriendshipStatus().equals(FriendshipStatusTypes.FRIEND) &&
-                    friendship.getSrcPerson().getPersonSettings() != null &&
                     friendship.getSrcPerson().getPersonSettings().getFriendBirthdayNotification()) {
-//                createNotification(person, friendship.getSrcPerson());
                 notificationsKafkaProducer.sendMessage(person, friendship.getSrcPerson());
                 sendNotificationToTelegramBot(person, friendship.getSrcPerson());
             }
@@ -121,7 +121,6 @@ public class NotificationsService {
     }
 
     public void sendNotificationToTelegramBot(Notificationed notificationed, Person person) {
-//        Person person = personsRepository.findPersonById(personId).orElse(new Person());
         if (person.getTelegramId() != null) {
             HttpClient httpClient = HttpClientBuilder.create().build();
             try {
@@ -138,6 +137,16 @@ public class NotificationsService {
                 httpClient.execute(request);
             } catch (IOException ignore) {
             }
+        }
+    }
+
+    public void handleMessageForNotification(Long messageId) {
+        Message message = messagesRepository.findById(messageId).orElseThrow();
+        if (message.getRecipient().getPersonSettings().getMessageNotification() &&
+                LocalDateTime.now(ZoneId.of(timezone)).minus(1, ChronoUnit.MINUTES)
+                        .isAfter(message.getRecipient().getLastOnlineTime())) {
+            notificationsKafkaProducer.sendMessage(message, message.getRecipient());
+            sendNotificationToTelegramBot(message, message.getRecipient());
         }
     }
 }
