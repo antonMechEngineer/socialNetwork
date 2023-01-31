@@ -43,13 +43,11 @@ public class CommentsService {
         Comment parentComment = getCommentById(commentRq.getParentId());
         post = parentComment == null ? post : null;
         Comment comment = commentRepository.save(commentMapper.commentRequestToNewComment(commentRq, post, person, parentComment));
-        if (post != null && post.getAuthor().getPersonSettings() != null &&
-                post.getAuthor().getPersonSettings().getPostCommentNotification()) {
+        if (post != null && post.getAuthor().getPersonSettings().getPostCommentNotification()) {
             notificationsKafkaProducer.sendMessage(comment, post.getAuthor());
             notificationsService.sendNotificationToTelegramBot(comment, post.getAuthor());
         }
-        if (post == null && parentComment.getAuthor().getPersonSettings() != null &&
-                parentComment.getAuthor().getPersonSettings().getCommentCommentNotification()) {
+        if (post == null && parentComment.getAuthor().getPersonSettings().getCommentCommentNotification()) {
             notificationsKafkaProducer.sendMessage(comment, parentComment.getAuthor());
             notificationsService.sendNotificationToTelegramBot(comment, parentComment.getAuthor());
         }

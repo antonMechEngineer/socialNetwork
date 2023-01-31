@@ -44,3 +44,23 @@ databaseChangeLog:
             name: last_name
         indexName: last_name_index
         tableName: persons
+- changeSet:
+    id: sprint-5-6
+    author: YurK
+    changes:
+    - addColumn:
+        tableName: persons
+        column:
+            constraints:
+                nullable: false
+            name: person_settings_id
+            type: BIGINT
+- changeSet:
+    id: sprint-5-7
+    author: YurK
+    changes:
+    - dropColumn:
+        columns:
+        - column:
+            name: person_id
+        tableName: person_settings

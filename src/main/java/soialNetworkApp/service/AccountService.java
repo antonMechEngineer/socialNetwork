@@ -78,7 +78,7 @@ public class AccountService {
         person.setIsDeleted(false);
         person.setEmail(regRequest.getEmail());
         person.setMessagePermission(MessagePermissionTypes.ALL);
-        person.setPersonSettings(createDefaultNotificationsSettings(person));
+        person.setPersonSettings(createDefaultNotificationsSettings());
         personCacheService.cachePerson(person);
 //        personsRepository.save(person);
         return registerRs;
@@ -180,9 +180,8 @@ public class AccountService {
         return response;
     }
 
-    private PersonSettings createDefaultNotificationsSettings(Person person) {
+    private PersonSettings createDefaultNotificationsSettings() {
         PersonSettings settings = new PersonSettings();
-        settings.setPerson(person);
         settings.setPostNotification(true);
         settings.setPostCommentNotification(true);
         settings.setCommentCommentNotification(true);
@@ -190,7 +189,7 @@ public class AccountService {
         settings.setFriendBirthdayNotification(true);
         settings.setFriendRequestNotification(true);
         settings.setMessageNotification(true);
-        return settings;
+        return personSettingsRepository.save(settings);
     }
 
     public CommonRs<ComplexRs> setPersonSetting(PersonSettingsRq request) throws PersonNotFoundException, IncorrectRequestTypeException {
@@ -244,10 +243,6 @@ public class AccountService {
             throw new PersonNotFoundException("Person not found");
         }
         PersonSettings personSettings = person.getPersonSettings();
-        if (personSettings == null) {
-            person.setPersonSettings(createDefaultNotificationsSettings(person));
-            personSettings = personCacheService.cachePerson(person).getPersonSettings();
-        }
         PersonSettingsRs postValue = PersonSettingsRs.builder()
                 .type(String.valueOf(NotificationTypes.POST)).enable(personSettings.getPostNotification()).build();
         PersonSettingsRs postCommentValue = PersonSettingsRs.builder()

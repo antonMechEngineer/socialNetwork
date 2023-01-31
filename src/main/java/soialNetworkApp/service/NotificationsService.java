@@ -108,7 +108,6 @@ public class NotificationsService {
         List<Person> personList = personsRepository.findPeopleByBirthDate(currentDate.getMonthValue(), currentDate.getDayOfMonth());
         personList.forEach(person -> friendshipsRepository.findFriendshipsByDstPerson(person).forEach(friendship -> {
             if (friendship.getFriendshipStatus().equals(FriendshipStatusTypes.FRIEND) &&
-                    friendship.getSrcPerson().getPersonSettings() != null &&
                     friendship.getSrcPerson().getPersonSettings().getFriendBirthdayNotification()) {
                 notificationsKafkaProducer.sendMessage(person, friendship.getSrcPerson());
                 sendNotificationToTelegramBot(person, friendship.getSrcPerson());
