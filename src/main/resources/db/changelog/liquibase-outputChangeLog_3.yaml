@@ -63,7 +63,7 @@ databaseChangeLog:
             name: person_id
         tableName: person_settings
 - changeSet:
-    id: sprint-5-7
+    id: sprint-5-8
     author: YurK
     changes:
     - addNotNullConstraint:
