@@ -62,3 +62,12 @@ databaseChangeLog:
         - column:
             name: person_id
         tableName: person_settings
+- changeSet:
+    id: sprint-5-7
+    author: YurK
+    changes:
+    - addNotNullConstraint:
+        tableName: persons
+        columnName: person_settings_id
+        constraintName: non_null_person_settings
+
