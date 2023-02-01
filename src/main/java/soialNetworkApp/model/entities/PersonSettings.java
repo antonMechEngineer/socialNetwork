@@ -36,8 +36,7 @@ public class PersonSettings implements Serializable {
     @Column(name = "post_notification", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
     private Boolean postNotification;
 
-    @OneToOne
-    @JoinColumn(name = "person_id", referencedColumnName = "id", nullable = false)
+    @OneToOne(mappedBy = "personSettings", cascade = CascadeType.ALL)
     private Person person;
 
     @Override
@@ -51,7 +50,7 @@ public class PersonSettings implements Serializable {
                 ", friendBirthdayNotification=" + friendBirthdayNotification +
                 ", likeNotification=" + likeNotification +
                 ", postNotification=" + postNotification +
-                ", personId=" + person.getId() +
+//                ", personId=" + person.getId() +
                 '}';
     }
 }
