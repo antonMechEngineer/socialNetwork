@@ -140,7 +140,7 @@ class DialogsServiceTest {
     }
 
     @Test
-    void getMessages() {
+    void getMessages() throws Exception {
         when(messagesRepository.findAllByDialogIdAndIsDeletedFalseOrderByTimeAsc(any()))
                 .thenReturn(messages.stream().filter(m -> m.getDialog().getId().equals(1L)).collect(Collectors.toList()));
         assertEquals(10, dialogsService.getMessages(1L, 0L, 0, 10).getTotal());

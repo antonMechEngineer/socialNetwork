@@ -1,15 +1,13 @@
 package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import soialNetworkApp.api.request.DialogUserShortListDto;
-import soialNetworkApp.api.request.MessageRq;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.ComplexRs;
 import soialNetworkApp.api.response.DialogRs;
 import soialNetworkApp.api.response.MessageRs;
+import soialNetworkApp.errors.NoSuchEntityException;
 import soialNetworkApp.mappers.DialogMapper;
 import soialNetworkApp.mappers.PersonMapper;
 import soialNetworkApp.model.entities.Dialog;
@@ -23,7 +21,6 @@ import soialNetworkApp.repository.FriendshipsRepository;
 import soialNetworkApp.repository.MessagesRepository;
 import soialNetworkApp.repository.PersonsRepository;
 import soialNetworkApp.service.util.CurrentUserExtractor;
-import soialNetworkApp.service.util.NetworkPageRequest;
 
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -41,40 +38,6 @@ public class DialogsService {
     private final DialogMapService dialogMapService;
     private final CurrentUserExtractor currentUserExtractor;
     private final PersonMapper personMapper;
-
-    public CommonRs<ComplexRs> deleteDialog(Long dialogId) {
-        return null;
-    }
-
-    public CommonRs<ComplexRs> deleteMessage(Long dialogId, Long messageId) {
-        Message message = messagesRepository.findById(messageId).orElseThrow();
-        if (!isMyMessage(message)) {
-            return new CommonRs<>(new ComplexRs("Сообщение не может быть удалено!"));
-        }
-        Dialog dialog = dialogsRepository.findById(dialogId).orElseThrow();
-        if (messageId.equals(dialog.getLastMessage().getId())) {
-            dialog.setLastMessage(null);
-            dialogsRepository.save(dialog);
-        }
-        message.setIsDeleted(true);
-        messagesRepository.save(message);
-        if (dialog.getLastMessage() == null) {
-            dialog.setLastMessage(getLastMessage(dialogId));
-            dialogsRepository.save(dialog);
-        }
-        return new CommonRs<>(new ComplexRs("Сообщение удалено"));
-    }
-
-    public CommonRs<MessageRs> editMessage(Long messageId, MessageRq messageRq) {
-        Message message = messagesRepository.findById(messageId).orElseThrow();
-        message.setMessageText(messageRq.getMessageText());
-        messagesRepository.save(message);
-        return new CommonRs<>(dialogMapper.toMessageRs(message, currentUserExtractor.getPerson()));
-    }
-
-    private boolean isMyMessage(Message message) {
-        return message.getAuthor().equals(currentUserExtractor.getPerson());
-    }
 
     public CommonRs<ComplexRs> getUnreadMessages() {
         return new CommonRs<>(new ComplexRs((long) messagesRepository
@@ -113,23 +76,23 @@ public class DialogsService {
         return new CommonRs<>(dialogRsList, (long) dialogRsList.size());
     }
 
-    public CommonRs<List<MessageRs>> getMessages(Long dialogId, long from, int offset, int size) {
+    public CommonRs<List<MessageRs>> getMessages(Long dialogId, long from, int offset, int size) throws Exception {
         List<MessageRs> messagesRs = new ArrayList<>();
         List<Message> messages = messagesRepository.findAllByDialogIdAndIsDeletedFalseOrderByTimeAsc(dialogId);
-        Message message;
-        int start = 0;
-        if (from != 0) {
-            message = messagesRepository.findById(from).orElseThrow();
-            start = messages.indexOf(message) + offset;
+        if (!messages.isEmpty()) {
+            int start = 0;
+            if (from != 0) {
+                Message message = messagesRepository.findById(from).orElseThrow(new NoSuchEntityException("Message not found!"));
+                start = messages.indexOf(message) + offset;
+            }
+            int end = start + size;
+            if (messages.size() < end) {
+                end = messages.size();
+            }
+            messages.subList(start, end)
+                    .forEach(m -> messagesRs.add(dialogMapper.toMessageRs(m, dialogMapService.getRecipientForLastMessage(m))));
         }
-        messages
-                .subList(start, start + size)
-                .forEach(m -> {
-                    messagesRs.add(dialogMapper.toMessageRs(m, dialogMapService.getRecipientForLastMessage(m)));
-                });
-        return new CommonRs<>(messagesRs.stream()
-                .sorted(Comparator.comparing(MessageRs::getTime))
-                .collect(Collectors.toList()), (long) messagesRs.size());
+        return new CommonRs<>(messagesRs, (long) messagesRs.size());
     }
 
     private List<DialogRs> createDialogRsList(Person person) {
@@ -155,17 +118,11 @@ public class DialogsService {
         }
     }
 
-        public Person getRecipientFromDialog(Long authorId, Long dialogId) {
+    public Person getRecipientFromDialog(Long authorId, Long dialogId) {
         Dialog dialog = dialogsRepository.findById(dialogId).orElseThrow();
         return !authorId.equals(dialog.getFirstPerson().getId()) ?
                 dialog.getFirstPerson() :
                 dialog.getSecondPerson();
-    }
-
-    private Message getLastMessage(Long dialogId) {
-        return messagesRepository.findAllByDialogIdAndIsDeletedFalseOrderByTimeAsc(dialogId)
-                .stream()
-                .max(Comparator.comparing(Message::getTime)).orElse(null);
     }
 
     private List<DialogRs> blockDialogs(List<DialogRs> dialogs) {

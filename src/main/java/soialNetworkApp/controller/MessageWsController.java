@@ -1,7 +1,6 @@
 package soialNetworkApp.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.*;
 import soialNetworkApp.api.websocket.MessageCommonWs;
 import soialNetworkApp.api.websocket.MessageTypingWs;
@@ -9,7 +8,6 @@ import soialNetworkApp.api.websocket.MessageWs;
 import org.springframework.stereotype.Controller;
 import soialNetworkApp.service.MessageWsService;
 
-@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class MessageWsController {
@@ -22,27 +20,27 @@ public class MessageWsController {
     }
 
     @MessageMapping("/dialogs/start_typing")
-    public void startTyping(@Header("dialog_id") Long dialogId, @Header String token, @Payload MessageTypingWs messageTypingWs) {
+    public void startTyping(@Header("dialog_id") Long dialogId, @Payload MessageTypingWs messageTypingWs) {
         messageWsService.messageTypingFromWs(dialogId, messageTypingWs);
     }
 
     @MessageMapping("/dialogs/stop_typing")
-    public void stopTyping(@Header("dialog_id") Long dialogId, @Header String token, @Payload MessageTypingWs messageTypingWs) {
+    public void stopTyping(@Header("dialog_id") Long dialogId, @Payload MessageTypingWs messageTypingWs) {
         messageWsService.messageTypingFromWs(dialogId, messageTypingWs);
     }
 
     @MessageMapping("/dialogs/edit_message")
-    public void editMessage(@Payload MessageCommonWs message) {
+    public void editMessage(@Payload MessageCommonWs message) throws Exception {
         messageWsService.changeMessage(message);
     }
 
     @MessageMapping("/dialogs/delete_messages")
-    public void deleteMessages(@Payload MessageCommonWs messages) {
+    public void deleteMessages(@Payload MessageCommonWs messages) throws Exception {
         messageWsService.removeMessage(messages);
     }
 
     @MessageMapping("/dialogs/recover_message")
-    public void recoverMessage(@Payload MessageCommonWs messageCommonWs) {
+    public void recoverMessage(@Payload MessageCommonWs messageCommonWs) throws Exception {
         messageWsService.restoreMessage(messageCommonWs);
     }
 

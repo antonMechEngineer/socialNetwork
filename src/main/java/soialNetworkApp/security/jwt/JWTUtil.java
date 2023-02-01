@@ -56,11 +56,4 @@ public class JWTUtil {
         UserDetails userDetails = userDetailsService.loadUserByUsername(extractUserName(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
-
-    public void refreshToken(String token) {
-        if (getTokenBody(token).getExpiration().getTime() - new Date().getTime() < 10000) {
-            getTokenBody(token).setExpiration(new Date(System.currentTimeMillis() + timeToLive));
-            log.info("!!!!!!!!!!!!!!!!!token refreshed! expired in " + getTokenBody(token).getExpiration());
-        }
-    }
 }

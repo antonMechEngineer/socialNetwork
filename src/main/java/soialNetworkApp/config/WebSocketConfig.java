@@ -1,4 +1,4 @@
-package soialNetworkApp.security.jwt.config;
+package soialNetworkApp.config;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

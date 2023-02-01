@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import soialNetworkApp.aop.annotations.UpdateOnlineTime;
 import soialNetworkApp.api.request.DialogUserShortListDto;
-import soialNetworkApp.api.request.MessageRq;
 import soialNetworkApp.api.response.*;
 import soialNetworkApp.service.DialogsService;
 import org.springframework.web.bind.annotation.*;
@@ -24,21 +23,6 @@ import java.util.List;
 public class DialogsController {
 
     private final DialogsService dialogsService;
-
-//    @DeleteMapping("/{dialogId}/delete")
-//    public CommonRs<ComplexRs> dialogDelete(@PathVariable Long dialogId) {
-//        return dialogsService.deleteDialog(dialogId);
-//    }
-//
-//    @DeleteMapping("/{dialogId}/messages/{messageId}/delete")
-//    public CommonRs<ComplexRs> messageDelete(@PathVariable Long dialogId, @PathVariable Long messageId) {
-//        return dialogsService.deleteMessage(dialogId, messageId);
-//    }
-
-//    @PutMapping("/messages/{messageId}/edit")
-//    public CommonRs<MessageRs> messageEdit(@PathVariable Long messageId, @RequestBody MessageRq messageRq) {
-//        return dialogsService.editMessage(messageId, messageRq);
-//    }
 
     @GetMapping
     @ApiOperation(value = "recover comment by id")
@@ -81,7 +65,7 @@ public class DialogsController {
     public CommonRs<List<MessageRs>> messages(@PathVariable Long dialogId,
                                               @RequestParam(name = "fromMessageId", required = false, defaultValue = "${socialNetwork.default.page}") long from,
                                               @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
-                                              @RequestParam(name = "itemPerPage", required = false, defaultValue = "${socialNetwork.default.size}") int size) {
+                                              @RequestParam(name = "itemPerPage", required = false, defaultValue = "${socialNetwork.default.size}") int size) throws Exception {
         return dialogsService.getMessages(dialogId, from, offset, size);
     }
 

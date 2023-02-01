@@ -28,7 +28,7 @@ public interface MessagesRepository extends JpaRepository<Message, Long> {
     List<Message> findAllByDialogIdAndRecipientAndReadStatusAndIsDeletedFalse(Long dialogId, Person person, ReadStatusTypes status);
 
     List<Message> findAllByDialogIdAndIsDeletedFalseOrderByTimeAsc(Long dialogId);
-    List<Message> findAllByDialogIdAndIsDeletedFalse(Pageable pageable, Long dialogId);
+    List<Message> findAllByDialogIdAndIsDeletedFalse(Long dialogId);
     @Transactional
     void deleteAllByDialogIdAndAuthorIdAndIsDeletedTrue(Long dialogId, Long authorId);
     Long countAllByDialogId(long id);

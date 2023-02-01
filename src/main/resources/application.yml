@@ -89,7 +89,7 @@ socialNetwork:
 
 auth:
   secret: someSecretCode
-  time-to-live: 60000
+  time-to-live: 36000000
   pass-restore: http://194.87.244.66:8080/change-password?token=
   email-restore: http://194.87.244.66:8080/shift-email?token=
 

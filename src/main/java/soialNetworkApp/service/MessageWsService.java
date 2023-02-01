@@ -7,12 +7,15 @@ import org.springframework.stereotype.Service;
 import soialNetworkApp.api.websocket.MessageCommonWs;
 import soialNetworkApp.api.websocket.MessageTypingWs;
 import soialNetworkApp.api.websocket.MessageWs;
+import soialNetworkApp.errors.NoSuchEntityException;
 import soialNetworkApp.kafka.MessagesKafkaProducer;
 import soialNetworkApp.model.entities.Dialog;
 import soialNetworkApp.model.entities.Message;
 import soialNetworkApp.repository.DialogsRepository;
 import soialNetworkApp.repository.MessagesRepository;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Comparator;
 
 @Slf4j
@@ -39,19 +42,18 @@ public class MessageWsService {
         messagingTemplate.convertAndSendToUser(dialogId.toString(), "/queue/messages", messageTypingWs);
     }
 
-    public void changeMessage(MessageCommonWs messageCommonWs) {
-        Message message = messagesRepository.findById(messageCommonWs.getMessageId()).orElseThrow();
+    public void changeMessage(MessageCommonWs messageCommonWs) throws Exception {
+        Message message = messagesRepository.findById(messageCommonWs.getMessageId()).orElseThrow(new NoSuchEntityException("Message not found!"));
         messagingTemplate.convertAndSendToUser(message.getDialog().getId().toString(), "/queue/messages", messageCommonWs);
         message.setMessageText(messageCommonWs.getMessageText());
         messagesRepository.save(message);
     }
 
-    public void removeMessage(MessageCommonWs messages) {
-        Dialog dialog = dialogsRepository.findById(messages.getDialogId()).orElseThrow();
+    public void removeMessage(MessageCommonWs messages) throws Exception {
+        Dialog dialog = dialogsRepository.findById(messages.getDialogId()).orElseThrow(new NoSuchEntityException("Dialog not found!"));
         messagingTemplate.convertAndSendToUser(messages.getDialogId().toString(), "/queue/messages", messages);
         messages.getMessageIds()
                 .forEach(id -> {
-                    log.info(id.toString());
                     Message message = messagesRepository.findById(id).orElse(null);
                     if (message != null) {
                         if (message.getId().equals(dialog.getLastMessage().getId())) {
@@ -68,21 +70,19 @@ public class MessageWsService {
                 });
     }
 
-    public void restoreMessage(MessageCommonWs messageCommonWs) {
-        Message message = messagesRepository.findById(messageCommonWs.getMessageId()).orElseThrow();
+    public void restoreMessage(MessageCommonWs messageCommonWs) throws Exception {
+        Message message = messagesRepository.findById(messageCommonWs.getMessageId()).orElseThrow(new NoSuchEntityException("Message not found!"));
         messagingTemplate.convertAndSendToUser(messageCommonWs.getDialogId().toString(), "/queue/messages", messageCommonWs);
         message.setIsDeleted(false);
         messagesRepository.save(message);
     }
 
     public void closeDialog(MessageCommonWs messageCommonWs) {
-        log.info("exit dialog " + messageCommonWs.getDialogId());
-        log.info("user " + messageCommonWs.getUserId());
         messagesRepository.deleteAllByDialogIdAndAuthorIdAndIsDeletedTrue(messageCommonWs.getDialogId(), messageCommonWs.getUserId());
     }
 
     private Message getLastMessage(Long dialogId) {
-        return messagesRepository.findAllByDialogIdAndIsDeletedFalseOrderByTimeAsc(dialogId)
+        return messagesRepository.findAllByDialogIdAndIsDeletedFalse(dialogId)
                 .stream()
                 .max(Comparator.comparing(Message::getTime)).orElse(null);
     }

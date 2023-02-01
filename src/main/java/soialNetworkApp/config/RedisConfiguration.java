@@ -1,4 +1,4 @@
-package soialNetworkApp.security.jwt.config;
+package soialNetworkApp.config;
 
 import lombok.Setter;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
