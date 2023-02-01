@@ -118,7 +118,7 @@ public class UsersController {
 
     @DeleteMapping("/me")
     @ApiImplicitParam(name = "authorization", value = "Access Token", required = true, paramType = "header", dataTypeClass = String.class, example = "JWT token")
-    @ApiOperation(value = "delte information about me")
+    @ApiOperation(value = "delete information about me")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "\"Name of error\"",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorRs.class))}),

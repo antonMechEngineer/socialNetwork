@@ -51,8 +51,6 @@ databaseChangeLog:
     - addColumn:
         tableName: persons
         column:
-            constraints:
-                nullable: false
             name: person_settings_id
             type: BIGINT
 - changeSet:
@@ -64,3 +62,12 @@ databaseChangeLog:
         - column:
             name: person_id
         tableName: person_settings
+- changeSet:
+    id: sprint-5-8
+    author: YurK
+    changes:
+    - addNotNullConstraint:
+        tableName: persons
+        columnName: person_settings_id
+        constraintName: non_null_person_settings
+
