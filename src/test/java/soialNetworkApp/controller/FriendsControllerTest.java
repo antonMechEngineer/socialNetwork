@@ -102,18 +102,17 @@ class FriendsControllerTest {
         assertEquals(expectedNumberFriendshipsWithRequest, actualNumberFriendshipsWithRequest);
     }
 
-//    @Test
-//    @Sql("/FriendsControllerData/friendsController-getRecommendedFriends.sql")
-//    void getRecommendedFriends() throws Exception {
-//        String url = "/api/v1/friends/recommendations";
-//        mockMvc.perform(get(url))
-//                .andDo(print())
-//                .andExpect(status().is2xxSuccessful())
-//                .andExpect(jsonPath("$.total").value(7))
-//                .andExpect(jsonPath("$.offset").value(0))
-//                .andExpect(jsonPath("$.perPage").value(8))
-//                .andExpect(jsonPath("$.data").isArray());
-//
-//        tokenCheck.wrongOrExpiredTokenCheck(mockMvc, HttpMethod.GET, url);
-//    }
+    @Test
+    void getRecommendedFriends() throws Exception {
+        String url = "/api/v1/friends/recommendations";
+        mockMvc.perform(get(url))
+                .andDo(print())
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.total").value(1))
+                .andExpect(jsonPath("$.offset").value(0))
+                .andExpect(jsonPath("$.perPage").value(8))
+                .andExpect(jsonPath("$.data").isArray());
+
+        tokenCheck.wrongOrExpiredTokenCheck(mockMvc, HttpMethod.GET, url);
+    }
 }
