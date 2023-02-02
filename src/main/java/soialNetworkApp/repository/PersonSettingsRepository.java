@@ -12,6 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 public interface PersonSettingsRepository extends JpaRepository<PersonSettings, Long> {
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM person_settings WHERE person_id = :id", nativeQuery = true)
+    @Query(value = "DELETE FROM person_settings WHERE id = :id", nativeQuery = true)
     void persSetDelete(@Param("id") long id);
 }
