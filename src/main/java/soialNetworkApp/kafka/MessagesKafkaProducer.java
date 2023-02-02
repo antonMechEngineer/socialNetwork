@@ -17,6 +17,7 @@ public class MessagesKafkaProducer {
     private final DialogMapper dialogMapper;
 
     public void sendMessage(MessageWs messageWsRq) {
+        log.info(messageWsRq.getAuthorId().toString());
         MessageKafka messageKafka = dialogMapper.toMessageKafkaFromMessageWs(messageWsRq);
         kafkaTemplate.send("messages", messageKafka);
     }

@@ -45,7 +45,7 @@ public class MessageWsController {
     }
 
     @MessageMapping("/dialogs/close_dialog")
-    public void closeDialog(@Payload MessageCommonWs messageCommonWs) {
+    public void closeDialog(@Payload MessageCommonWs messageCommonWs) throws Exception {
         messageWsService.closeDialog(messageCommonWs);
     }
 }

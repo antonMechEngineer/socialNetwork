@@ -62,11 +62,8 @@ public class DialogsController {
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     @UpdateOnlineTime
-    public CommonRs<List<MessageRs>> messages(@PathVariable Long dialogId,
-                                              @RequestParam(name = "fromMessageId", required = false, defaultValue = "${socialNetwork.default.page}") long from,
-                                              @RequestParam(name = "offset", required = false, defaultValue = "${socialNetwork.default.page}") int offset,
-                                              @RequestParam(name = "itemPerPage", required = false, defaultValue = "${socialNetwork.default.size}") int size) throws Exception {
-        return dialogsService.getMessages(dialogId, from, offset, size);
+    public CommonRs<List<MessageRs>> messages(@PathVariable Long dialogId) {
+        return dialogsService.getMessages(dialogId);
     }
 
     @GetMapping("/unreaded")
