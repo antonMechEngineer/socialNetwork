@@ -70,4 +70,11 @@ databaseChangeLog:
         tableName: persons
         columnName: person_settings_id
         constraintName: non_null_person_settings
-
+- changeSet:
+    id: sprint-5-9
+    author: YurK
+    changes:
+    - addUniqueConstraint:
+        columnNames: entity_id, person_id
+        constraintName: entity_person_index
+        tableName: notifications

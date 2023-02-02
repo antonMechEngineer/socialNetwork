@@ -1,6 +1,11 @@
 package soialNetworkApp.service;
 
 import lombok.RequiredArgsConstructor;
+import org.mapstruct.Named;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 import soialNetworkApp.api.request.CommentRq;
 import soialNetworkApp.api.response.CommentRs;
 import soialNetworkApp.api.response.CommonRs;
@@ -11,11 +16,6 @@ import soialNetworkApp.model.entities.Person;
 import soialNetworkApp.model.entities.Post;
 import soialNetworkApp.repository.CommentsRepository;
 import soialNetworkApp.service.util.NetworkPageRequest;
-import org.mapstruct.Named;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -44,10 +44,12 @@ public class CommentsService {
         post = parentComment == null ? post : null;
         Comment comment = commentRepository.save(commentMapper.commentRequestToNewComment(commentRq, post, person, parentComment));
         if (post != null && post.getAuthor().getPersonSettings().getPostCommentNotification()) {
+            notificationsService.sendNotificationToWs(comment, post.getAuthor());
             notificationsKafkaProducer.sendMessage(comment, post.getAuthor());
             notificationsService.sendNotificationToTelegramBot(comment, post.getAuthor());
         }
         if (post == null && parentComment.getAuthor().getPersonSettings().getCommentCommentNotification()) {
+            notificationsService.sendNotificationToWs(comment, parentComment.getAuthor());
             notificationsKafkaProducer.sendMessage(comment, parentComment.getAuthor());
             notificationsService.sendNotificationToTelegramBot(comment, parentComment.getAuthor());
         }
