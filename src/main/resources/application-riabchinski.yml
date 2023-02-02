@@ -6,6 +6,7 @@ spring:
     host: localhost
   cache:
     type: redis
+    time-to-live: 3000000
 
   datasource:
 #    driver-class-name: org.postgresql.Driver
@@ -26,3 +27,5 @@ logging:
     path: log
     uploadLogs: false
 
+user:
+  time-to-delete: 15000
