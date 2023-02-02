@@ -66,4 +66,7 @@ public interface PersonsRepository extends JpaRepository<Person, Long>, JpaSpeci
 
     @Query(value = "SELECT DISTINCT city FROM Person WHERE country = :country")
     List<String> getCitiesByCountry(@Param("country") String country);
+
+    @Query(value = "DELETE FROM persons WHERE id = :id", nativeQuery = true)
+    void personDelete(@Param("id") long id);
 }
