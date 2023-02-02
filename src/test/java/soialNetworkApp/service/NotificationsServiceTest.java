@@ -162,7 +162,7 @@ class NotificationsServiceTest {
     void sendNotificationsToWs() {
         when(notificationsRepository.findAllByPersonAndIsReadIsFalse(any(), any())).thenReturn(new PageImpl<>(new ArrayList<>()));
 
-        notificationsService.sendNotificationsToWs(person);
+        notificationsService.sendNotificationToWs(post, person);
 //        verify(notificationsKafkaProducer).sendMessage(any(), any(), any());    //verify(notificationsRepository).save(any());
         verify(template).convertAndSend(anyString(), (Object) any());
     }

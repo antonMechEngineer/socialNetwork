@@ -47,6 +47,7 @@ public class LikesService {
         like.setTime(LocalDateTime.now(ZoneId.of(timezone)));
         likesRepository.save(like);
         if (like.getEntity().getAuthor().getPersonSettings().getLikeNotification()) {
+            notificationsService.sendNotificationToWs(like, liked.getAuthor());
             notificationsKafkaProducer.sendMessage(like, liked.getAuthor());
             notificationsService.sendNotificationToTelegramBot(like, liked.getAuthor());
         }

@@ -66,8 +66,6 @@ class PostsServiceTest {
     private PersonMapper personMapper;
     @MockBean
     private Authentication authentication;
-//    @MockBean
-//    private CurrentUserExtractor currentUserExtractor;
 
     @MockBean
     private SearchPosts searchPosts;
@@ -89,8 +87,6 @@ class PostsServiceTest {
         friendship = new Friendship();
         friendship.setFriendshipStatus(FriendshipStatusTypes.FRIEND);
         friendship.setSentTime(LocalDateTime.now());
-        friendship.setSrcPerson(new Person());
-        friendship.setDstPerson(person);
         postRq = new PostRq();
         postRq.setTitle(postTitle);
         postRq.setPostText(postText);
@@ -106,6 +102,8 @@ class PostsServiceTest {
         personSettings = new PersonSettings();
         personSettings.setPostNotification(true);
         person.setPersonSettings(personSettings);
+        friendship.setSrcPerson(person);
+        friendship.setDstPerson(person);
     }
 
     @AfterEach

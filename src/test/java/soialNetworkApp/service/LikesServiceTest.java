@@ -3,10 +3,7 @@ package soialNetworkApp.service;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import soialNetworkApp.api.request.LikeRq;
 import soialNetworkApp.errors.NoSuchEntityException;
-import soialNetworkApp.model.entities.Comment;
-import soialNetworkApp.model.entities.Like;
-import soialNetworkApp.model.entities.Person;
-import soialNetworkApp.model.entities.Post;
+import soialNetworkApp.model.entities.*;
 import soialNetworkApp.repository.CommentsRepository;
 import soialNetworkApp.repository.LikesRepository;
 import soialNetworkApp.repository.PostsRepository;
@@ -67,6 +64,9 @@ class LikesServiceTest {
     void setUp() {
         person = new Person();
         person.setId(1L);
+        PersonSettings settings = new PersonSettings();
+        settings.setLikeNotification(true);
+        person.setPersonSettings(settings);
         liked1 = new Post();
         liked1.setId(11L);
         liked1.setAuthor(person);
