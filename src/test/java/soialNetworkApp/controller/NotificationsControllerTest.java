@@ -70,7 +70,7 @@ class NotificationsControllerTest {
         Notification notification2 = new Notification();
         notification2.setId(2L);
         notification2.setPerson(personsRepository.findById(1L).get());
-        notification2.setEntity(commentsRepository.findById(1L).get());
+        notification2.setEntity(commentsRepository.findById(5L).get());
         notification2.setIsRead(false);
         notification2.setSentTime(LocalDateTime.now());
         notificationsRepository.saveAll(List.of(notification1, notification2));
