@@ -200,7 +200,8 @@ public class UsersService {
             notificationsRepository.notificationDelete(oldId);
             messagesRepository.messagesDelete(oldId);
             likesRepository.likeDelete(oldId);
-            personsRepository.deleteAll(personsRepository.findOldDeletes(timeToDel));
+            personsRepository.personDelete(oldId);
+      //      personsRepository.deleteAll(personsRepository.findOldDeletes(timeToDel));
         }
     }
 
