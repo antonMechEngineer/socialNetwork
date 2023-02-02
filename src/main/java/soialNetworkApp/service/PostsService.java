@@ -23,7 +23,6 @@ import soialNetworkApp.repository.FriendshipsRepository;
 import soialNetworkApp.repository.PersonsRepository;
 import soialNetworkApp.repository.PostsRepository;
 import soialNetworkApp.service.search.SearchPosts;
-import soialNetworkApp.service.util.CurrentUserExtractor;
 import soialNetworkApp.service.util.NetworkPageRequest;
 
 import java.sql.Timestamp;
@@ -47,7 +46,6 @@ public class PostsService {
     private final NotificationsService notificationsService;
     private final PostMapper postMapper;
     private final SearchPosts searchPosts;
-    private final CurrentUserExtractor currentUserExtractor;
     private final PersonCacheService personCacheService;
     private final NotificationsKafkaProducer notificationsKafkaProducer;
 
@@ -190,7 +188,7 @@ public class PostsService {
     }
 
     private boolean blockPostsByAuthor(Person author) {
-        Person me = currentUserExtractor.getPerson();
+        Person me = personCacheService.getPersonByContext();
         Optional<Friendship> friendship = friendshipsRepository.findFriendshipByFriendshipStatusAndSrcPersonIdAndDstPersonId(BLOCKED, author.getId(), me.getId());
         return friendship.isPresent();
     }

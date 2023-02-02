@@ -11,7 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import soialNetworkApp.api.request.FindPostRq;
 import soialNetworkApp.api.request.PostRq;
@@ -26,7 +25,6 @@ import soialNetworkApp.repository.FriendshipsRepository;
 import soialNetworkApp.repository.PersonsRepository;
 import soialNetworkApp.repository.PostsRepository;
 import soialNetworkApp.service.search.SearchPosts;
-import soialNetworkApp.service.util.CurrentUserExtractor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
