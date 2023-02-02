@@ -5,7 +5,7 @@ stages:
 test-job:
   stage: test
   script:
-    - echo "Tests passed"
+    - mvn clean test
   only:
     - dev
 
