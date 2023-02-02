@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import soialNetworkApp.api.response.CommonRs;
 import soialNetworkApp.api.response.NotificationRs;
+import soialNetworkApp.api.websocket.MessageWs;
 import soialNetworkApp.errors.NoSuchEntityException;
 import soialNetworkApp.errors.PersonNotFoundException;
 import soialNetworkApp.kafka.NotificationsKafkaProducer;
@@ -93,14 +94,20 @@ public class NotificationsService {
         return getAllNotificationsByPerson(offset, size, person);
     }
 
-    public void sendNotificationsToWs(Person person)  {
+    public void sendNotificationToWs(Notificationed entity, Person person)  {
+        Notification notification = new Notification();
+        notification.setPerson(person);
+        notification.setEntity(entity);
+        notification.setIsRead(false);
+        notification.setNotificationType(entity.getNotificationType());
+        notification.setSentTime(LocalDateTime.now(ZoneId.of(timezone)));
         template.convertAndSend(String.format("/user/%s/queue/notifications", person.getId()),
-                getAllNotificationsByPerson(offset, size, person));
+                notificationMapper.toNotificationResponse(notification));
     }
 
-    public void sendNotificationsToWs(long personId)  {
-        sendNotificationsToWs(personsRepository.findPersonById(personId).orElseThrow());
-    }
+//    public void sendNotificationsToWs(long personId)  {
+//        sendNotificationsToWs(personsRepository.findPersonById(personId).orElseThrow());
+//    }
 
     @Scheduled(cron = "${socialNetwork.scheduling.birthdays}", zone = "${socialNetwork.timezone}")
     public void birthdaysNotificator() {
@@ -109,6 +116,7 @@ public class NotificationsService {
         personList.forEach(person -> friendshipsRepository.findFriendshipsByDstPerson(person).forEach(friendship -> {
             if (friendship.getFriendshipStatus().equals(FriendshipStatusTypes.FRIEND) &&
                     friendship.getSrcPerson().getPersonSettings().getFriendBirthdayNotification()) {
+                sendNotificationToWs(person, friendship.getSrcPerson());
                 notificationsKafkaProducer.sendMessage(person, friendship.getSrcPerson());
                 sendNotificationToTelegramBot(person, friendship.getSrcPerson());
             }
@@ -140,12 +148,15 @@ public class NotificationsService {
         }
     }
 
-    public void handleMessageForNotification(Long messageId) {
-        Message message = messagesRepository.findById(messageId).orElseThrow();
-        if (message.getRecipient().getPersonSettings().getMessageNotification() &&
+    public void handleMessageForNotification(MessageWs messageWs) {
+        Message message = new Message();
+        message.setMessageText(messageWs.getMessageText());
+        message.setAuthor(personsRepository.findById(messageWs.getAuthorId()).orElse(null));
+        Person recipient = personsRepository.findById(messageWs.getRecipientId()).orElseThrow();
+        if (recipient.getPersonSettings().getMessageNotification() &&
                 LocalDateTime.now(ZoneId.of(timezone)).minus(1, ChronoUnit.MINUTES)
-                        .isAfter(message.getRecipient().getLastOnlineTime())) {
-            notificationsKafkaProducer.sendMessage(message, message.getRecipient());
+                        .isAfter(recipient.getLastOnlineTime())) {
+            sendNotificationToWs(message, message.getRecipient());
             sendNotificationToTelegramBot(message, message.getRecipient());
         }
     }

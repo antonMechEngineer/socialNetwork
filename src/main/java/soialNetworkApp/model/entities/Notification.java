@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
-@Table(name = "notifications")
+@Table(name = "notifications",
+        indexes = {@Index(name = "entity_person_index", columnList = "entity_id, person_id", unique = true)})
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

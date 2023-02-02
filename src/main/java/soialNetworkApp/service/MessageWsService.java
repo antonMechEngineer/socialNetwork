@@ -21,6 +21,7 @@ public class MessageWsService {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final DialogsService dialogsService;
+    private final NotificationsService notificationsService;
     private final MessagesKafkaProducer messagesKafkaProducer;
     private final MessagesRepository messagesRepository;
     private final DialogsRepository dialogsRepository;
@@ -31,6 +32,7 @@ public class MessageWsService {
         messageWs.setId(id);
         messageWs.setRecipientId(recipientId);
         messagingTemplate.convertAndSendToUser(messageWs.getDialogId().toString(), "/queue/messages", messageWs);
+        notificationsService.handleMessageForNotification(messageWs);
         messagesKafkaProducer.sendMessage(messageWs);
     }
 

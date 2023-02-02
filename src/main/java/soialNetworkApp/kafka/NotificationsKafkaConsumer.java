@@ -23,7 +23,6 @@ public class NotificationsKafkaConsumer {
     @Value("${socialNetwork.timezone}")
     private String timezone;
     private final NotificationsRepository notificationsRepository;
-    private final NotificationsService notificationsService;
 
     @KafkaListener(topics = "notifications", autoStartup = "${listen.auto.start:true}")
     public void consume(NotificationKafka notificationKafka) {
@@ -33,12 +32,9 @@ public class NotificationsKafkaConsumer {
             Notification notification = notificationsRepository.findById(notificationKafka.getId()).orElseThrow();
             notification.setIsRead(true);
             notificationsRepository.save(notification);
-            notificationsService.sendNotificationsToWs(notification.getPerson());
         } else {
             notificationsRepository.save(notificationKafka.getNotificationType().toString(), notificationKafka.getNotificationedId(),
                     notificationKafka.getIsRead(), LocalDateTime.now(ZoneId.of(timezone)), notificationKafka.getPersonId());
-            notificationsService.sendNotificationsToWs(notificationKafka.getPersonId());
-//            notificationsService.sendNotificationToTelegramBot(notificationKafka.getNotificationType(), notificationKafka.getPersonId());
         }
     }
 
