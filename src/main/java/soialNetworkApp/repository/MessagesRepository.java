@@ -1,4 +1,5 @@
 package soialNetworkApp.repository;
+import org.springframework.data.domain.Pageable;
 import soialNetworkApp.model.entities.Message;
 import soialNetworkApp.model.entities.Person;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,6 +26,8 @@ public interface MessagesRepository extends JpaRepository<Message, Long> {
     List<Message> findAllByRecipientAndIsDeletedFalse(Person recipient);
     List<Message> findAllByRecipientAndReadStatusAndIsDeletedFalse(Person person, ReadStatusTypes status);
     List<Message> findAllByDialogIdAndRecipientAndReadStatusAndIsDeletedFalse(Long dialogId, Person person, ReadStatusTypes status);
+
+    List<Message> findAllByDialogIdAndIsDeletedFalseOrderByTimeAsc(Long dialogId);
     List<Message> findAllByDialogIdAndIsDeletedFalse(Long dialogId);
     @Transactional
     void deleteAllByDialogIdAndAuthorIdAndIsDeletedTrue(Long dialogId, Long authorId);
