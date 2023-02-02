@@ -124,6 +124,7 @@ public class FriendsService {
         friendshipsRepository.save(srcFriendship);
         friendshipsRepository.save(dstFriendship);
         if (dstPerson.getPersonSettings().getFriendRequestNotification()) {
+            notificationsService.sendNotificationToWs(dstFriendship, dstPerson);
             notificationsKafkaProducer.sendMessage(dstFriendship, dstPerson);
             notificationsService.sendNotificationToTelegramBot(dstFriendship, dstPerson);
         }

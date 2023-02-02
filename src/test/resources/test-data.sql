@@ -1,8 +1,14 @@
-INSERT INTO persons (first_name,last_name,reg_date,birth_date,email,phone,password,about, change_password_token)
+INSERT INTO person_settings (post_comment_notification,comment_comment_notification,friend_request_notification,message_notification,friend_birthday_notification,like_notification,post_notification)
 VALUES
-    ('Gretchen','Contreras','2022-09-29 21:49:07','2000-06-08 10:54:06','rhoncus.nullam@yahoo.edu','+7 (978) 311-43-59','ZvJ57ekY5Tc','senectus et netus et malesuada fames ac turpis egestas. Fusce aliquet magna a neque. Nullam ut','changeword1'),
-    ('Jescie','Logan','2022-04-18 23:14:12','1979-01-03 15:07:47','molestie@yahoo.edu','+7 (965) 698-46-45','UbQ85uuS8Lu','molestie arcu. Sed eu nibh vulputate mauris sagittis placerat. Cras dictum ultricies ligula. Nullam enim. Sed nulla ante,','changeword2'),
-    ('Peter','First','2022-04-18 23:14:12','1999-01-03 15:07:47','testbd@internet.ru','+7 (965) 698-46-45','UbQ85uuS8Lu','Just a word','changeword3');
+    ('true','true','true','true','true','true','true'),
+    ('true','true','true','true','true','true','true'),
+    ('true','true','true','true','true','true','true');
+
+INSERT INTO persons (first_name,last_name,reg_date,birth_date,email,phone,password,about, change_password_token,person_settings_id)
+VALUES
+    ('Gretchen','Contreras','2022-09-29 21:49:07','2000-06-08 10:54:06','rhoncus.nullam@yahoo.edu','+7 (978) 311-43-59','ZvJ57ekY5Tc','senectus et netus et malesuada fames ac turpis egestas. Fusce aliquet magna a neque. Nullam ut','changeword1',1),
+    ('Jescie','Logan','2022-04-18 23:14:12','1979-01-03 15:07:47','molestie@yahoo.edu','+7 (965) 698-46-45','UbQ85uuS8Lu','molestie arcu. Sed eu nibh vulputate mauris sagittis placerat. Cras dictum ultricies ligula. Nullam enim. Sed nulla ante,','changeword2',2),
+    ('Peter','First','2022-04-18 23:14:12','1999-01-03 15:07:47','testbd@internet.ru','+7 (965) 698-46-45','UbQ85uuS8Lu','Just a word','changeword3',3);
 
 
 INSERT INTO posts (time,author_id,title,post_text)
@@ -50,10 +56,6 @@ VALUES
     (5,3),
     (5,5);
 
-
-INSERT INTO person_settings (person_id,post_comment_notification,comment_comment_notification,friend_request_notification,message_notification,friend_birthday_notification,like_notification,post_notification)
-VALUES
-    (1,'true','true','true','true','true','true','true');
 
 INSERT INTO captcha (code, secret_code, time)
 VALUES

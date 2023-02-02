@@ -21,6 +21,7 @@ spring:
   cache:
     type: none
   kafka:
+    bootstrap-servers: 127.0.0.1:9092
     consumer:
       group-id: yuriGroup
 auth:

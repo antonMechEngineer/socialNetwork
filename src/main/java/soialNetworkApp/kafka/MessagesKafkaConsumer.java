@@ -20,7 +20,7 @@ public class MessagesKafkaConsumer {
     private final MessagesRepository messagesRepository;
     private final DialogsRepository dialogsRepository;
     private final DialogMapper dialogMapper;
-    private final NotificationsService notificationsService;
+    private final NotificationsKafkaProducer notificationsKafkaProducer;
 
     @KafkaListener(topics = "messages", autoStartup = "${listen.auto.start:true}")
     public void consume(MessageKafka messageKafka) {
@@ -30,6 +30,6 @@ public class MessagesKafkaConsumer {
         Dialog dialog = dialogsRepository.findById(messageKafka.getDialogId()).orElseThrow();
         dialog.setLastMessage(message);
         dialogsRepository.save(dialog);
-        notificationsService.handleMessageForNotification(message.getId());
+        notificationsKafkaProducer.sendMessage(message, message.getRecipient());
     }
 }

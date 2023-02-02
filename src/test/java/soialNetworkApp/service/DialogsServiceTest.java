@@ -141,7 +141,7 @@ class DialogsServiceTest {
 
     @Test
     void getMessages() {
-        when(messagesRepository.findAllByDialogIdAndIsDeletedFalse(any()))
+        when(messagesRepository.findAllByDialogIdAndIsDeletedFalseOrderByTimeAsc(any()))
                 .thenReturn(messages.stream().filter(m -> m.getDialog().getId().equals(1L)).collect(Collectors.toList()));
         assertEquals(10, dialogsService.getMessages(1L).getTotal());
     }
