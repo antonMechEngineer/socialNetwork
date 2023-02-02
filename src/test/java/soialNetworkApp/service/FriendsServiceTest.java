@@ -52,6 +52,9 @@ class FriendsServiceTest {
     @MockBean
     private PersonMapper personMapper;
 
+    @MockBean
+    private PersonCacheService personCacheService;
+
     private Friendship fsCurPsRcFr;
     private Friendship fsRcFr;
     private Friendship fsCurPsFr;
@@ -106,6 +109,7 @@ class FriendsServiceTest {
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication().getName()).thenReturn(CURRENT_PERSON_MAIL);
+        when(personCacheService.getPersonByContext()).thenReturn(CURRENT_PERSON);
     }
 
     private void buildFriendObjects() {  //testDeleteFriend  // getFriends
@@ -204,4 +208,18 @@ class FriendsServiceTest {
         FriendshipStatusTypes actualFriendshipStatusTypes = friendsService.getStatusTwoPersons(CURRENT_PERSON, C_FRIEND);
         assertEquals(FRIEND, actualFriendshipStatusTypes);
     }
+
+    @Test
+    void getFriendsRecommendation(){
+        Person person = new Person();
+        when(personsRepository.findPersonByEmail(any())).thenReturn(Optional.of(person));
+        when(personsRepository.getPersonByCityAndIdNotIn(any(), any(), any())).thenReturn(Page.empty());
+        when(personsRepository.getPersonByIdNotInOrderByRegDateDesc(any(), any())).thenReturn(Page.empty());
+        when(personCacheService.getPersonByContext()).thenReturn(person);
+        friendsService.getFriendsRecommendation();
+        verify(personsRepository, times(1)).getPersonByCityAndIdNotIn(any(), any(), any());
+        verify(personsRepository, times(1)).getPersonByIdNotInOrderByRegDateDesc(any(),any());
+    }
+
+
 }
