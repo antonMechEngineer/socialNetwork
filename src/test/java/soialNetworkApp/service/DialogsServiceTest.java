@@ -9,8 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import soialNetworkApp.api.request.DialogUserShortListDto;
-import soialNetworkApp.api.websocket.MessageWs;
-import soialNetworkApp.kafka.MessagesKafkaProducer;
 import soialNetworkApp.model.entities.Dialog;
 import soialNetworkApp.model.entities.Message;
 import soialNetworkApp.model.entities.Person;
@@ -18,7 +16,6 @@ import soialNetworkApp.model.enums.ReadStatusTypes;
 import soialNetworkApp.repository.DialogsRepository;
 import soialNetworkApp.repository.MessagesRepository;
 import soialNetworkApp.repository.PersonsRepository;
-import soialNetworkApp.service.util.CurrentUserExtractor;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -45,14 +42,10 @@ class DialogsServiceTest {
     @MockBean
     private PersonsRepository personsRepository;
     @MockBean
-    private CurrentUserExtractor currentUserExtractor;
-    @MockBean
-    private MessagesKafkaProducer messagesKafkaProducer;
+    private PersonCacheService personCacheService;
 
 
-    private Person person1,
-            person2,
-            person3;
+    private Person person1, person2, person3;
     private Dialog dialog1, dialog2;
     private List<Message> messages = new ArrayList<>();
     private List<Dialog> dialogs = new ArrayList<>();
@@ -97,14 +90,14 @@ class DialogsServiceTest {
         }
         dialog1.setLastMessage(messages.get(9));
         dialogs = List.of(dialog1, dialog2);
-        when(currentUserExtractor.getPerson()).thenReturn(person1);
+        when(personCacheService.getPersonByContext()).thenReturn(person1);
     }
 
     @AfterEach
     void tearDown() {
         person1 = person2 = person3 = null;
         messages = null;
-        dialog1 = null;
+        dialog1 = dialog2 = null;
     }
 
     @Test
