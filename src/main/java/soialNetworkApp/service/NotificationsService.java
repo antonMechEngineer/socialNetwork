@@ -153,6 +153,7 @@ public class NotificationsService {
         message.setMessageText(messageWs.getMessageText());
         message.setAuthor(personsRepository.findById(messageWs.getAuthorId()).orElse(null));
         Person recipient = personsRepository.findById(messageWs.getRecipientId()).orElseThrow();
+        message.setRecipient(recipient);
         if (recipient.getPersonSettings().getMessageNotification() &&
                 LocalDateTime.now(ZoneId.of(timezone)).minus(1, ChronoUnit.MINUTES)
                         .isAfter(recipient.getLastOnlineTime())) {
