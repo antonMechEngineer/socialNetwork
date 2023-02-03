@@ -32,8 +32,8 @@ public class MessageWsService {
         messageWs.setId(id);
         messageWs.setRecipientId(recipientId);
         messagingTemplate.convertAndSendToUser(messageWs.getDialogId().toString(), "/queue/messages", messageWs);
+        notificationsService.handleMessageForNotification(messageWs);
         messagesKafkaProducer.sendMessage(messageWs);
-        //        notificationsService.handleMessageForNotification(messageWs);
     }
 
     public void messageTypingFromWs(Long dialogId, MessageTypingWs messageTypingWs) {
