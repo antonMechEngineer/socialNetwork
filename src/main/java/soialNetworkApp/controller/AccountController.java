@@ -78,8 +78,8 @@ public class AccountController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public ResponseEntity<RegisterRs> passwordRecovery(@RequestBody LinkedHashMap email){
-        return ResponseEntity.ok(accountService.getPasswordRecovery(email.get("email").toString()));}
+    public ResponseEntity<RegisterRs> passwordRecovery(@RequestBody String email){
+        return ResponseEntity.ok(accountService.getPasswordRecovery(email));}
 
     @PutMapping("/email")
     @ApiOperation(value = "set email")
