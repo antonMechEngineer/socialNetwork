@@ -57,7 +57,7 @@ spring:
         spring:
           json:
             trusted:
-              packages: soialNetworkApp.kafka.dto
+              packages: socialnet.kafka.dto
 #applicationParams
 socialNetwork:
   default:
