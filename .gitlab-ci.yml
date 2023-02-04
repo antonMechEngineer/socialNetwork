@@ -31,6 +31,7 @@ sonarqube-check:
     - mvn verify sonar:sonar -Dsonar.projectKey=javapro_team30_javaproTeams30Backend_AYYXJxs8qxrm375sUWdg
                             -Dsonar.host.url=http://194.87.244.66:9000
                             -Dsonar.login=sqp_0d6086ed2a5acabd4550d0e462e07880904a2a1b
+                            -Pcoverage
   allow_failure: true
   only:
     - dev
