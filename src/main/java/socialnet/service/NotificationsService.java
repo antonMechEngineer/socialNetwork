@@ -26,12 +26,12 @@ import socialnet.model.entities.Person;
 import socialnet.model.entities.interfaces.Notificationed;
 import socialnet.model.enums.FriendshipStatusTypes;
 import socialnet.repository.FriendshipsRepository;
-import socialnet.repository.MessagesRepository;
 import socialnet.repository.NotificationsRepository;
 import socialnet.repository.PersonsRepository;
 import socialnet.service.util.NetworkPageRequest;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -48,7 +48,6 @@ public class NotificationsService {
     private final NotificationMapper notificationMapper;
     private final SimpMessagingTemplate template;
     private final NotificationsKafkaProducer notificationsKafkaProducer;
-    private final MessagesRepository messagesRepository;
 
     @Value("${socialNetwork.default.page}")
     private int offset;
@@ -105,10 +104,6 @@ public class NotificationsService {
                 notificationMapper.toNotificationResponse(notification));
     }
 
-//    public void sendNotificationsToWs(long personId)  {
-//        sendNotificationsToWs(personsRepository.findPersonById(personId).orElseThrow());
-//    }
-
     @Scheduled(cron = "${socialNetwork.scheduling.birthdays}", zone = "${socialNetwork.timezone}")
     public void birthdaysNotificator() {
         LocalDateTime currentDate = LocalDateTime.now(ZoneId.of(timezone));
@@ -139,7 +134,7 @@ public class NotificationsService {
                         .put("author", new JSONObject()
                                 .put("first_name", notificationed.getAuthor().getFirstName())
                                 .put("last_name", notificationed.getAuthor().getLastName()));
-                StringEntity params = new StringEntity(jsonObject.toString());
+                StringEntity params = new StringEntity(jsonObject.toString(), StandardCharsets.UTF_8);
                 request.addHeader("content-type", "application/json");
                 request.setEntity(params);
                 httpClient.execute(request);
