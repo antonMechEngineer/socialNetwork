@@ -1,5 +1,6 @@
 package socialnet.controller;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
+import socialnet.model.enums.FriendshipStatusTypes;
 import socialnet.repository.FriendshipsRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,21 +48,18 @@ class FriendsControllerTest {
     @Test
     void userBlocksUser() throws Exception {
         Integer expectedNumberFriendsAfterBlocking = 0;
-        mockMvc.perform(post("/block_unblock/2")
+        Integer expectedNumberBlockedFriendship = 1;
+        mockMvc.perform(post("/api/v1/friends/block_unblock/2")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful());
-
-
-
         mockMvc.perform(get("/api/v1/friends")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.data.size()").value(expectedNumberFriendsAfterBlocking));
-
-
-
+        Integer actualNumberBlockedFriendship = friendshipsRepository.findFriendshipByFriendshipStatus(FriendshipStatusTypes.BLOCKED).size();
+        assertEquals(expectedNumberBlockedFriendship, actualNumberBlockedFriendship);
     }
 
     @Test
