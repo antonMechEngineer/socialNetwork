@@ -17,7 +17,6 @@ import socialnet.repository.PersonsRepository;
 @RequiredArgsConstructor
 public class MessagesKafkaConsumer {
     private final PersonsRepository personsRepository;
-
     private final MessagesRepository messagesRepository;
     private final DialogsRepository dialogsRepository;
     private final DialogMapper dialogMapper;
